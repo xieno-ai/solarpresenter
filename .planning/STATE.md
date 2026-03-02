@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Given a SunPitch URL or manually entered numbers, produce a pixel-accurate 11-page solar proposal PDF with all financial calculations computed correctly from documented formulas.
-**Current focus:** Phase 1 - Foundation & Data Schema
+**Current focus:** Phase 2 - Manual Entry
 
 ## Current Position
 
-Phase: 1 of 9 (Foundation & Data Schema)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-03-02 - Completed 01-01-PLAN.md
+Phase: 2 of 9 (Manual Entry)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-03-02 - Phase 1 complete (all smoke test checks passed)
 
-Progress: [█░░░░░░░░░░░░░░░░░░░] 5% (1/~20 plans)
+Progress: [██░░░░░░░░░░░░░░░░░░] 10% (2/~20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 5min
-- Total execution time: 0.08 hours
+- Total plans completed: 2
+- Average duration: ~8min
+- Total execution time: ~0.25 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 1/2 | 5min | 5min |
+| 1. Foundation | 2/2 | ~15min | ~8min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5min)
-- Trend: First plan, no trend yet
+- Last 5 plans: 01-01 (5min), 01-02 (~10min)
+- Trend: Consistent, fast execution
 
 *Updated after each plan completion*
 
@@ -48,6 +48,9 @@ Recent decisions affecting current work:
 - [01-01]: MonthlyValues as 12-element Decimal tuple type for compile-time length enforcement
 - [01-01]: DM Sans + JetBrains Mono font pairing
 - [01-01]: Manual Next.js initialization instead of create-next-app to preserve existing package.json
+- [01-02]: Supabase NUMERIC returned as strings — passed directly to d(), never through float
+- [01-02]: Effective date filtering for Alberta config version history
+- [01-02]: Smoke test page gracefully handles missing Supabase connection
 
 ### Pending Todos
 
@@ -62,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 01-01-PLAN.md
+Stopped at: Phase 1 complete, ready for Phase 2 planning
 Resume file: None
