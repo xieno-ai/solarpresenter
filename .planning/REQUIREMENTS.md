@@ -12,8 +12,8 @@
 - [ ] **INPUT-03**: Manual entry form pre-populates with scraped SunPitch data when available, all fields remain editable
 - [ ] **INPUT-04**: User can upload a utility bill (PDF, photo, or scan) and AI extracts electricity usage, utility company, energy rate, all-in rate, account holder, and service address
 - [ ] **INPUT-05**: Bill extraction outputs data in a structured format ready to input into SunPitch or populate the manual entry form
-- [ ] **INPUT-06**: All numeric inputs are validated with range checks and cross-field validation (e.g., system size vs production consistency)
-- [ ] **INPUT-07**: Missing or suspect data is clearly indicated with visual error states before proposal generation
+- [x] **INPUT-06**: All numeric inputs are validated with range checks and cross-field validation (e.g., system size vs production consistency)
+- [x] **INPUT-07**: Missing or suspect data is clearly indicated with visual error states before proposal generation
 
 ### Calculations
 
@@ -88,8 +88,8 @@
 | INPUT-03 | Phase 6: SunPitch Scraping | Pending |
 | INPUT-04 | Phase 7: Bill Extraction | Pending |
 | INPUT-05 | Phase 7: Bill Extraction | Pending |
-| INPUT-06 | Phase 2: Manual Entry | Pending |
-| INPUT-07 | Phase 2: Manual Entry | Pending |
+| INPUT-06 | Phase 2: Manual Entry | Complete |
+| INPUT-07 | Phase 2: Manual Entry | Complete |
 | CALC-01 | Phase 3: Calculation Engine | Pending |
 | CALC-02 | Phase 3: Calculation Engine | Pending |
 | CALC-03 | Phase 3: Calculation Engine | Pending |
