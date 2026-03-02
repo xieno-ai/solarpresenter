@@ -40,9 +40,17 @@ export default async function Home() {
             <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
             <h1 className="text-lg font-semibold tracking-tight">Solar Presenter</h1>
           </div>
-          <span className="font-[family-name:var(--font-mono)] text-xs tracking-[0.15em] uppercase text-neutral-500">
-            Phase 1 Smoke Test
-          </span>
+          <div className="flex items-center gap-6">
+            <a
+              href="/enter"
+              className="font-[family-name:var(--font-mono)] text-xs tracking-[0.1em] uppercase text-amber-400 hover:text-amber-300 transition-colors"
+            >
+              Manual Entry →
+            </a>
+            <span className="font-[family-name:var(--font-mono)] text-xs tracking-[0.15em] uppercase text-neutral-500">
+              Phase 1 Smoke Test
+            </span>
+          </div>
         </div>
       </header>
 
