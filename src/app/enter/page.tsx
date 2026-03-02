@@ -95,7 +95,7 @@ export default function ManualEntryPage() {
   }, [watch, setValue]);
 
   // Error count for footer (flatten nested errors)
-  const errorCount = Object.keys(errors).reduce((count, section) => {
+  const rhfErrorCount = Object.keys(errors).reduce((count, section) => {
     const sectionErrors = (errors as Record<string, unknown>)[section];
     if (!sectionErrors) return count;
     const countSection = (obj: unknown): number => {
@@ -108,6 +108,31 @@ export default function ManualEntryPage() {
     };
     return count + countSection(sectionErrors);
   }, 0);
+
+  // When the form has not been touched yet (onBlur mode never fires initial validation),
+  // RHF reports isValid=true and errors={} for an empty form. Count unfilled required
+  // scalar fields so the footer shows "N fields remaining" instead of "Ready to generate"
+  // on a blank form. Monthly arrays are excluded — the annual totals drive those.
+  const allValues = watch();
+  const emptyRequiredFieldCount = [
+    allValues.customer?.name,
+    allValues.customer?.address,
+    allValues.system?.systemSizeKw,
+    allValues.system?.annualProductionKwh,
+    allValues.consumption?.annualConsumptionKwh,
+    allValues.consumption?.annualElectricityCost,
+    allValues.rates?.allInRate,
+    allValues.rates?.netMeteringBuyRate,
+    allValues.rates?.netMeteringSellRate,
+    allValues.rates?.annualEscalationRate,
+    allValues.financing?.cashPurchasePrice,
+    allValues.financing?.financeMonthlyPayment,
+    allValues.financing?.financeTermMonths,
+    allValues.financing?.financeInterestRate,
+  ].filter((v) => v === undefined || v === null || v.trim() === '').length;
+
+  // Use whichever count is greater: RHF errors (post-blur) or empty field count (pre-touch)
+  const errorCount = Math.max(rhfErrorCount, emptyRequiredFieldCount);
 
   // Submit handler — Phase 2 stub shows ProposalInputs JSON
   const onSubmit = (values: ProposalFormValues) => {
