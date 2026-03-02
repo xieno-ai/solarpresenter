@@ -83,44 +83,44 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INPUT-01 | — | Pending |
-| INPUT-02 | — | Pending |
-| INPUT-03 | — | Pending |
-| INPUT-04 | — | Pending |
-| INPUT-05 | — | Pending |
-| INPUT-06 | — | Pending |
-| INPUT-07 | — | Pending |
-| CALC-01 | — | Pending |
-| CALC-02 | — | Pending |
-| CALC-03 | — | Pending |
-| CALC-04 | — | Pending |
-| CALC-05 | — | Pending |
-| CALC-06 | — | Pending |
-| CALC-07 | — | Pending |
-| CALC-08 | — | Pending |
-| CALC-09 | — | Pending |
-| CALC-10 | — | Pending |
-| PROP-01 | — | Pending |
-| PROP-02 | — | Pending |
-| PROP-03 | — | Pending |
-| PROP-04 | — | Pending |
-| PROP-05 | — | Pending |
-| PROP-06 | — | Pending |
-| PROP-07 | — | Pending |
-| PROP-08 | — | Pending |
-| PROP-09 | — | Pending |
-| PROP-10 | — | Pending |
-| RATE-01 | — | Pending |
-| RATE-02 | — | Pending |
-| RATE-03 | — | Pending |
-| SHARE-01 | — | Pending |
-| SHARE-02 | — | Pending |
+| INPUT-01 | Phase 6: SunPitch Scraping | Pending |
+| INPUT-02 | Phase 2: Manual Entry | Pending |
+| INPUT-03 | Phase 6: SunPitch Scraping | Pending |
+| INPUT-04 | Phase 7: Bill Extraction | Pending |
+| INPUT-05 | Phase 7: Bill Extraction | Pending |
+| INPUT-06 | Phase 2: Manual Entry | Pending |
+| INPUT-07 | Phase 2: Manual Entry | Pending |
+| CALC-01 | Phase 3: Calculation Engine | Pending |
+| CALC-02 | Phase 3: Calculation Engine | Pending |
+| CALC-03 | Phase 3: Calculation Engine | Pending |
+| CALC-04 | Phase 3: Calculation Engine | Pending |
+| CALC-05 | Phase 3: Calculation Engine | Pending |
+| CALC-06 | Phase 3: Calculation Engine | Pending |
+| CALC-07 | Phase 3: Calculation Engine | Pending |
+| CALC-08 | Phase 3: Calculation Engine | Pending |
+| CALC-09 | Phase 1: Foundation & Data Schema | Pending |
+| CALC-10 | Phase 1: Foundation & Data Schema | Pending |
+| PROP-01 | Phase 4: Proposal Rendering | Pending |
+| PROP-02 | Phase 4: Proposal Rendering | Pending |
+| PROP-03 | Phase 4: Proposal Rendering | Pending |
+| PROP-04 | Phase 4: Proposal Rendering | Pending |
+| PROP-05 | Phase 4: Proposal Rendering | Pending |
+| PROP-06 | Phase 4: Proposal Rendering | Pending |
+| PROP-07 | Phase 4: Proposal Rendering | Pending |
+| PROP-08 | Phase 5: PDF Generation | Pending |
+| PROP-09 | Phase 4: Proposal Rendering | Pending |
+| PROP-10 | Phase 4: Proposal Rendering | Pending |
+| RATE-01 | Phase 8: Alberta Rate Intelligence | Pending |
+| RATE-02 | Phase 8: Alberta Rate Intelligence | Pending |
+| RATE-03 | Phase 8: Alberta Rate Intelligence | Pending |
+| SHARE-01 | Phase 9: Sharing & Scenarios | Pending |
+| SHARE-02 | Phase 9: Sharing & Scenarios | Pending |
 
 **Coverage:**
 - v1 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32 ⚠️
+- Mapped to phases: 32
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-02*
-*Last updated: 2026-03-02 after initial definition*
+*Last updated: 2026-03-02 after roadmap creation*
