@@ -52,7 +52,7 @@ Plans:
 **Plans**: 3
 
 Plans:
-- [ ] 02-01-PLAN.md -- Form lib layer (Zod schema, Alberta solar curve, localStorage persistence, server action for rate defaults)
+- [x] 02-01-PLAN.md -- Form lib layer (Zod schema, Alberta solar curve, localStorage persistence, server action for rate defaults)
 - [ ] 02-02-PLAN.md -- Form components (FormInput, SectionCard, GenerateFooter, MonthlyGrid with two-way sync)
 - [ ] 02-03-PLAN.md -- Form page assembly at /enter + human verification
 
@@ -175,7 +175,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Foundation & Data Schema | 2/2 | Complete | 2026-03-02 |
-| 2. Manual Entry | 0/3 | Planned | - |
+| 2. Manual Entry | 1/3 | In progress | - |
 | 3. Calculation Engine | 0/TBD | Not started | - |
 | 4. Proposal Rendering | 0/TBD | Not started | - |
 | 5. PDF Generation | 0/TBD | Not started | - |

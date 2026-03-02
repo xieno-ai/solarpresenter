@@ -10,27 +10,28 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 2 of 9 (Manual Entry)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-02 - Phase 1 complete (all smoke test checks passed)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-03-02 - 02-01 complete (form lib foundation: schema, defaults, persistence, server action)
 
-Progress: [██░░░░░░░░░░░░░░░░░░] 10% (2/~20 plans)
+Progress: [███░░░░░░░░░░░░░░░░░] 15% (3/~20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: ~8min
-- Total execution time: ~0.25 hours
+- Total plans completed: 3
+- Average duration: ~10min
+- Total execution time: ~0.40 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~15min | ~8min |
+| 2. Manual Entry | 1/3 | ~15min | ~15min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5min), 01-02 (~10min)
+- Last 5 plans: 01-01 (5min), 01-02 (~10min), 02-01 (~15min)
 - Trend: Consistent, fast execution
 
 *Updated after each plan completion*
@@ -51,6 +52,11 @@ Recent decisions affecting current work:
 - [01-02]: Supabase NUMERIC returned as strings — passed directly to d(), never through float
 - [01-02]: Effective date filtering for Alberta config version history
 - [01-02]: Smoke test page gracefully handles missing Supabase connection
+- [02-01]: numericString() Zod helper with refine() chain for all numeric form inputs
+- [02-01]: All form fields are strings — Decimal conversion happens at calculation boundary (Phase 3)
+- [02-01]: Monthly arrays initialized with Array(12).fill('0') not '' — RHF requires values at registration
+- [02-01]: allInRate and netMeteringBuyRate both initialize from defaultNetMeteringBuyRate (user can differentiate)
+- [02-01]: Vitest chosen over Jest — native ESM support, no Babel transform needed
 
 ### Pending Todos
 
@@ -65,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Phase 1 complete, ready for Phase 2 planning
+Stopped at: 02-01 complete — form lib foundation. Ready for 02-02 (form components)
 Resume file: None
