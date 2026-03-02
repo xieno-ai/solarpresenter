@@ -13,7 +13,7 @@ Solar Presenter delivers a branded 11-page solar proposal generator for Northern
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Data Schema** - Next.js scaffold, TypeScript data contracts, Decimal.js integration, centralized Alberta config
-- [ ] **Phase 2: Manual Entry** - Input form with validation that defines the data schema every other input path conforms to
+- [x] **Phase 2: Manual Entry** - Input form with validation that defines the data schema every other input path conforms to (completed 2026-03-02)
 - [ ] **Phase 3: Calculation Engine** - All 8 financial formula sections verified against the reference spreadsheet
 - [ ] **Phase 4: Proposal Rendering** - Complete 11-page branded proposal viewable in-browser with charts and Northern NRG design
 - [ ] **Phase 5: PDF Generation** - Playwright-based PDF export matching the web preview pixel-for-pixel
@@ -175,7 +175,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Foundation & Data Schema | 2/2 | Complete | 2026-03-02 |
-| 2. Manual Entry | 2/3 | In Progress|  |
+| 2. Manual Entry | 3/3 | Complete   | 2026-03-02 |
 | 3. Calculation Engine | 0/TBD | Not started | - |
 | 4. Proposal Rendering | 0/TBD | Not started | - |
 | 5. PDF Generation | 0/TBD | Not started | - |
