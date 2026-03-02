@@ -34,10 +34,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All monetary arithmetic uses Decimal.js -- native JavaScript `Number` is never used for financial values anywhere in the codebase
   4. Alberta regulatory values (carbon benchmark prices, grid emission factor, net metering rates, escalation assumptions) are stored in a single centralized configuration file with effective dates, not hardcoded in any formula or component
   5. A trivial end-to-end smoke test passes: hardcoded test inputs flow through a stub calculation function and render a placeholder page in the browser
-**Plans**: 2 plans
+**Plans**: 2
 
 Plans:
-- [ ] 01-01-PLAN.md -- Next.js scaffold, TypeScript data contracts, Decimal.js utilities, Paul Friesen test fixture
+- [x] 01-01-PLAN.md -- Next.js scaffold, TypeScript data contracts, Decimal.js utilities, Paul Friesen test fixture
 - [ ] 01-02-PLAN.md -- Supabase schema, Alberta config data layer, smoke test page
 
 ### Phase 2: Manual Entry
@@ -173,7 +173,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Foundation & Data Schema | 0/TBD | Not started | - |
+| 1. Foundation & Data Schema | 1/2 | In progress | - |
 | 2. Manual Entry | 0/TBD | Not started | - |
 | 3. Calculation Engine | 0/TBD | Not started | - |
 | 4. Proposal Rendering | 0/TBD | Not started | - |
