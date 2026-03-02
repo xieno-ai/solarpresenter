@@ -12,7 +12,7 @@ Solar Presenter delivers a branded 11-page solar proposal generator for Northern
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Data Schema** - Next.js scaffold, TypeScript data contracts, Decimal.js integration, centralized Alberta config
+- [x] **Phase 1: Foundation & Data Schema** - Next.js scaffold, TypeScript data contracts, Decimal.js integration, centralized Alberta config
 - [ ] **Phase 2: Manual Entry** - Input form with validation that defines the data schema every other input path conforms to
 - [ ] **Phase 3: Calculation Engine** - All 8 financial formula sections verified against the reference spreadsheet
 - [ ] **Phase 4: Proposal Rendering** - Complete 11-page branded proposal viewable in-browser with charts and Northern NRG design
@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Next.js scaffold, TypeScript data contracts, Decimal.js utilities, Paul Friesen test fixture
-- [ ] 01-02-PLAN.md -- Supabase schema, Alberta config data layer, smoke test page
+- [x] 01-02-PLAN.md -- Supabase schema, Alberta config data layer, smoke test page
 
 ### Phase 2: Manual Entry
 **Goal**: Users can enter all proposal input fields in a validated form that serves as the always-works fallback and defines the data schema every other input path must conform to
@@ -49,11 +49,12 @@ Plans:
   2. All numeric inputs are validated with range checks (e.g., system size 1-100 kW, monthly kWh 0-5000) and invalid values show clear inline error messages
   3. Cross-field validation catches inconsistencies (e.g., system size vs total production mismatch) and displays warnings before the user can proceed to proposal generation
   4. Missing required fields are visually indicated with error states, and the "Generate Proposal" action is disabled until all required fields are valid
-**Plans**: TBD
+**Plans**: 3
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- Form lib layer (Zod schema, Alberta solar curve, localStorage persistence, server action for rate defaults)
+- [ ] 02-02-PLAN.md -- Form components (FormInput, SectionCard, GenerateFooter, MonthlyGrid with two-way sync)
+- [ ] 02-03-PLAN.md -- Form page assembly at /enter + human verification
 
 ### Phase 3: Calculation Engine
 **Goal**: All financial calculations produce verified results matching the reference spreadsheet, transforming manual entry inputs into complete proposal output data
@@ -173,8 +174,8 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Foundation & Data Schema | 1/2 | In progress | - |
-| 2. Manual Entry | 0/TBD | Not started | - |
+| 1. Foundation & Data Schema | 2/2 | Complete | 2026-03-02 |
+| 2. Manual Entry | 0/3 | Planned | - |
 | 3. Calculation Engine | 0/TBD | Not started | - |
 | 4. Proposal Rendering | 0/TBD | Not started | - |
 | 5. PDF Generation | 0/TBD | Not started | - |
