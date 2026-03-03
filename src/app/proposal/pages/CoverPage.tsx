@@ -23,9 +23,10 @@ export function CoverPage({
   outputs,
   satelliteUrl,
 }: CoverPageProps) {
-  const offsetPct = parseFloat(outputs.solarOffsetPercent).toFixed(1);
+  const offsetPct = Math.round(parseFloat(outputs.solarOffsetPercent));
   const utilityCost = formatCAD(outputs.twentyYearUtilityCost);
   const savings = formatCAD(outputs.twentyYearSavings);
+  const systemKw = parseFloat(systemSizeKw).toFixed(2);
 
   return (
     <div
@@ -33,344 +34,325 @@ export function CoverPage({
       style={{
         background: 'var(--nrg-page-bg)',
         display: 'flex',
-        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      {/* Header bar */}
+      {/* Right-side decorative house photo panel */}
+      {/* Replace the inner div background with: background: 'url(/house-cover.jpg) center/cover' when asset available */}
       <div
         style={{
-          background: 'var(--nrg-green)',
-          padding: '0 2.5rem',
-          height: '72px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '2rem',
-            color: '#ffffff',
-            letterSpacing: '0.08em',
-          }}
-        >
-          NORTHERN NRG
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.85)',
-            letterSpacing: '0.12em',
-          }}
-        >
-          ENERGY SAVINGS REPORT
-        </span>
-      </div>
-
-      {/* Main content */}
-      <div
-        style={{
-          flex: 1,
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '2rem',
-          padding: '2rem 2.5rem',
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: '44%',
+          borderTopLeftRadius: '140px',
+          borderBottomLeftRadius: '140px',
           overflow: 'hidden',
         }}
       >
-        {/* Left column — key stats card */}
         <div
           style={{
-            background: 'var(--nrg-card-bg)',
-            borderRadius: '12px',
-            padding: '2.5rem',
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(150deg, #d0ede8 0%, #a8d5cc 25%, #6db8ae 55%, #3d9e93 80%, #1a8278 100%)',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '1.5rem',
-            boxShadow: '0 2px 16px rgba(0,121,63,0.08)',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          {/* Customer name */}
+          <svg width="140" height="140" viewBox="0 0 140 140" fill="none" aria-hidden="true" style={{ opacity: 0.18 }}>
+            <path d="M25 68 L70 18 L115 68 L115 122 H25 Z" fill="white" />
+            <rect x="52" y="88" width="36" height="34" fill="white" opacity="0.9" />
+            <rect x="28" y="72" width="24" height="18" fill="white" opacity="0.7" />
+            <rect x="88" y="72" width="24" height="18" fill="white" opacity="0.7" />
+            <rect x="35" y="50" width="90" height="10" rx="3" fill="white" opacity="0.5" />
+            <rect x="40" y="40" width="80" height="10" rx="3" fill="white" opacity="0.4" />
+            <rect x="45" y="30" width="70" height="10" rx="3" fill="white" opacity="0.3" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Main content — left 56% to stay clear of right panel */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          width: '56%',
+          padding: '3.5rem 2rem 3rem 3.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: '2rem',
+        }}
+      >
+        {/* Top: Headline + customer pill */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Label + headline */}
           <div>
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: '0.75rem',
+                fontSize: '0.875rem',
                 fontWeight: 600,
-                color: 'var(--nrg-text-secondary)',
-                letterSpacing: '0.12em',
+                color: 'var(--nrg-green)',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                marginBottom: '0.25rem',
+                marginBottom: '0.3rem',
               }}
             >
-              Prepared For
+              Energy Savings Report
             </p>
             <h1
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: '2rem',
-                fontWeight: 700,
+                fontSize: 'clamp(2.2rem, 4vw, 3.25rem)',
+                fontWeight: 900,
                 color: 'var(--nrg-text-heading)',
-                lineHeight: 1.15,
+                lineHeight: 1.05,
+                textTransform: 'uppercase',
+                margin: 0,
+                letterSpacing: '-0.01em',
               }}
             >
-              {customerName}
+              STOP RENTING YOUR{' '}
+              <span style={{ color: 'var(--nrg-gold)' }}>POWER</span>
             </h1>
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: '0.9rem',
+                fontSize: '0.95rem',
                 color: 'var(--nrg-text-secondary)',
-                marginTop: '0.25rem',
+                lineHeight: 1.6,
+                marginTop: '0.9rem',
+              }}
+            >
+              A complete financial analysis and proposal for transitioning to solar energy — built on
+              real numbers, full transparency, and a company that will be here for the long haul.
+            </p>
+          </div>
+
+          {/* Customer info pill — content width, green border */}
+          <div
+            style={{
+              background: '#ffffff',
+              borderRadius: '12px',
+              border: '1.5px solid var(--nrg-green)',
+              padding: '1rem 2rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              alignSelf: 'flex-start',
+              gap: '1.25rem',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 600,
+                fontSize: '1.05rem',
+                color: 'var(--nrg-text-heading)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {customerName}
+            </span>
+            <span
+              style={{
+                width: '9px',
+                height: '9px',
+                borderRadius: '50%',
+                background: 'var(--nrg-green)',
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '1.05rem',
+                color: 'var(--nrg-text-heading)',
               }}
             >
               {address}
-            </p>
+            </span>
           </div>
+        </div>
 
-          {/* System size */}
+        {/* Bottom: satellite image + stats grid */}
+        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'stretch', height: '290px' }}>
+          {/* Satellite / property image */}
           <div
             style={{
-              borderLeft: '3px solid var(--nrg-green)',
-              paddingLeft: '1rem',
+              width: '290px',
+              flexShrink: 0,
+              borderRadius: '14px',
+              overflow: 'hidden',
+              background: 'var(--nrg-light-green-bg)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
             }}
           >
-            <p
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '1.5rem',
-                color: 'var(--nrg-green)',
-                letterSpacing: '0.05em',
-              }}
-            >
-              {parseFloat(systemSizeKw).toFixed(2)} kW SYSTEM
-            </p>
+            {satelliteUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={satelliteUrl}
+                alt="Property aerial view"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  padding: '1rem',
+                }}
+              >
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                  <rect x="4" y="4" width="48" height="48" rx="4" fill="var(--nrg-green)" opacity="0.12" />
+                  <rect x="7" y="7" width="18" height="18" rx="2" fill="var(--nrg-green)" opacity="0.3" />
+                  <rect x="31" y="7" width="18" height="18" rx="2" fill="var(--nrg-green)" opacity="0.3" />
+                  <rect x="7" y="31" width="18" height="18" rx="2" fill="var(--nrg-green)" opacity="0.3" />
+                  <rect x="31" y="31" width="18" height="18" rx="2" fill="var(--nrg-green)" opacity="0.3" />
+                  <line x1="26" y1="4" x2="26" y2="52" stroke="var(--nrg-green)" strokeWidth="1" opacity="0.4" />
+                  <line x1="4" y1="26" x2="52" y2="26" stroke="var(--nrg-green)" strokeWidth="1" opacity="0.4" />
+                </svg>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '0.7rem',
+                    color: 'var(--nrg-text-secondary)',
+                    textAlign: 'center',
+                  }}
+                >
+                  {address}
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Stats grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1 }}>
-            {/* Solar offset */}
-            <div
-              style={{
-                background: 'var(--nrg-light-green-bg)',
-                borderRadius: '8px',
-                padding: '1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
+          {/* 2×2 stats grid */}
+          <div
+            style={{
+              flex: 1,
+              background: '#ffffff',
+              borderRadius: '20px',
+              border: '1.5px solid var(--nrg-green)',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gridTemplateRows: '1fr 1fr',
+              overflow: 'hidden',
+            }}
+          >
+            {/* System Size */}
+            <div style={{ padding: '1.75rem 1.75rem 0.5rem' }}>
+              <p
+                style={{
+                  fontFamily: 'var(--font-montserrat)',
+                  fontSize: 'clamp(2rem, 3.2vw, 3rem)',
+                  fontWeight: 700,
+                  color: 'var(--nrg-gold)',
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
+                {systemKw} kW
+              </p>
               <p
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                  color: 'var(--nrg-text-primary)',
+                  fontSize: '1rem',
+                  color: 'var(--nrg-text-secondary)',
+                  marginTop: '0.5rem',
+                }}
+              >
+                System Size
+              </p>
+            </div>
+
+            {/* 20-Year Utility Cost */}
+            <div style={{ padding: '1.75rem 1.75rem 0.5rem' }}>
+              <p
+                style={{
+                  fontFamily: 'var(--font-montserrat)',
+                  fontSize: 'clamp(2rem, 3.2vw, 3rem)',
+                  fontWeight: 700,
+                  color: 'var(--nrg-red-badge)',
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
+                {utilityCost}
+              </p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '1rem',
+                  color: 'var(--nrg-text-secondary)',
+                  marginTop: '0.5rem',
+                }}
+              >
+                20-Year Utility Cost
+              </p>
+            </div>
+
+            {/* Solar Offset */}
+            <div style={{ padding: '0.5rem 1.75rem 1.75rem' }}>
+              <p
+                style={{
+                  fontFamily: 'var(--font-montserrat)',
+                  fontSize: 'clamp(2rem, 3.2vw, 3rem)',
+                  fontWeight: 700,
+                  color: 'var(--nrg-gold)',
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
+                {offsetPct}%
+              </p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '1rem',
+                  color: 'var(--nrg-text-secondary)',
+                  marginTop: '0.5rem',
                 }}
               >
                 Solar Offset
               </p>
-              <span
-                style={{
-                  fontFamily: 'var(--font-montserrat)',
-                  fontSize: '2rem',
-                  fontWeight: 700,
-                  color: 'var(--nrg-green)',
-                }}
-              >
-                {offsetPct}%
-              </span>
             </div>
 
-            {/* 20-yr utility cost */}
-            <div
-              style={{
-                background: '#fff5f5',
-                borderRadius: '8px',
-                padding: '1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: '#df584d',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  Without Solar
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.8rem',
-                    color: 'var(--nrg-text-secondary)',
-                  }}
-                >
-                  20-Year Utility Cost
-                </p>
-              </div>
-              <span
+            {/* 20-Year Savings */}
+            <div style={{ padding: '0.5rem 1.75rem 1.75rem' }}>
+              <p
                 style={{
                   fontFamily: 'var(--font-montserrat)',
-                  fontSize: '1.4rem',
-                  fontWeight: 700,
-                  color: '#df584d',
-                }}
-              >
-                {utilityCost}
-              </span>
-            </div>
-
-            {/* 20-yr savings */}
-            <div
-              style={{
-                background: 'var(--nrg-light-green-bg)',
-                borderRadius: '8px',
-                padding: '1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: 'var(--nrg-green)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  With Solar Savings
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.8rem',
-                    color: 'var(--nrg-text-secondary)',
-                  }}
-                >
-                  20-Year Net Savings
-                </p>
-              </div>
-              <span
-                style={{
-                  fontFamily: 'var(--font-montserrat)',
-                  fontSize: '1.4rem',
+                  fontSize: 'clamp(2rem, 3.2vw, 3rem)',
                   fontWeight: 700,
                   color: 'var(--nrg-green)',
+                  lineHeight: 1,
+                  margin: 0,
                 }}
               >
                 {savings}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right column — satellite image or placeholder */}
-        <div
-          style={{
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: '0 2px 16px rgba(0,121,63,0.08)',
-          }}
-        >
-          {satelliteUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={satelliteUrl}
-              alt="Property satellite view"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                background: 'var(--nrg-light-green-bg)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '1rem',
-              }}
-            >
-              {/* Solar panel SVG placeholder */}
-              <svg
-                width="80"
-                height="80"
-                viewBox="0 0 80 80"
-                fill="none"
-                aria-hidden="true"
-              >
-                <rect x="5" y="5" width="70" height="70" rx="6" fill="var(--nrg-green)" opacity="0.12" />
-                <rect x="10" y="10" width="26" height="26" rx="3" fill="var(--nrg-green)" opacity="0.3" />
-                <rect x="44" y="10" width="26" height="26" rx="3" fill="var(--nrg-green)" opacity="0.3" />
-                <rect x="10" y="44" width="26" height="26" rx="3" fill="var(--nrg-green)" opacity="0.3" />
-                <rect x="44" y="44" width="26" height="26" rx="3" fill="var(--nrg-green)" opacity="0.3" />
-                <line x1="38" y1="5" x2="38" y2="75" stroke="var(--nrg-green)" strokeWidth="1.5" opacity="0.4" />
-                <line x1="5" y1="38" x2="75" y2="38" stroke="var(--nrg-green)" strokeWidth="1.5" opacity="0.4" />
-              </svg>
+              </p>
               <p
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.9rem',
+                  fontSize: '1rem',
                   color: 'var(--nrg-text-secondary)',
-                  textAlign: 'center',
-                  maxWidth: '200px',
+                  marginTop: '0.5rem',
                 }}
               >
-                {address}
-              </p>
-              <p
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '0.85rem',
-                  color: 'var(--nrg-green)',
-                  letterSpacing: '0.1em',
-                  opacity: 0.7,
-                }}
-              >
-                SOLAR INSTALLATION SITE
+                20-Year Savings
               </p>
             </div>
-          )}
+          </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div
-        style={{
-          height: '36px',
-          background: 'var(--nrg-green)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.75rem',
-            color: 'rgba(255,255,255,0.7)',
-            letterSpacing: '0.15em',
-          }}
-        >
-          NORTHERN NRG — ENERGY SAVINGS REPORT
-        </span>
       </div>
     </div>
   );

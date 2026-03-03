@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 5 of 9 (PDF Generation) — IN PROGRESS
-Plan: 1 of 2 in Phase 5 — COMPLETE
-Status: Phase 5 Plan 1 complete — Playwright PDF pipeline implemented; /proposal/pdf render target, /api/pdf GET handler, ProposalFAB Download PDF action
-Last activity: 2026-03-03 - Phase 5 Plan 1 complete (PDF generation infrastructure: Playwright route, pdf.css, Download PDF FAB action)
+Phase: 5 of 9 (PDF Generation) — IN PROGRESS (verification complete, awaiting phase sign-off)
+Plan: 2 of 2 in Phase 5 — COMPLETE
+Status: Phase 5 both plans complete — PDF export human-verified and approved
+Last activity: 2026-03-03 - Phase 5 Plan 2 complete (human verification approved; fixed orientation and 16:9 viewport)
 
 Progress: [███████████████░░░░░] 75% (15/~20 plans)
 

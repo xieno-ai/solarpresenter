@@ -24,9 +24,8 @@ export async function GET(request: NextRequest) {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    // Set viewport to Letter dimensions at 96 DPI (816×1056px)
-    // This ensures vw/vh units resolve to correct paper dimensions
-    await page.setViewportSize({ width: 816, height: 1056 });
+    // Set viewport to 1920×1080 — matches the 16:9 aspect ratio the proposal pages are designed for
+    await page.setViewportSize({ width: 1920, height: 1080 });
 
     // CRITICAL: emulateMedia before goto — applies screen CSS throughout load
     // Without this, page.pdf() uses @media print which strips all backgrounds
@@ -41,7 +40,9 @@ export async function GET(request: NextRequest) {
     await page.waitForTimeout(500);
 
     const pdfBuffer = await page.pdf({
-      format: 'Letter',
+      // Custom 16:9 page size matching 1920×1080 viewport — no format preset, explicit px dimensions
+      width: '1920px',
+      height: '1080px',
       printBackground: true,
       margin: { top: '0', right: '0', bottom: '0', left: '0' },
     });
