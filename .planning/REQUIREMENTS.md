@@ -17,14 +17,14 @@
 
 ### Calculations
 
-- [ ] **CALC-01**: Utility cost projections for 20 and 30 years using 5% annual rate increase (geometric series formula)
-- [ ] **CALC-02**: Monthly net metering analysis — grid buy and surplus sold for each of 12 months based on production vs consumption
-- [ ] **CALC-03**: Annual grid purchase cost and annual sell revenue from net metering rates (buy rate ~16.8¢/kWh, sell rate 33.5¢/kWh)
-- [ ] **CALC-04**: 20-year and 30-year net metering projections with 5% annual increase
-- [ ] **CALC-05**: Carbon credit calculations — annual CO₂ avoided (Alberta grid factor 0.55 t/MWh), 10-year payout estimates using Alberta benchmark schedule (45-65% range)
-- [ ] **CALC-06**: Cash-back calculation — 3% on all grid electricity purchases over 20 and 30 years
-- [ ] **CALC-07**: True all-in savings (cash purchase) — utility avoided + net metering revenue + carbon credits + cash back − system cost
-- [ ] **CALC-08**: Monthly finance analysis — finance payment + remaining utility − net metering revenue − carbon credits − cash back = monthly all-in cost
+- [x] **CALC-01**: Utility cost projections for 20 and 30 years using 5% annual rate increase (geometric series formula)
+- [x] **CALC-02**: Monthly net metering analysis — grid buy and surplus sold for each of 12 months based on production vs consumption
+- [x] **CALC-03**: Annual grid purchase cost and annual sell revenue from net metering rates (buy rate ~16.8¢/kWh, sell rate 33.5¢/kWh)
+- [x] **CALC-04**: 20-year and 30-year net metering projections with 5% annual increase
+- [x] **CALC-05**: Carbon credit calculations — annual CO₂ avoided (Alberta grid factor 0.55 t/MWh), 10-year payout estimates using Alberta benchmark schedule (45-65% range)
+- [x] **CALC-06**: Cash-back calculation — 3% on all grid electricity purchases over 20 and 30 years
+- [x] **CALC-07**: True all-in savings (cash purchase) — utility avoided + net metering revenue + carbon credits + cash back − system cost
+- [x] **CALC-08**: Monthly finance analysis — finance payment + remaining utility − net metering revenue − carbon credits − cash back = monthly all-in cost
 - [ ] **CALC-09**: All financial calculations use Decimal.js for precision (no IEEE 754 floating-point errors in 30-year projections)
 - [ ] **CALC-10**: Alberta regulatory values (carbon benchmark prices, grid emission factor, rate assumptions) stored in a centralized configuration, not hardcoded in formulas
 
@@ -90,14 +90,14 @@
 | INPUT-05 | Phase 7: Bill Extraction | Pending |
 | INPUT-06 | Phase 2: Manual Entry | Complete |
 | INPUT-07 | Phase 2: Manual Entry | Complete |
-| CALC-01 | Phase 3: Calculation Engine | Pending |
-| CALC-02 | Phase 3: Calculation Engine | Pending |
-| CALC-03 | Phase 3: Calculation Engine | Pending |
-| CALC-04 | Phase 3: Calculation Engine | Pending |
-| CALC-05 | Phase 3: Calculation Engine | Pending |
-| CALC-06 | Phase 3: Calculation Engine | Pending |
-| CALC-07 | Phase 3: Calculation Engine | Pending |
-| CALC-08 | Phase 3: Calculation Engine | Pending |
+| CALC-01 | Phase 3: Calculation Engine | Complete |
+| CALC-02 | Phase 3: Calculation Engine | Complete |
+| CALC-03 | Phase 3: Calculation Engine | Complete |
+| CALC-04 | Phase 3: Calculation Engine | Complete |
+| CALC-05 | Phase 3: Calculation Engine | Complete |
+| CALC-06 | Phase 3: Calculation Engine | Complete |
+| CALC-07 | Phase 3: Calculation Engine | Complete |
+| CALC-08 | Phase 3: Calculation Engine | Complete |
 | CALC-09 | Phase 1: Foundation & Data Schema | Pending |
 | CALC-10 | Phase 1: Foundation & Data Schema | Pending |
 | PROP-01 | Phase 4: Proposal Rendering | Pending |

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T23:51:41.056Z"
+last_updated: "2026-03-03T01:20:41.027Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 8
+  completed_plans: 6
 ---
 
 # Project State
@@ -22,19 +22,19 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 2 of 9 (Manual Entry) — COMPLETE
-Plan: 3 of 3 in current phase — COMPLETE
-Status: Phase 2 complete, ready for Phase 3 (Calculations)
-Last activity: 2026-03-02 - 02-03 complete (manual entry form page, all 12 checks verified)
+Phase: 3 of 9 (Calculation Engine) — IN PROGRESS
+Plan: 1 of 3 in current phase — COMPLETE
+Status: Phase 3 plan 1 complete (domain sub-calculation modules); ready for 03-02
+Last activity: 2026-03-03 - 03-01 complete (5 domain modules, 31 tests, 7 files)
 
-Progress: [█████░░░░░░░░░░░░░░░] 25% (5/~20 plans)
+Progress: [██████░░░░░░░░░░░░░░] 30% (6/~20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 6
 - Average duration: ~10min
-- Total execution time: ~0.50 hours
+- Total execution time: ~0.70 hours
 
 **By Phase:**
 
@@ -42,14 +42,16 @@ Progress: [█████░░░░░░░░░░░░░░░] 25% (5/
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~15min | ~8min |
 | 2. Manual Entry | 3/3 | ~70min | ~23min |
+| 3. Calculation Engine | 1/3 | ~12min | ~12min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5min), 01-02 (~10min), 02-01 (~15min), 02-02 (~10min), 02-03 (~45min)
+- Last 5 plans: 02-01 (~15min), 02-02 (~10min), 02-03 (~45min), 03-01 (~12min)
 - Trend: Consistent, fast execution
 
 *Updated after each plan completion*
 | Phase 02-manual-entry P02 | 10 | 2 tasks | 4 files |
 | Phase 02-manual-entry P03 | 45 | 2 tasks | 2 files |
+| Phase 03-calculation-engine P01 | 12 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -75,6 +77,10 @@ Recent decisions affecting current work:
 - [Phase 02-02]: Controller (not register) for monthly inputs — programmatic setValue requires controlled components
 - [Phase 02-02]: syncSource ref prevents infinite watch loop between annual→monthly and monthly→annual effects
 - [Phase 02-manual-entry]: emptyRequiredFieldCount derived from watch() scalar values floors errorCount to prevent 'Ready to generate' on blank form in onBlur mode
+- [03-01]: Carbon benchmark schedule uses approximated 2024 Alberta values ($65-$230/tonne); CALC-05 tests assert range condition (45-65%) rather than exact dollar values for robustness
+- [03-01]: computeFinanceOption uses base-year (Year 0) values for monthly snapshot — no escalation for 'current year' comparison
+- [03-01]: production.greaterThanOrEqualTo(consumption) for surplus detection — equal treated as surplus (locked decision)
+- [03-01]: CarbonBenchmarkEntry.payoutLow is pre-computed (pricePerTonne × 0.45); computeCarbonCredits multiplies by annualCo2Avoided only
 
 ### Pending Todos
 
@@ -88,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed 02-03-PLAN.md — manual entry form assembly, human verified (all 12 checks pass). Phase 2 complete. Ready for Phase 3 planning.
+Last session: 2026-03-03
+Stopped at: Completed 03-01-PLAN.md — domain sub-calculation modules (CALC-01 through CALC-08), TDD verified, 31 tests pass.
 Resume file: None
