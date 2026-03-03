@@ -176,7 +176,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 |-------|---------------|--------|-----------|
 | 1. Foundation & Data Schema | 2/2 | Complete | 2026-03-02 |
 | 2. Manual Entry | 3/3 | Complete   | 2026-03-02 |
-| 3. Calculation Engine | 1/3 | In Progress|  |
+| 3. Calculation Engine | 2/3 | In Progress|  |
 | 4. Proposal Rendering | 0/TBD | Not started | - |
 | 5. PDF Generation | 0/TBD | Not started | - |
 | 6. SunPitch Scraping | 0/TBD | Not started | - |

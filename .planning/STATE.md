@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-03T01:20:41.027Z"
+last_updated: "2026-03-03T01:25:15.358Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 3 of 9 (Calculation Engine) — IN PROGRESS
-Plan: 1 of 3 in current phase — COMPLETE
-Status: Phase 3 plan 1 complete (domain sub-calculation modules); ready for 03-02
-Last activity: 2026-03-03 - 03-01 complete (5 domain modules, 31 tests, 7 files)
+Plan: 2 of 3 in current phase — COMPLETE
+Status: Phase 3 plan 2 complete (calculateProposal public API, 24 integration tests); ready for 03-03
+Last activity: 2026-03-03 - 03-02 complete (calculateProposal() implemented, 72 total tests pass)
 
-Progress: [██████░░░░░░░░░░░░░░] 30% (6/~20 plans)
+Progress: [███████░░░░░░░░░░░░░] 35% (7/~20 plans)
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [██████░░░░░░░░░░░░░░] 30% (6/
 | Phase 02-manual-entry P02 | 10 | 2 tasks | 4 files |
 | Phase 02-manual-entry P03 | 45 | 2 tasks | 2 files |
 | Phase 03-calculation-engine P01 | 12 | 2 tasks | 7 files |
+| Phase 03-calculation-engine P02 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recent decisions affecting current work:
 - [03-01]: computeFinanceOption uses base-year (Year 0) values for monthly snapshot — no escalation for 'current year' comparison
 - [03-01]: production.greaterThanOrEqualTo(consumption) for surplus detection — equal treated as surplus (locked decision)
 - [03-01]: CarbonBenchmarkEntry.payoutLow is pre-computed (pricePerTonne × 0.45); computeCarbonCredits multiplies by annualCo2Avoided only
+- [Phase 03-calculation-engine]: carbonCredits field in SavingsSummary uses tenYearPayoutLow for both 20yr and 30yr horizons (conservative carbon estimate)
+- [Phase 03-calculation-engine]: annualCarbonCredit for finance option = tenYearPayoutLow / 10 (average annual proxy for current-year monthly snapshot)
 
 ### Pending Todos
 
@@ -95,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 03-01-PLAN.md — domain sub-calculation modules (CALC-01 through CALC-08), TDD verified, 31 tests pass.
+Stopped at: Completed 03-02-PLAN.md — calculateProposal() public API assembled from domain modules, 24 integration tests, all CALC-01 through CALC-08 pass, 72 total tests passing.
 Resume file: None
