@@ -1,0 +1,60 @@
+/* NRG brand CSS custom properties — scoped to .proposal-root to prevent bleeding
+   into the dark /enter theme. All NRG colors extracted from Solar Template.pdf. */
+
+.proposal-root {
+  /* Core brand */
+  --nrg-green: #00793f;
+  --nrg-dark-green: #17573a;
+  --nrg-gold: #f5a623;
+
+  /* Page backgrounds */
+  --nrg-page-bg: #ecf7ff;
+  --nrg-card-bg: #ffffff;
+  --nrg-light-green-bg: #e7faf0;
+  --nrg-pale-green-bg: #f5fff7;
+  --nrg-row-green: #f4fffa;
+
+  /* Accent colors */
+  --nrg-surplus-green: #1aad5e;
+  --nrg-carbon-dark: #17573a;
+  --nrg-carbon-mint: #7effd4;
+
+  /* Column backgrounds */
+  --nrg-cash-col-bg: #f0f9ff;
+  --nrg-finance-col-bg: #e7faf0;
+
+  /* Column headers */
+  --nrg-cash-header: #4194d8;
+  --nrg-finance-header: #11834b;
+
+  /* Banners and badges */
+  --nrg-gold-banner: #f5a623;
+  --nrg-gold-banner-inner: #fff7eb;
+  --nrg-red-badge: #df584d;
+
+  /* Text colors */
+  --nrg-text-primary: #1a2b3c;
+  --nrg-text-secondary: #6b8299;
+  --nrg-text-heading: #0d1b2a;
+  --nrg-text-body: #171717;
+  --nrg-text-dark-bg: #182645;
+  --nrg-mint-highlight: #7effd4;
+}
+
+/* Scroll-snap container — fills viewport and snaps between full-page slides */
+.proposal-snap-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+
+/* Individual proposal page — exactly one viewport tall, snaps to start */
+.proposal-page {
+  height: 100vh;
+  min-height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background: var(--nrg-page-bg);
+  position: relative;
+  overflow: hidden;
+}
