@@ -12,6 +12,8 @@ import type { SerializedProposalOutputs, SerializedSavingsSummary } from '@/app/
 
 import { CoverPage } from './pages/CoverPage';
 import { NetMeteringPage } from './pages/NetMeteringPage';
+import { CarbonCreditsPage } from './pages/CarbonCreditsPage';
+import { AllInCostsPage } from './pages/AllInCostsPage';
 
 // ---------------------------------------------------------------------------
 // Satellite image URL builder (server-side only — API key never sent to client)
@@ -170,11 +172,16 @@ export default async function ProposalPage({
         sellRate={formValues.rates.netMeteringSellRate}
       />
 
-      {/* Page 4 — Carbon Credits (Task 3 below) */}
-      <div className="proposal-page" />
+      {/* Page 4 — Carbon Credits */}
+      <CarbonCreditsPage carbonCredits={serialized.carbonCredits} />
 
-      {/* Page 5 — All-In Costs (Task 3 below) */}
-      <div className="proposal-page" />
+      {/* Page 5 — All-In Costs */}
+      <AllInCostsPage
+        cashPurchase={serialized.cashPurchase}
+        financeOption={serialized.financeOption}
+        utilityProjection20Year={serialized.utilityProjection20Year}
+        systemCost={formValues.financing.cashPurchasePrice}
+      />
 
       {/* Pages 6–11 — static marketing content (Plan 03) */}
       <div className="proposal-page" />
