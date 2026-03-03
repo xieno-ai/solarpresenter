@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-03T01:25:15.358Z"
+status: in_progress
+last_updated: "2026-03-03T09:15:00.000Z"
 progress:
-  total_phases: 3
-  completed_phases: 2
+  total_phases: 9
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Given a SunPitch URL or manually entered numbers, produce a pixel-accurate 11-page solar proposal PDF with all financial calculations computed correctly from documented formulas.
-**Current focus:** Phase 3 - Calculations
+**Current focus:** Phase 4 - Proposal Rendering
 
 ## Current Position
 
-Phase: 3 of 9 (Calculation Engine) — IN PROGRESS
-Plan: 2 of 3 in current phase — COMPLETE
-Status: Phase 3 plan 2 complete (calculateProposal public API, 24 integration tests); ready for 03-03
-Last activity: 2026-03-03 - 03-02 complete (calculateProposal() implemented, 72 total tests pass)
+Phase: 3 of 9 (Calculation Engine) — COMPLETE
+Plan: 3 of 3 in current phase — COMPLETE
+Status: Phase 3 fully done; ready to plan Phase 4 (Proposal Rendering)
+Last activity: 2026-03-03 - 03-03 complete (server action + /enter page wired; carbon credits filter bug fixed; 72 tests pass)
 
-Progress: [███████░░░░░░░░░░░░░] 35% (7/~20 plans)
+Progress: [████████░░░░░░░░░░░░] 40% (8/~20 plans)
 
 ## Performance Metrics
 
@@ -42,10 +42,10 @@ Progress: [███████░░░░░░░░░░░░░] 35% (7/
 |-------|-------|-------|----------|
 | 1. Foundation | 2/2 | ~15min | ~8min |
 | 2. Manual Entry | 3/3 | ~70min | ~23min |
-| 3. Calculation Engine | 1/3 | ~12min | ~12min |
+| 3. Calculation Engine | 3/3 | ~16min | ~5min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (~15min), 02-02 (~10min), 02-03 (~45min), 03-01 (~12min)
+- Last 5 plans: 02-02 (~10min), 02-03 (~45min), 03-01 (~12min), 03-02 (~2min), 03-03 (~2min)
 - Trend: Consistent, fast execution
 
 *Updated after each plan completion*
@@ -53,6 +53,7 @@ Progress: [███████░░░░░░░░░░░░░] 35% (7/
 | Phase 02-manual-entry P03 | 45 | 2 tasks | 2 files |
 | Phase 03-calculation-engine P01 | 12 | 2 tasks | 7 files |
 | Phase 03-calculation-engine P02 | 2 | 2 tasks | 2 files |
+| Phase 03-calculation-engine P03 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,7 @@ Recent decisions affecting current work:
 - [03-01]: CarbonBenchmarkEntry.payoutLow is pre-computed (pricePerTonne × 0.45); computeCarbonCredits multiplies by annualCo2Avoided only
 - [Phase 03-calculation-engine]: carbonCredits field in SavingsSummary uses tenYearPayoutLow for both 20yr and 30yr horizons (conservative carbon estimate)
 - [Phase 03-calculation-engine]: annualCarbonCredit for finance option = tenYearPayoutLow / 10 (average annual proxy for current-year monthly snapshot)
+- [03-03]: carbonBenchmarkSchedule year filter changed from `year <= 10` to `slice(0, 10)` — Supabase stores calendar years (2025+), test fixtures use relative years (1-10); slice handles both
 
 ### Pending Todos
 
@@ -98,5 +100,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 03-02-PLAN.md — calculateProposal() public API assembled from domain modules, 24 integration tests, all CALC-01 through CALC-08 pass, 72 total tests passing.
+Stopped at: Phase 3 complete. 03-03 done — server action + /enter page wired; carbon credits filter bug found and fixed; human verify approved. Ready to plan Phase 4 (Proposal Rendering).
 Resume file: None
