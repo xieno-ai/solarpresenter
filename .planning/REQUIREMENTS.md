@@ -31,15 +31,15 @@
 ### Proposal Output
 
 - [ ] **PROP-01**: Full 11-page branded proposal rendered as a web preview (scrollable, in-browser)
-- [ ] **PROP-02**: Page 1 — Cover page with customer name, address, system size, solar offset %, 20-year utility cost, 20-year savings, satellite image
+- [x] **PROP-02**: Page 1 — Cover page with customer name, address, system size, solar offset %, 20-year utility cost, 20-year savings, satellite image
 - [ ] **PROP-03**: Page 2 — Table of contents / roadmap with 9 numbered sections
-- [ ] **PROP-04**: Page 3 — Net metering table with monthly breakdown (consume, produce, grid buy, surplus sold, cost to buy, revenue earned) plus rate cards
-- [ ] **PROP-05**: Page 4 — Carbon credits section with annual CO₂ avoided, 10-year revenue estimate, Alberta benchmark price schedule table
-- [ ] **PROP-06**: Page 5 — True all-in costs with cash purchase breakdown and finance option side-by-side, including 30-year savings note
+- [x] **PROP-04**: Page 3 — Net metering table with monthly breakdown (consume, produce, grid buy, surplus sold, cost to buy, revenue earned) plus rate cards
+- [x] **PROP-05**: Page 4 — Carbon credits section with annual CO₂ avoided, 10-year revenue estimate, Alberta benchmark price schedule table
+- [x] **PROP-06**: Page 5 — True all-in costs with cash purchase breakdown and finance option side-by-side, including 30-year savings note
 - [ ] **PROP-07**: Pages 6-11 — Static marketing sections (Price History, What's Coming, Why Us, Warranty, FAQ, Next Steps) rendered identically for every proposal
 - [ ] **PROP-08**: PDF download that matches the web preview pixel-for-pixel
-- [ ] **PROP-09**: Charts/graphs — utility cost projection trend, production vs consumption visualization
-- [ ] **PROP-10**: Northern NRG branding throughout — green/dark green/gold color scheme, logo, specific typography matching template PDF
+- [x] **PROP-09**: Charts/graphs — utility cost projection trend, production vs consumption visualization
+- [x] **PROP-10**: Northern NRG branding throughout — green/dark green/gold color scheme, logo, specific typography matching template PDF
 
 ### Alberta Intelligence
 
@@ -101,15 +101,15 @@
 | CALC-09 | Phase 1: Foundation & Data Schema | Pending |
 | CALC-10 | Phase 1: Foundation & Data Schema | Pending |
 | PROP-01 | Phase 4: Proposal Rendering | Pending |
-| PROP-02 | Phase 4: Proposal Rendering | Pending |
+| PROP-02 | Phase 4: Proposal Rendering | Complete |
 | PROP-03 | Phase 4: Proposal Rendering | Pending |
-| PROP-04 | Phase 4: Proposal Rendering | Pending |
-| PROP-05 | Phase 4: Proposal Rendering | Pending |
-| PROP-06 | Phase 4: Proposal Rendering | Pending |
+| PROP-04 | Phase 4: Proposal Rendering | Complete |
+| PROP-05 | Phase 4: Proposal Rendering | Complete |
+| PROP-06 | Phase 4: Proposal Rendering | Complete |
 | PROP-07 | Phase 4: Proposal Rendering | Pending |
 | PROP-08 | Phase 5: PDF Generation | Pending |
-| PROP-09 | Phase 4: Proposal Rendering | Pending |
-| PROP-10 | Phase 4: Proposal Rendering | Pending |
+| PROP-09 | Phase 4: Proposal Rendering | Complete |
+| PROP-10 | Phase 4: Proposal Rendering | Complete |
 | RATE-01 | Phase 8: Alberta Rate Intelligence | Pending |
 | RATE-02 | Phase 8: Alberta Rate Intelligence | Pending |
 | RATE-03 | Phase 8: Alberta Rate Intelligence | Pending |

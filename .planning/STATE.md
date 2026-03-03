@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-03-03T17:05:00.000Z"
+last_updated: "2026-03-03T17:15:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 10
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 4 of 9 (Proposal Rendering) — IN PROGRESS
-Plan: 1 of 3 in current phase — COMPLETE
-Status: 04-01 done — proposal infrastructure built; ready for 04-02 (cover + net metering pages)
-Last activity: 2026-03-03 - 04-01 complete (URL encoding, NRG CSS, fonts, proposal server component, /enter navigation wired)
+Plan: 2 of 3 in current phase — COMPLETE
+Status: 04-02 done — CoverPage, NetMeteringPage, CarbonCreditsPage, AllInCostsPage, two Recharts charts built; ready for 04-03 (static marketing pages)
+Last activity: 2026-03-03 - 04-02 complete (Pages 1, 3, 4, 5 with real data; recharts installed; TypeScript clean)
 
-Progress: [█████████░░░░░░░░░░░] 45% (9/~20 plans)
+Progress: [██████████░░░░░░░░░░] 50% (10/~20 plans)
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [█████████░░░░░░░░░░░] 45% (9/
 | Phase 03-calculation-engine P02 | 2 | 2 tasks | 2 files |
 | Phase 03-calculation-engine P03 | 2 | 2 tasks | 2 files |
 | Phase 04-proposal-rendering P01 | 2 | 2 tasks | 5 files |
+| Phase 04-proposal-rendering P02 | 5 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - [04-01]: URL param key is `d` — single base64 blob with btoa(encodeURIComponent(JSON.stringify(values))) for Unicode safety
 - [04-01]: Proposal page calls calculateProposal() directly (server component) — not runCalculation server action
 - [04-01]: buildSatelliteImageUrl returns null if GOOGLE_MAPS_API_KEY absent — no hard Maps API dependency
+- [04-02]: recharts installed with --legacy-peer-deps (vitest peer conflict does not affect runtime)
+- [04-02]: Recharts Tooltip formatter typed as (number | undefined) — Recharts 3.x requires nullable value param
+- [04-02]: Dynamic import ssr:false applied to both chart components to prevent hydration mismatches
 
 ### Pending Todos
 
@@ -105,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: 04-01 complete. Proposal infrastructure built: URL encoding, NRG CSS theme, Bebas Neue/Montserrat fonts, /proposal server component, /enter navigation wired. TypeScript clean.
+Stopped at: 04-02 complete. Pages 1 (Cover), 3 (Net Metering), 4 (Carbon Credits), 5 (All-In Costs) fully rendered with real data. Two Recharts charts (ComposedChart, LineChart) wired via dynamic ssr:false. TypeScript clean.
 Resume file: None
