@@ -25,8 +25,10 @@ export function computeCarbonCredits(
     .dividedBy(d('1000'))
     .times(config.gridEmissionFactor);
 
-  // Sum 10-year payouts using pre-computed payoutLow/payoutHigh from each benchmark entry
-  const tenYearEntries = config.carbonBenchmarkSchedule.filter(entry => entry.year <= 10);
+  // Sum 10-year payouts using pre-computed payoutLow/payoutHigh from each benchmark entry.
+  // Use slice(0, 10) instead of year-value filter — schedule may use calendar years (2025-2034)
+  // or relative years (1-10) depending on source; slice handles both.
+  const tenYearEntries = config.carbonBenchmarkSchedule.slice(0, 10);
 
   const tenYearPayoutLow = tenYearEntries.reduce(
     (sum, entry) => sum.plus(annualCo2Avoided.times(entry.payoutLow)),
