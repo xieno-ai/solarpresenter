@@ -227,7 +227,7 @@ export default async function ProposalPage({
       <NextStepsPage />
 
       {/* Persistent floating action button */}
-      <ProposalFAB />
+      <ProposalFAB d={params.d} customerName={formValues.customer.name} />
     </div>
   );
 }
