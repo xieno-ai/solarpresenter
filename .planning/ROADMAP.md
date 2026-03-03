@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Data Schema** - Next.js scaffold, TypeScript data contracts, Decimal.js integration, centralized Alberta config
 - [x] **Phase 2: Manual Entry** - Input form with validation that defines the data schema every other input path conforms to (completed 2026-03-02)
-- [ ] **Phase 3: Calculation Engine** - All 8 financial formula sections verified against the reference spreadsheet
+- [x] **Phase 3: Calculation Engine** - All 8 financial formula sections verified against the reference spreadsheet
 - [ ] **Phase 4: Proposal Rendering** - Complete 11-page branded proposal viewable in-browser with charts and Northern NRG design
 - [ ] **Phase 5: PDF Generation** - Playwright-based PDF export matching the web preview pixel-for-pixel
 - [ ] **Phase 6: SunPitch Scraping** - Headless browser extraction from SunPitch proposal URLs with graceful fallback
@@ -69,9 +69,9 @@ Plans:
 **Plans**: 3
 
 Plans:
-- [ ] 03-01-PLAN.md -- AlbertaConfig test fixture + 5 domain sub-modules (utility-projection, net-metering, carbon-credits, cash-back, savings)
-- [ ] 03-02-PLAN.md -- calculateProposal() public API assembly + complete Vitest test suite (TDD, all CALC-* requirements)
-- [ ] 03-03-PLAN.md -- Server action (runCalculation) + /enter page wired to real output + human verification
+- [x] 03-01-PLAN.md -- AlbertaConfig test fixture + 5 domain sub-modules (utility-projection, net-metering, carbon-credits, cash-back, savings)
+- [x] 03-02-PLAN.md -- calculateProposal() public API assembly + complete Vitest test suite (TDD, all CALC-* requirements)
+- [x] 03-03-PLAN.md -- Server action (runCalculation) + /enter page wired to real output + human verification
 
 ### Phase 4: Proposal Rendering
 **Goal**: Users can see a complete, branded 11-page solar proposal in-browser that matches the Northern NRG template design, with all dynamic pages populated from calculated data and all static marketing pages rendered identically
@@ -86,7 +86,7 @@ Plans:
 **Plans**: 4
 
 Plans:
-- [ ] 04-01-PLAN.md -- URL encoding utility, NRG CSS theme, fonts (Bebas Neue + Montserrat), /proposal server component shell, /enter Generate button navigation
+- [x] 04-01-PLAN.md -- URL encoding utility, NRG CSS theme, fonts (Bebas Neue + Montserrat), /proposal server component shell, /enter Generate button navigation
 - [ ] 04-02-PLAN.md -- Dynamic pages 1, 3, 4, 5 (Cover, Net Metering, Carbon Credits, All-In Costs) + Recharts charts (utility trend + production/consumption)
 - [ ] 04-03-PLAN.md -- Table of Contents (Page 2) + static marketing pages 6-11 (Price History, What's Coming, Why Us, Warranty, FAQ, Next Steps) + full 11-page assembly
 - [ ] 04-04-PLAN.md -- Human verification of complete 11-page proposal
@@ -175,8 +175,8 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 |-------|---------------|--------|-----------|
 | 1. Foundation & Data Schema | 2/2 | Complete | 2026-03-02 |
 | 2. Manual Entry | 3/3 | Complete   | 2026-03-02 |
-| 3. Calculation Engine | 2/3 | In Progress|  |
-| 4. Proposal Rendering | 0/4 | Not started | - |
+| 3. Calculation Engine | 3/3 | Complete | 2026-03-03 |
+| 4. Proposal Rendering | 1/4 | In Progress | - |
 | 5. PDF Generation | 0/TBD | Not started | - |
 | 6. SunPitch Scraping | 0/TBD | Not started | - |
 | 7. Bill Extraction | 0/TBD | Not started | - |

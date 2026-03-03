@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-03-03T09:15:00.000Z"
+last_updated: "2026-03-03T17:05:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 9
+  completed_plans: 9
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 3 of 9 (Calculation Engine) — COMPLETE
-Plan: 3 of 3 in current phase — COMPLETE
-Status: Phase 3 fully done; ready to plan Phase 4 (Proposal Rendering)
-Last activity: 2026-03-03 - 03-03 complete (server action + /enter page wired; carbon credits filter bug fixed; 72 tests pass)
+Phase: 4 of 9 (Proposal Rendering) — IN PROGRESS
+Plan: 1 of 3 in current phase — COMPLETE
+Status: 04-01 done — proposal infrastructure built; ready for 04-02 (cover + net metering pages)
+Last activity: 2026-03-03 - 04-01 complete (URL encoding, NRG CSS, fonts, proposal server component, /enter navigation wired)
 
-Progress: [████████░░░░░░░░░░░░] 40% (8/~20 plans)
+Progress: [█████████░░░░░░░░░░░] 45% (9/~20 plans)
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [████████░░░░░░░░░░░░] 40% (8/
 | Phase 03-calculation-engine P01 | 12 | 2 tasks | 7 files |
 | Phase 03-calculation-engine P02 | 2 | 2 tasks | 2 files |
 | Phase 03-calculation-engine P03 | 2 | 2 tasks | 2 files |
+| Phase 04-proposal-rendering P01 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,10 @@ Recent decisions affecting current work:
 - [Phase 03-calculation-engine]: carbonCredits field in SavingsSummary uses tenYearPayoutLow for both 20yr and 30yr horizons (conservative carbon estimate)
 - [Phase 03-calculation-engine]: annualCarbonCredit for finance option = tenYearPayoutLow / 10 (average annual proxy for current-year monthly snapshot)
 - [03-03]: carbonBenchmarkSchedule year filter changed from `year <= 10` to `slice(0, 10)` — Supabase stores calendar years (2025+), test fixtures use relative years (1-10); slice handles both
+- [04-01]: CSS variables scoped to .proposal-root (not :root) — prevents NRG light theme bleeding into /enter dark theme
+- [04-01]: URL param key is `d` — single base64 blob with btoa(encodeURIComponent(JSON.stringify(values))) for Unicode safety
+- [04-01]: Proposal page calls calculateProposal() directly (server component) — not runCalculation server action
+- [04-01]: buildSatelliteImageUrl returns null if GOOGLE_MAPS_API_KEY absent — no hard Maps API dependency
 
 ### Pending Todos
 
@@ -100,5 +105,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Phase 3 complete. 03-03 done — server action + /enter page wired; carbon credits filter bug found and fixed; human verify approved. Ready to plan Phase 4 (Proposal Rendering).
+Stopped at: 04-01 complete. Proposal infrastructure built: URL encoding, NRG CSS theme, Bebas Neue/Montserrat fonts, /proposal server component, /enter navigation wired. TypeScript clean.
 Resume file: None
