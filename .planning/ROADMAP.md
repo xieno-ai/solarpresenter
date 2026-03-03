@@ -100,11 +100,11 @@ Plans:
   2. The downloaded PDF matches the web preview pixel-for-pixel -- same layout, colors, fonts, charts, images, and page breaks
   3. PDF file size is under 5 MB for a typical proposal (with satellite image placeholder)
   4. Page breaks fall cleanly between proposal sections -- no table rows split mid-row, no headings orphaned from their content
-**Plans**: TBD
+**Plans**: 2
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md -- /proposal/pdf render target + pdf.css page breaks + /api/pdf Playwright route handler + ProposalFAB Download PDF action
+- [ ] 05-02-PLAN.md -- Human verification: PDF downloads correctly with 11 pages, correct colors/fonts/charts, under 5 MB
 
 ### Phase 6: SunPitch Scraping
 **Goal**: Users can paste a SunPitch proposal URL and have all input fields auto-populated, eliminating manual data entry for the primary sales workflow
@@ -177,7 +177,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | 2. Manual Entry | 3/3 | Complete   | 2026-03-02 |
 | 3. Calculation Engine | 3/3 | Complete | 2026-03-03 |
 | 4. Proposal Rendering | 4/4 | Complete | 2026-03-03 |
-| 5. PDF Generation | 0/TBD | Not started | - |
+| 5. PDF Generation | 0/2 | Not started | - |
 | 6. SunPitch Scraping | 0/TBD | Not started | - |
 | 7. Bill Extraction | 0/TBD | Not started | - |
 | 8. Alberta Rate Intelligence | 0/TBD | Not started | - |
