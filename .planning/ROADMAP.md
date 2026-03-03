@@ -53,8 +53,8 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md -- Form lib layer (Zod schema, Alberta solar curve, localStorage persistence, server action for rate defaults)
-- [ ] 02-02-PLAN.md -- Form components (FormInput, SectionCard, GenerateFooter, MonthlyGrid with two-way sync)
-- [ ] 02-03-PLAN.md -- Form page assembly at /enter + human verification
+- [x] 02-02-PLAN.md -- Form components (FormInput, SectionCard, GenerateFooter, MonthlyGrid with two-way sync)
+- [x] 02-03-PLAN.md -- Form page assembly at /enter + human verification
 
 ### Phase 3: Calculation Engine
 **Goal**: All financial calculations produce verified results matching the reference spreadsheet, transforming manual entry inputs into complete proposal output data
@@ -66,12 +66,12 @@ Plans:
   3. Carbon credit calculations produce correct annual CO2 avoided using Alberta grid factor 0.55 t/MWh, and 10-year payout estimates using the Alberta benchmark schedule fall within the 45-65% range
   4. True all-in savings (cash purchase) and monthly finance analysis produce results matching the reference spreadsheet -- including cash-back at 3% on grid purchases over 20 and 30 years
   5. All calculation functions are pure (inputs in, outputs out, no side effects) and unit-tested against known reference values from the calculations document
-**Plans**: TBD
+**Plans**: 3
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md -- AlbertaConfig test fixture + 5 domain sub-modules (utility-projection, net-metering, carbon-credits, cash-back, savings)
+- [ ] 03-02-PLAN.md -- calculateProposal() public API assembly + complete Vitest test suite (TDD, all CALC-* requirements)
+- [ ] 03-03-PLAN.md -- Server action (runCalculation) + /enter page wired to real output + human verification
 
 ### Phase 4: Proposal Rendering
 **Goal**: Users can see a complete, branded 11-page solar proposal in-browser that matches the Northern NRG template design, with all dynamic pages populated from calculated data and all static marketing pages rendered identically
@@ -176,7 +176,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 |-------|---------------|--------|-----------|
 | 1. Foundation & Data Schema | 2/2 | Complete | 2026-03-02 |
 | 2. Manual Entry | 3/3 | Complete   | 2026-03-02 |
-| 3. Calculation Engine | 0/TBD | Not started | - |
+| 3. Calculation Engine | 0/3 | Not started | - |
 | 4. Proposal Rendering | 0/TBD | Not started | - |
 | 5. PDF Generation | 0/TBD | Not started | - |
 | 6. SunPitch Scraping | 0/TBD | Not started | - |
