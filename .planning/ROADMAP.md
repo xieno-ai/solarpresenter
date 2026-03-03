@@ -115,12 +115,12 @@ Plans:
   2. All proposal fields are populated from the scraped data: system size, monthly production, monthly consumption, rates, costs, financing terms, customer name/address, and satellite image
   3. Scraped data pre-populates the manual entry form with all fields remaining editable -- the user can review and correct any value before generating the proposal
   4. When scraping fails (timeout, DOM changes, invalid URL), the user sees a clear error message and can fall back to manual entry without losing any data they already entered
-**Plans**: TBD
+**Plans**: 3
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
-- [ ] 06-03: TBD
+- [ ] 06-01-PLAN.md -- Scraper contracts (types, URL validator), Playwright dual-strategy scraper, POST /api/scrape route
+- [ ] 06-02-PLAN.md -- SunPitchTab component, /enter page tab refactor with highlight state and pre-fill wiring
+- [ ] 06-03-PLAN.md -- Human verification: live scrape test with real URL, selector calibration, end-to-end flow
 
 ### Phase 7: Bill Extraction
 **Goal**: Users can upload a utility bill and have consumption and rate data extracted by AI, pre-filling relevant fields in the manual entry form with human confirmation
@@ -178,7 +178,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | 3. Calculation Engine | 3/3 | Complete | 2026-03-03 |
 | 4. Proposal Rendering | 4/4 | Complete | 2026-03-03 |
 | 5. PDF Generation | 1/2 | In progress | - |
-| 6. SunPitch Scraping | 0/TBD | Not started | - |
+| 6. SunPitch Scraping | 0/3 | Not started | - |
 | 7. Bill Extraction | 0/TBD | Not started | - |
 | 8. Alberta Rate Intelligence | 0/TBD | Not started | - |
 | 9. Sharing & Scenarios | 0/TBD | Not started | - |
