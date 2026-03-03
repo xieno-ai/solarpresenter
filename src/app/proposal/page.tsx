@@ -11,9 +11,11 @@ import type { ProposalOutputs, SavingsSummary } from '@/lib/types';
 import type { SerializedProposalOutputs, SerializedSavingsSummary } from '@/app/actions/calculate';
 
 import { CoverPage } from './pages/CoverPage';
+import { TableOfContentsPage } from './pages/TableOfContentsPage';
 import { NetMeteringPage } from './pages/NetMeteringPage';
 import { CarbonCreditsPage } from './pages/CarbonCreditsPage';
 import { AllInCostsPage } from './pages/AllInCostsPage';
+import { PriceHistoryPage } from './pages/PriceHistoryPage';
 
 // ---------------------------------------------------------------------------
 // Satellite image URL builder (server-side only — API key never sent to client)
@@ -160,8 +162,8 @@ export default async function ProposalPage({
         satelliteUrl={satelliteUrl}
       />
 
-      {/* Page 2 — placeholder (Plan 03) */}
-      <div className="proposal-page" />
+      {/* Page 2 — Table of Contents */}
+      <TableOfContentsPage />
 
       {/* Page 3 — Net Metering */}
       <NetMeteringPage
@@ -183,8 +185,10 @@ export default async function ProposalPage({
         systemCost={formValues.financing.cashPurchasePrice}
       />
 
-      {/* Pages 6–11 — static marketing content (Plan 03) */}
-      <div className="proposal-page" />
+      {/* Page 6 — Price History */}
+      <PriceHistoryPage />
+
+      {/* Pages 7–11 — static marketing content (Plan 03 Task 2) */}
       <div className="proposal-page" />
       <div className="proposal-page" />
       <div className="proposal-page" />
