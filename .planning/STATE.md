@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-03-03T17:15:00.000Z"
+last_updated: "2026-03-03T17:20:00.000Z"
 progress:
   total_phases: 9
-  completed_phases: 3
-  total_plans: 10
-  completed_plans: 10
+  completed_phases: 4
+  total_plans: 13
+  completed_plans: 13
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 4 of 9 (Proposal Rendering) — IN PROGRESS
-Plan: 2 of 3 in current phase — COMPLETE
-Status: 04-02 done — CoverPage, NetMeteringPage, CarbonCreditsPage, AllInCostsPage, two Recharts charts built; ready for 04-03 (static marketing pages)
-Last activity: 2026-03-03 - 04-02 complete (Pages 1, 3, 4, 5 with real data; recharts installed; TypeScript clean)
+Phase: 4 of 9 (Proposal Rendering) — COMPLETE
+Plan: 3 of 3 in current phase — COMPLETE
+Status: 04-03 done — all 7 static pages built; full 11-page proposal scrollable; TypeScript clean; Phase 4 complete
+Last activity: 2026-03-03 - 04-03 complete (Pages 2, 6-11 static marketing pages; inline SVG chart; complete proposal assembly)
 
-Progress: [██████████░░░░░░░░░░] 50% (10/~20 plans)
+Progress: [█████████████░░░░░░░] 65% (13/~20 plans)
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [██████████░░░░░░░░░░] 50% (10
 | Phase 03-calculation-engine P03 | 2 | 2 tasks | 2 files |
 | Phase 04-proposal-rendering P01 | 2 | 2 tasks | 5 files |
 | Phase 04-proposal-rendering P02 | 5 | 3 tasks | 7 files |
+| Phase 04-proposal-rendering P03 | 5 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Recent decisions affecting current work:
 - [04-02]: recharts installed with --legacy-peer-deps (vitest peer conflict does not affect runtime)
 - [04-02]: Recharts Tooltip formatter typed as (number | undefined) — Recharts 3.x requires nullable value param
 - [04-02]: Dynamic import ssr:false applied to both chart components to prevent hydration mismatches
+- [04-03]: PriceHistoryPage uses pure inline SVG area chart (no charting library) — avoids Recharts dynamic import complexity for a static page
+- [04-03]: FAQPage uses 2-column grid layout instead of vertical accordion — fits proposal-page height constraint without scrolling
+- [04-03]: NextStepsPage uses 2-column grid of step cards rather than a vertical timeline — better space utilization in fixed viewport
 
 ### Pending Todos
 
@@ -109,5 +113,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: 04-02 complete. Pages 1 (Cover), 3 (Net Metering), 4 (Carbon Credits), 5 (All-In Costs) fully rendered with real data. Two Recharts charts (ComposedChart, LineChart) wired via dynamic ssr:false. TypeScript clean.
+Stopped at: Phase 4 complete. All 11 proposal pages rendered with real data and static content. TableOfContentsPage, PriceHistoryPage (inline SVG chart), WhatsComingPage, WhyUsPage, WarrantyPage, FAQPage, NextStepsPage built and assembled. TypeScript clean.
 Resume file: None
