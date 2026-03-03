@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-03-03T17:20:00.000Z"
+last_updated: "2026-03-03T22:29:48.000Z"
 progress:
   total_phases: 9
   completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 14
+  completed_plans: 14
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 4 of 9 (Proposal Rendering) — COMPLETE ✓
-Plan: 4 of 4 in Phase 4 — COMPLETE
-Status: Phase 4 fully signed off — all 11 pages manually reviewed and redesigned pixel-perfect against Northern NRG reference images; persistent FAB added; proposal generates correctly
-Last activity: 2026-03-03 - Phase 4 complete (human verification + pixel-perfect redesign of all pages; FAB with speed dial)
+Phase: 5 of 9 (PDF Generation) — IN PROGRESS
+Plan: 1 of 2 in Phase 5 — COMPLETE
+Status: Phase 5 Plan 1 complete — Playwright PDF pipeline implemented; /proposal/pdf render target, /api/pdf GET handler, ProposalFAB Download PDF action
+Last activity: 2026-03-03 - Phase 5 Plan 1 complete (PDF generation infrastructure: Playwright route, pdf.css, Download PDF FAB action)
 
-Progress: [██████████████░░░░░░] 70% (14/~20 plans)
+Progress: [███████████████░░░░░] 75% (15/~20 plans)
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [██████████████░░░░░░] 70% (14
 | Phase 04-proposal-rendering P01 | 2 | 2 tasks | 5 files |
 | Phase 04-proposal-rendering P02 | 5 | 3 tasks | 7 files |
 | Phase 04-proposal-rendering P03 | 5 | 2 tasks | 8 files |
+| Phase 05-pdf-generation P01 | 3 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,10 @@ Recent decisions affecting current work:
 - [04-03]: FAQPage uses 2-column grid layout instead of vertical accordion — fits proposal-page height constraint without scrolling
 - [04-03]: NextStepsPage uses 2-column grid of step cards rather than a vertical timeline — better space utilization in fixed viewport
 - [04-04]: All 11 pages manually reviewed and redesigned pixel-perfect vs reference PNGs; ProposalFAB added (fixed position, speed dial with 3 links: NAIT snow study, hail test video, solarclub.ca); FAQPage and NextStepsPage fully replaced with reference-matching layouts
+- [05-01]: emulateMedia('screen') must be called before page.goto() — ensures screen CSS active from start of page load, prevents @media print stripping backgrounds
+- [05-01]: PDF render target returns error div (not redirect) on missing d param — Playwright redirect would fail silently
+- [05-01]: Buffer from page.pdf() must be converted to Uint8Array for Next.js Response BodyInit compatibility (TypeScript 5.x)
+- [05-01]: Viewport set to 816x1056 (Letter at 96 DPI) before goto so vw/vh resolve to correct paper dimensions
 
 ### Pending Todos
 
@@ -114,5 +119,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Phase 4 fully complete and signed off. All 11 pages pixel-perfect vs Northern NRG references. ProposalFAB with speed dial (3 links) added. Ready for Phase 5: PDF Generation.
+Stopped at: Completed 05-01-PLAN.md — Playwright PDF pipeline implemented. /proposal/pdf render target, /api/pdf GET route, ProposalFAB Download PDF action with loading/error state. TypeScript clean. Ready for Plan 05-02 verification checkpoint.
 Resume file: None

@@ -37,7 +37,7 @@
 - [x] **PROP-05**: Page 4 — Carbon credits section with annual CO₂ avoided, 10-year revenue estimate, Alberta benchmark price schedule table
 - [x] **PROP-06**: Page 5 — True all-in costs with cash purchase breakdown and finance option side-by-side, including 30-year savings note
 - [x] **PROP-07**: Pages 6-11 — Static marketing sections (Price History, What's Coming, Why Us, Warranty, FAQ, Next Steps) rendered identically for every proposal
-- [ ] **PROP-08**: PDF download that matches the web preview pixel-for-pixel
+- [x] **PROP-08**: PDF download that matches the web preview pixel-for-pixel
 - [x] **PROP-09**: Charts/graphs — utility cost projection trend, production vs consumption visualization
 - [x] **PROP-10**: Northern NRG branding throughout — green/dark green/gold color scheme, logo, specific typography matching template PDF
 
@@ -107,7 +107,7 @@
 | PROP-05 | Phase 4: Proposal Rendering | Complete |
 | PROP-06 | Phase 4: Proposal Rendering | Complete |
 | PROP-07 | Phase 4: Proposal Rendering | Complete |
-| PROP-08 | Phase 5: PDF Generation | Pending |
+| PROP-08 | Phase 5: PDF Generation | Complete |
 | PROP-09 | Phase 4: Proposal Rendering | Complete |
 | PROP-10 | Phase 4: Proposal Rendering | Complete |
 | RATE-01 | Phase 8: Alberta Rate Intelligence | Pending |
