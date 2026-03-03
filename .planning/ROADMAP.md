@@ -83,14 +83,13 @@ Plans:
   3. Pages 6-11 render static marketing content (Price History, What's Coming, Why Us, Warranty, FAQ, Next Steps) identically for every proposal regardless of input data
   4. Charts and visualizations render correctly: utility cost projection trend line and production vs consumption comparison are visible and data-accurate
   5. Northern NRG branding is applied throughout: green/dark green/gold color scheme, logo placement, typography, and layout match the template PDF
-**Plans**: TBD
+**Plans**: 4
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
-- [ ] 04-04: TBD
-- [ ] 04-05: TBD
+- [ ] 04-01-PLAN.md -- URL encoding utility, NRG CSS theme, fonts (Bebas Neue + Montserrat), /proposal server component shell, /enter Generate button navigation
+- [ ] 04-02-PLAN.md -- Dynamic pages 1, 3, 4, 5 (Cover, Net Metering, Carbon Credits, All-In Costs) + Recharts charts (utility trend + production/consumption)
+- [ ] 04-03-PLAN.md -- Table of Contents (Page 2) + static marketing pages 6-11 (Price History, What's Coming, Why Us, Warranty, FAQ, Next Steps) + full 11-page assembly
+- [ ] 04-04-PLAN.md -- Human verification of complete 11-page proposal
 
 ### Phase 5: PDF Generation
 **Goal**: Users can download a PDF of the proposal that matches the web preview, completing the core product workflow from data entry to deliverable sales document
@@ -177,7 +176,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | 1. Foundation & Data Schema | 2/2 | Complete | 2026-03-02 |
 | 2. Manual Entry | 3/3 | Complete   | 2026-03-02 |
 | 3. Calculation Engine | 2/3 | In Progress|  |
-| 4. Proposal Rendering | 0/TBD | Not started | - |
+| 4. Proposal Rendering | 0/4 | Not started | - |
 | 5. PDF Generation | 0/TBD | Not started | - |
 | 6. SunPitch Scraping | 0/TBD | Not started | - |
 | 7. Bill Extraction | 0/TBD | Not started | - |
