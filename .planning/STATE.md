@@ -6,7 +6,7 @@ status: in_progress
 last_updated: "2026-03-03T17:20:00.000Z"
 progress:
   total_phases: 9
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 13
   completed_plans: 13
 ---
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Given a SunPitch URL or manually entered numbers, produce a pixel-accurate 11-page solar proposal PDF with all financial calculations computed correctly from documented formulas.
-**Current focus:** Phase 4 - Proposal Rendering
+**Current focus:** Phase 5 - PDF Generation
 
 ## Current Position
 
-Phase: 4 of 9 (Proposal Rendering) — COMPLETE
-Plan: 3 of 3 in current phase — COMPLETE
-Status: 04-03 done — all 7 static pages built; full 11-page proposal scrollable; TypeScript clean; Phase 4 complete
-Last activity: 2026-03-03 - 04-03 complete (Pages 2, 6-11 static marketing pages; inline SVG chart; complete proposal assembly)
+Phase: 4 of 9 (Proposal Rendering) — COMPLETE ✓
+Plan: 4 of 4 in Phase 4 — COMPLETE
+Status: Phase 4 fully signed off — all 11 pages manually reviewed and redesigned pixel-perfect against Northern NRG reference images; persistent FAB added; proposal generates correctly
+Last activity: 2026-03-03 - Phase 4 complete (human verification + pixel-perfect redesign of all pages; FAB with speed dial)
 
-Progress: [█████████████░░░░░░░] 65% (13/~20 plans)
+Progress: [██████████████░░░░░░] 70% (14/~20 plans)
 
 ## Performance Metrics
 
@@ -99,6 +99,7 @@ Recent decisions affecting current work:
 - [04-03]: PriceHistoryPage uses pure inline SVG area chart (no charting library) — avoids Recharts dynamic import complexity for a static page
 - [04-03]: FAQPage uses 2-column grid layout instead of vertical accordion — fits proposal-page height constraint without scrolling
 - [04-03]: NextStepsPage uses 2-column grid of step cards rather than a vertical timeline — better space utilization in fixed viewport
+- [04-04]: All 11 pages manually reviewed and redesigned pixel-perfect vs reference PNGs; ProposalFAB added (fixed position, speed dial with 3 links: NAIT snow study, hail test video, solarclub.ca); FAQPage and NextStepsPage fully replaced with reference-matching layouts
 
 ### Pending Todos
 
@@ -113,5 +114,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Phase 4 complete. All 11 proposal pages rendered with real data and static content. TableOfContentsPage, PriceHistoryPage (inline SVG chart), WhatsComingPage, WhyUsPage, WarrantyPage, FAQPage, NextStepsPage built and assembled. TypeScript clean.
+Stopped at: Phase 4 fully complete and signed off. All 11 pages pixel-perfect vs Northern NRG references. ProposalFAB with speed dial (3 links) added. Ready for Phase 5: PDF Generation.
 Resume file: None
