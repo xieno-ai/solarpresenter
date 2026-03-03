@@ -7,12 +7,11 @@ import { proposalFormSchema, ProposalFormValues } from '@/lib/form/schema';
 import { getEmptyDefaults } from '@/lib/form/defaults';
 import { loadFormDraft, saveFormDraft } from '@/lib/form/persistence';
 import { getDefaultRates } from '@/app/actions/get-defaults';
+import { runCalculation, SerializedProposalOutputs } from '@/app/actions/calculate';
 import { FormInput } from '@/components/form/FormInput';
 import { SectionCard } from '@/components/form/SectionCard';
 import { GenerateFooter } from '@/components/form/GenerateFooter';
 import { MonthlyGrid } from '@/components/form/MonthlyGrid';
-import { d } from '@/lib/decimal';
-import type { ProposalInputs, MonthlyValues } from '@/lib/types';
 
 export default function ManualEntryPage() {
   const {
@@ -29,7 +28,9 @@ export default function ManualEntryPage() {
   });
 
   const [warnings, setWarnings] = useState<{ systemProductionMismatch?: string }>({});
-  const [generatedInputs, setGeneratedInputs] = useState<ProposalInputs | null>(null);
+  const [calculationResult, setCalculationResult] = useState<SerializedProposalOutputs | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [calcError, setCalcError] = useState<string | null>(null);
 
   // 1. Load localStorage draft on mount
   useEffect(() => {
@@ -134,39 +135,18 @@ export default function ManualEntryPage() {
   // Use whichever count is greater: RHF errors (post-blur) or empty field count (pre-touch)
   const errorCount = Math.max(rhfErrorCount, emptyRequiredFieldCount);
 
-  // Submit handler — Phase 2 stub shows ProposalInputs JSON
-  const onSubmit = (values: ProposalFormValues) => {
-    const inputs: ProposalInputs = {
-      customer: {
-        name: values.customer.name,
-        address: values.customer.address,
-        latitude: 0,
-        longitude: 0,
-      },
-      system: {
-        systemSizeKw: d(values.system.systemSizeKw),
-        annualProductionKwh: d(values.system.annualProductionKwh),
-        monthlyProductionKwh: values.system.monthlyProductionKwh.map(d) as MonthlyValues,
-      },
-      consumption: {
-        annualConsumptionKwh: d(values.consumption.annualConsumptionKwh),
-        monthlyConsumptionKwh: values.consumption.monthlyConsumptionKwh.map(d) as MonthlyValues,
-        annualElectricityCost: d(values.consumption.annualElectricityCost),
-      },
-      rates: {
-        allInRate: d(values.rates.allInRate),
-        netMeteringBuyRate: d(values.rates.netMeteringBuyRate),
-        netMeteringSellRate: d(values.rates.netMeteringSellRate),
-        annualEscalationRate: d(values.rates.annualEscalationRate),
-      },
-      financing: {
-        cashPurchasePrice: d(values.financing.cashPurchasePrice),
-        financeMonthlyPayment: d(values.financing.financeMonthlyPayment),
-        financeTermMonths: parseInt(values.financing.financeTermMonths, 10),
-        financeInterestRate: d(values.financing.financeInterestRate),
-      },
-    };
-    setGeneratedInputs(inputs);
+  // Submit handler — calls runCalculation server action with real engine
+  const onSubmit = async (values: ProposalFormValues) => {
+    setIsCalculating(true);
+    setCalcError(null);
+    try {
+      const result = await runCalculation(values);
+      setCalculationResult(result);
+    } catch (err) {
+      setCalcError(err instanceof Error ? err.message : 'Calculation failed');
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   return (
@@ -438,26 +418,59 @@ export default function ManualEntryPage() {
             </div>
           </SectionCard>
 
-          {/* Generated JSON display — Phase 2 stub */}
-          {generatedInputs !== null && (
-            <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-6 space-y-3">
-              <div className="text-xs font-[family-name:var(--font-mono)] text-emerald-400 uppercase tracking-widest">
-                ProposalInputs - Validated Contract
+          {/* Calculation status — loading */}
+          {isCalculating && (
+            <div className="rounded-xl border border-neutral-700 bg-neutral-900 p-6">
+              <span className="text-sm text-neutral-400 font-[family-name:var(--font-mono)]">
+                Calculating...
+              </span>
+            </div>
+          )}
+
+          {/* Calculation status — error */}
+          {calcError && (
+            <div className="rounded-xl border border-red-400/20 bg-red-400/5 p-6">
+              <div className="text-xs font-[family-name:var(--font-mono)] text-red-400 uppercase tracking-widest mb-2">
+                Calculation Error
               </div>
-              <pre className="text-xs text-neutral-300 font-[family-name:var(--font-mono)] overflow-auto max-h-96">
-                {JSON.stringify(
-                  generatedInputs,
-                  (key, val) =>
-                    val &&
-                    typeof val === 'object' &&
-                    's' in val &&
-                    'e' in val &&
-                    'c' in val
-                      ? val.toString()
-                      : val,
-                  2,
-                )}
-              </pre>
+              <p className="text-sm text-red-300">{calcError}</p>
+            </div>
+          )}
+
+          {/* Calculation output — real proposal figures */}
+          {calculationResult !== null && (
+            <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-6 space-y-4">
+              <div className="text-xs font-[family-name:var(--font-mono)] text-emerald-400 uppercase tracking-widest">
+                Proposal Outputs
+              </div>
+              {/* Key summary metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                  <div className="text-xs text-neutral-500 font-[family-name:var(--font-mono)]">Solar Offset</div>
+                  <div className="text-lg font-semibold text-emerald-400">{calculationResult.solarOffsetPercent}%</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-xs text-neutral-500 font-[family-name:var(--font-mono)]">20-Year Utility Cost</div>
+                  <div className="text-lg font-semibold text-red-400">${parseFloat(calculationResult.twentyYearUtilityCost).toLocaleString('en-CA', { maximumFractionDigits: 0 })}</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-xs text-neutral-500 font-[family-name:var(--font-mono)]">20-Year Savings</div>
+                  <div className="text-lg font-semibold text-emerald-400">${parseFloat(calculationResult.twentyYearSavings).toLocaleString('en-CA', { maximumFractionDigits: 0 })}</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-xs text-neutral-500 font-[family-name:var(--font-mono)]">CO&#8322; Avoided/yr</div>
+                  <div className="text-lg font-semibold text-sky-400">{calculationResult.carbonCredits.annualCo2Avoided} t</div>
+                </div>
+              </div>
+              {/* Full JSON dump for debugging */}
+              <details className="mt-2">
+                <summary className="text-xs text-neutral-500 cursor-pointer font-[family-name:var(--font-mono)] hover:text-neutral-400">
+                  Full output JSON
+                </summary>
+                <pre className="text-xs text-neutral-300 font-[family-name:var(--font-mono)] overflow-auto max-h-96 mt-2">
+                  {JSON.stringify(calculationResult, null, 2)}
+                </pre>
+              </details>
             </div>
           )}
         </main>
