@@ -77,6 +77,10 @@ export async function getAlbertaConfig(asOfDate?: Date): Promise<AlbertaConfig> 
     };
   });
 
+  // default_pre_solar_rate may not exist in older DB rows — fall back to 0.0725
+  const rawPreSolar = (configRow as Record<string, unknown>)['default_pre_solar_rate'];
+  const defaultPreSolarRate = d(rawPreSolar != null ? String(rawPreSolar) : '0.0725');
+
   return {
     id: configRow.id,
     effectiveFrom: configRow.effective_from,
@@ -86,6 +90,7 @@ export async function getAlbertaConfig(asOfDate?: Date): Promise<AlbertaConfig> 
     payoutPercentageHigh: payoutHigh,
     cashBackRate: d(configRow.cash_back_rate),
     defaultEscalationRate: d(configRow.default_escalation_rate),
+    defaultPreSolarRate,
     defaultNetMeteringBuyRate: d(configRow.default_net_metering_buy_rate),
     defaultNetMeteringSellRate: d(configRow.default_net_metering_sell_rate),
     carbonBenchmarkSchedule,

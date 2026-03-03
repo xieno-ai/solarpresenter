@@ -16,7 +16,8 @@ export interface AlbertaConfig {
   payoutPercentageHigh: Decimal;      // e.g., 0.65
   cashBackRate: Decimal;              // e.g., 0.03
   defaultEscalationRate: Decimal;     // e.g., 0.05
-  defaultNetMeteringBuyRate: Decimal; // $/kWh
-  defaultNetMeteringSellRate: Decimal;// $/kWh
+  defaultPreSolarRate: Decimal;        // $/kWh — ENMAX Solar Ready™ rate
+  defaultNetMeteringBuyRate: Decimal; // $/kWh — LO Rate
+  defaultNetMeteringSellRate: Decimal;// $/kWh — HI Rate
   carbonBenchmarkSchedule: CarbonBenchmarkEntry[];
 }

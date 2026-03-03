@@ -57,4 +57,20 @@
   background: var(--nrg-page-bg);
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centered inner container — constrains content on large monitors.
+   Use this as the direct child of .proposal-page instead of padding the page itself. */
+.proposal-inner {
+  width: 100%;
+  max-width: 1600px;
+  min-width: 640px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem 3rem;
+  box-sizing: border-box;
 }

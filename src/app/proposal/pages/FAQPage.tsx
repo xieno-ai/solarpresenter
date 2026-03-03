@@ -1,190 +1,313 @@
-const faqs = [
-  {
-    question: 'How does net metering work in Alberta?',
-    answer:
-      'When your solar panels produce more electricity than you consume, the surplus flows back to the grid and your utility credits your account at the wholesale or regulated buy-back rate. These credits offset future bills when your consumption exceeds production — typically in winter months. Credits are calculated monthly and can carry forward for up to 12 months.',
-  },
-  {
-    question: 'What happens on cloudy or winter days?',
-    answer:
-      'Your solar system remains connected to the provincial grid at all times. On overcast or low-production days, your home draws power from the grid seamlessly — you will never experience an outage due to weather. Solar panels still produce power in diffuse light; production is reduced, not eliminated. Your annual production estimate already accounts for seasonal variation.',
-  },
-  {
-    question: 'How long does installation take?',
-    answer:
-      "A typical residential installation takes 2 to 5 days from crew arrival to electrical sign-off. Site complexity, roof type, and panel count affect the timeline. Permitting and utility interconnection applications — handled entirely by Northern NRG — typically take 2 to 6 weeks prior to installation and are the longest part of the overall process.",
-  },
-  {
-    question: 'Will solar affect my home insurance?',
-    answer:
-      "In most cases, your existing home insurance policy covers the solar system as a permanent attached fixture at no additional premium. You should notify your insurer once the system is operational — some providers require a brief rider or endorsement. Northern NRG provides a system valuation letter to support any insurance documentation.",
-  },
-  {
-    question: 'What maintenance does solar require?',
-    answer:
-      "Solar systems are very low maintenance. In Alberta, seasonal snowfall typically clears naturally from tilted panel surfaces. An annual gentle rinse in spring removes dust and pollen that can slightly reduce output. Northern NRG includes annual production monitoring reviews; if output drops unexpectedly, our team investigates at no charge during the workmanship warranty period.",
-  },
-  {
-    question: 'How is system size determined?',
-    answer:
-      "System size is calculated from three inputs: your annual electricity consumption (from utility bills), your roof's available south- or west-facing area and its tilt, and your budget. Northern NRG engineers your system to offset the maximum percentage of your consumption given your roof constraints — typically between 70% and 110% of annual use.",
-  },
-];
+'use client';
+import { useState } from 'react';
 
-export function FAQPage() {
+const VIDEO_EMBED_URL =
+  'https://drive.google.com/file/d/1eGb2WDqYwZ-1JNTLzo4Vmi_xYX-fyOnF/preview';
+
+interface FAQPageProps {
+  systemCost?: string;
+}
+
+export function FAQPage({ systemCost }: FAQPageProps) {
+  const [videoOpen, setVideoOpen] = useState(false);
+
+  const formattedCost = systemCost
+    ? Number(systemCost).toLocaleString('en-CA', { maximumFractionDigits: 0 })
+    : '43,108';
+
   return (
-    <div
-      className="proposal-page"
-      style={{
-        background: 'var(--nrg-page-bg)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Header bar */}
-      <div
-        style={{
-          background: 'var(--nrg-green)',
-          padding: '0 2.5rem',
-          height: '72px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '2rem',
-            color: '#ffffff',
-            letterSpacing: '0.08em',
-          }}
-        >
-          NORTHERN NRG
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.85)',
-            letterSpacing: '0.12em',
-          }}
-        >
-          ENERGY SAVINGS REPORT
-        </span>
-      </div>
+    <div className="proposal-page" style={{ background: 'var(--nrg-page-bg)' }}>
+      <div className="proposal-inner" style={{ height: 'auto' }}>
 
-      {/* Main content */}
-      <div
-        style={{
-          flex: 1,
-          padding: '1.5rem 2.5rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Page heading */}
-        <div style={{ flexShrink: 0 }}>
-          <p
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.9rem',
-              color: 'var(--nrg-green)',
-              letterSpacing: '0.22em',
-              marginBottom: '0.25rem',
-            }}
-          >
-            FREQUENTLY ASKED QUESTIONS
+        {/* Header */}
+        <div style={{ marginBottom: '1.75rem' }}>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            color: 'var(--nrg-green)',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            marginBottom: '0.4rem',
+          }}>
+            COMMON QUESTIONS
           </p>
-          <h2
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '1.75rem',
-              fontWeight: 700,
-              color: 'var(--nrg-text-heading)',
-              lineHeight: 1.15,
-            }}
-          >
-            Common Questions from Solar Customers
-          </h2>
+          <h1 style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '2.6rem',
+            fontWeight: 800,
+            color: 'var(--nrg-text-heading)',
+            lineHeight: 1.1,
+            marginBottom: '0.55rem',
+          }}>
+            Frequently Asked Questions
+          </h1>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.95rem',
+            color: 'var(--nrg-text-secondary)',
+          }}>
+            Everything you want to know before you commit. Real answers, no runaround.
+          </p>
         </div>
 
-        {/* FAQ items */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '0.85rem',
-            flex: 1,
-            overflow: 'hidden',
-          }}
-        >
-          {faqs.map((faq) => (
-            <div
-              key={faq.question}
-              style={{
-                background: 'var(--nrg-card-bg)',
-                borderRadius: '10px',
-                padding: '1.1rem 1.25rem',
-                borderLeft: '4px solid var(--nrg-green)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                boxShadow: '0 1px 6px rgba(0,121,63,0.06)',
-                overflow: 'hidden',
-              }}
-            >
-              <h3
-                style={{
+        {/* FAQ Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+          {/* Card 1: Home Sale */}
+          <div style={{
+            background: '#ffffff',
+            border: '1.5px solid #b8dece',
+            borderRadius: '12px',
+            padding: '1.5rem 1.75rem',
+          }}>
+            {/* Card header row */}
+            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '3.5rem', lineHeight: 1, flexShrink: 0 }}>🏠</div>
+              <div>
+                <h3 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.88rem',
+                  fontSize: '1.05rem',
                   fontWeight: 700,
                   color: 'var(--nrg-text-heading)',
-                  lineHeight: 1.35,
-                }}
-              >
-                {faq.question}
-              </h3>
-              <p
-                style={{
+                  marginBottom: '0.2rem',
+                  lineHeight: 1.3,
+                }}>
+                  What if I sell my home before the system is paid off?
+                </h3>
+                <p style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.8rem',
+                  fontSize: '0.875rem',
                   color: 'var(--nrg-text-secondary)',
-                  lineHeight: 1.6,
-                }}
-              >
-                {faq.answer}
-              </p>
+                }}>
+                  Moving, downsizing, or upgrading — your investment is protected either way
+                </p>
+              </div>
             </div>
-          ))}
+
+            {/* Two-column body */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
+              <div>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  color: '#c47f2a',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.5rem',
+                }}>
+                  IF YOU FINANCED
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.875rem',
+                  color: '#3d4f5e',
+                  lineHeight: 1.7,
+                }}>
+                  The financing agreement is fully transferable to the new buyer. They simply
+                  assume the remaining payments and inherit all the savings. This is actually a
+                  selling feature — a home that already costs less to run is more attractive, not
+                  less. Buyers from provinces like Ontario or B.C. immediately recognize the
+                  value of locking in lower electricity costs.
+                </p>
+              </div>
+              <div>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  color: '#c47f2a',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.5rem',
+                }}>
+                  IF YOU PAID CASH
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.875rem',
+                  color: '#3d4f5e',
+                  lineHeight: 1.7,
+                }}>
+                  Your system becomes a permanent asset of the home. Studies show solar homes
+                  sell for 3–4% more and spend less time on market. Your ${formattedCost}{' '}
+                  investment doesn&apos;t disappear — it converts into home equity and gets baked
+                  into the sale price. You recover the cost when you sell, then walk away with
+                  the savings you earned along the way.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Weather */}
+          <div style={{
+            background: '#ffffff',
+            border: '1.5px solid #b8dece',
+            borderRadius: '12px',
+            padding: '1.5rem 1.75rem',
+            position: 'relative',
+          }}>
+            {/* Play button — top right */}
+            <button
+              onClick={() => setVideoOpen(true)}
+              aria-label="Play hail test video"
+              style={{
+                position: 'absolute',
+                top: '1.25rem',
+                right: '1.25rem',
+                width: '48px',
+                height: '48px',
+                border: '2px solid #1a2b3c',
+                borderRadius: '8px',
+                background: '#ffffff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+              }}
+            >
+              <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+                <polygon points="1,0 13,8 1,16" fill="#1a2b3c" />
+              </svg>
+            </button>
+
+            {/* Card header row */}
+            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '3.5rem', lineHeight: 1, flexShrink: 0 }}>⛈️</div>
+              <div>
+                <h3 style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '1.05rem',
+                  fontWeight: 700,
+                  color: 'var(--nrg-text-heading)',
+                  marginBottom: '0.2rem',
+                  lineHeight: 1.3,
+                }}>
+                  What about snow in winter and hail in summer?
+                </h3>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.875rem',
+                  color: 'var(--nrg-text-secondary)',
+                }}>
+                  Alberta weather is tough — your panels are tougher
+                </p>
+              </div>
+            </div>
+
+            {/* Two-column body */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
+              <div>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  color: '#1aad5e',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.5rem',
+                }}>
+                  SNOW
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.875rem',
+                  color: '#3d4f5e',
+                  lineHeight: 1.7,
+                }}>
+                  Snow only reduces annual production by 3–5% — translating to a difference of
+                  just a few dollars on your bill. Panels are mounted at an angle, so snow slides
+                  off faster than it does from your roof. On cold, clear Alberta days, panels
+                  actually perform better than in summer heat because solar cells are more
+                  efficient at lower temperatures.
+                </p>
+              </div>
+              <div>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  color: '#c47f2a',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.5rem',
+                }}>
+                  HAIL
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.875rem',
+                  color: '#3d4f5e',
+                  lineHeight: 1.7,
+                }}>
+                  Our panels are tested to withstand golf-ball sized hail at 384 km/h — and pass.
+                  At that speed, hailstones actually disintegrate on impact rather than damaging
+                  the tempered glass surface. In over 13 years and 16,000+ installations across
+                  Alberta, hail has never been a warranty claim issue. And if somehow damage
+                  did occur, our lifetime workmanship warranty has you covered.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          height: '36px',
-          background: 'var(--nrg-green)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <span
+      {/* Video Modal */}
+      {videoOpen && (
+        <div
+          onClick={() => setVideoOpen(false)}
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.75rem',
-            color: 'rgba(255,255,255,0.7)',
-            letterSpacing: '0.15em',
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.82)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          NORTHERN NRG — ENERGY SAVINGS REPORT
-        </span>
-      </div>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '80vw',
+              maxWidth: '900px',
+              aspectRatio: '16/9',
+              background: '#000',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            <button
+              onClick={() => setVideoOpen(false)}
+              aria-label="Close video"
+              style={{
+                position: 'absolute',
+                top: '-40px',
+                right: 0,
+                background: 'none',
+                border: 'none',
+                color: '#ffffff',
+                fontSize: '1.4rem',
+                cursor: 'pointer',
+                padding: '0.25rem 0.5rem',
+                lineHeight: 1,
+              }}
+            >
+              ✕
+            </button>
+            <iframe
+              src={VIDEO_EMBED_URL}
+              width="100%"
+              height="100%"
+              allow="autoplay"
+              style={{ border: 'none', display: 'block' }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

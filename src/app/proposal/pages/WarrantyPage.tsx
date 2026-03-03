@@ -1,160 +1,170 @@
-const warrantyCards = [
+import Image from 'next/image';
+
+const ICON_BG = '#f5a623';
+
+function IconCircle({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        width: '64px',
+        height: '64px',
+        borderRadius: '50%',
+        background: ICON_BG,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Icon 1: gauge / performance trending up
+function GaugeIcon() {
+  return (
+    <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+      <path d="M5 22 A12 12 0 0 1 27 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="16" y1="22" x2="23" y2="13" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="16" cy="22" r="2.5" fill="white" />
+    </svg>
+  );
+}
+
+// Icon 2: lightning bolt
+function BoltIcon() {
+  return (
+    <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+      <path
+        d="M19 4L8 18h9l-4 10 15-16h-10z"
+        fill="white"
+        stroke="white"
+        strokeWidth="0.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// Icon 3: crossed wrenches
+function WrenchIcon() {
+  return (
+    <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+      <path
+        d="M20 4 a6 6 0 0 1 0 10 L10 24 a3 3 0 0 1-4-4 L16 10 a6 6 0 0 1 4-6z"
+        stroke="white" strokeWidth="2" strokeLinejoin="round"
+      />
+      <path
+        d="M12 4 a6 6 0 0 0 0 10 L22 24 a3 3 0 0 0 4-4 L16 10 a6 6 0 0 0-4-6z"
+        stroke="white" strokeWidth="2" strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// Icon 4: circle with checkmark
+function CheckCircleIcon() {
+  return (
+    <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+      <circle cx="16" cy="16" r="11" stroke="white" strokeWidth="2.5" />
+      <path d="M10 16 l4 4 8-8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const WARRANTY_CARDS = [
   {
-    title: 'Panel Warranty',
-    term: '25 Years',
-    termSub: 'Product + Performance',
-    description:
-      'Our Tier-1 solar panels carry a 25-year product warranty against manufacturing defects and a separate 25-year linear performance guarantee — output is guaranteed to remain above 80% of rated capacity.',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <circle cx="16" cy="12" r="7" stroke="var(--nrg-green)" strokeWidth="2" />
-        <path d="M9 20c-4 2-6 5-6 8h26c0-3-2-6-6-8" stroke="var(--nrg-green)" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M12 12l3 3 5-5" stroke="var(--nrg-green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    term: '25 YEARS',
+    title: 'Performance Warranty',
+    desc: 'Your panels are guaranteed to produce at rated capacity',
+    icon: <GaugeIcon />,
   },
   {
+    term: '25 YEARS',
     title: 'Inverter Warranty',
-    term: '12 Years',
-    termSub: 'Manufacturer Coverage',
-    description:
-      "String inverters include a standard 12-year manufacturer's warranty with optional extension to 20 years available at time of purchase. Microinverters carry a 25-year warranty where specified.",
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect x="4" y="8" width="24" height="16" rx="3" stroke="var(--nrg-green)" strokeWidth="2" />
-        <path
-          d="M16 5L18 8H14L16 5z M16 27l-2-3h4l-2 3z"
-          fill="var(--nrg-green)"
-          opacity="0.5"
-        />
-        <path d="M10 16l3-3 3 3 3-3 3 3" stroke="var(--nrg-green)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    desc: 'Industry-leading coverage on your inverter hardware',
+    icon: <BoltIcon />,
   },
   {
+    term: 'LIFETIME',
     title: 'Workmanship Warranty',
-    term: '10 Years',
-    termSub: 'Installation by Northern NRG',
-    description:
-      'Every system Northern NRG installs is backed by a 10-year workmanship warranty covering all labour, wiring, mounting hardware, and structural attachment points against installation defects.',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <path
-          d="M8 26l4-4 10-10-4-4L8 18l-2 6 2 2z"
-          stroke="var(--nrg-green)"
-          strokeWidth="2"
-          strokeLinejoin="round"
-        />
-        <path d="M18 8l4-4 6 6-4 4" stroke="var(--nrg-green)" strokeWidth="2" strokeLinejoin="round" />
-        <circle cx="10" cy="22" r="1.5" fill="var(--nrg-green)" />
-      </svg>
-    ),
+    desc: 'Any issue with our installation — we fix it, no questions asked',
+    icon: <WrenchIcon />,
   },
   {
-    title: 'Roof Penetration Warranty',
-    term: '10 Years',
-    termSub: 'Waterproofing Guarantee',
-    description:
-      'All roof penetrations are flashed and sealed to IKO standards. Northern NRG warrants every penetration point against water ingress for 10 years — your roof integrity is fully protected.',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <path d="M4 18L16 6l12 12H4z" stroke="var(--nrg-green)" strokeWidth="2" strokeLinejoin="round" />
-        <rect x="10" y="18" width="12" height="10" stroke="var(--nrg-green)" strokeWidth="2" />
-        <path d="M14 24v-4h4v4" stroke="var(--nrg-green)" strokeWidth="1.75" />
-      </svg>
-    ),
+    term: 'ALWAYS ON',
+    title: '24/7 Production Monitoring',
+    desc: 'Live system app tracking — verify your warranties in real time',
+    icon: <CheckCircleIcon />,
   },
 ];
 
 export function WarrantyPage() {
   return (
-    <div
-      className="proposal-page"
-      style={{
-        background: 'var(--nrg-page-bg)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Header bar */}
-      <div
-        style={{
-          background: 'var(--nrg-green)',
-          padding: '0 2.5rem',
-          height: '72px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '2rem',
-            color: '#ffffff',
-            letterSpacing: '0.08em',
-          }}
-        >
-          NORTHERN NRG
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.85)',
-            letterSpacing: '0.12em',
-          }}
-        >
-          ENERGY SAVINGS REPORT
-        </span>
-      </div>
+    <div className="proposal-page" style={{ background: 'var(--nrg-page-bg)' }}>
+      <div className="proposal-inner" style={{ height: 'auto' }}>
 
-      {/* Main content */}
-      <div
-        style={{
-          flex: 1,
-          padding: '1.75rem 2.5rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Page heading */}
-        <div style={{ textAlign: 'center', flexShrink: 0 }}>
-          <p
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.9rem',
-              color: 'var(--nrg-green)',
-              letterSpacing: '0.22em',
-              marginBottom: '0.35rem',
-            }}
-          >
-            YOUR INVESTMENT IS PROTECTED
-          </p>
-          <h2
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '1.9rem',
-              fontWeight: 700,
-              color: 'var(--nrg-text-heading)',
-              lineHeight: 1.15,
-            }}
-          >
-            Warranty &amp; Protection
-          </h2>
-          <p
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '0.9rem',
-              color: 'var(--nrg-text-secondary)',
-              marginTop: '0.4rem',
-            }}
-          >
-            Comprehensive coverage from panels to penetrations — every component of your system is backed.
-          </p>
+        {/* Header row: text left + phone image right */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            marginBottom: '1.75rem',
+          }}
+        >
+          {/* Left: eyebrow + H1 + subtitle */}
+          <div style={{ flex: 1, paddingRight: '2rem' }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: 'var(--nrg-green)',
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                marginBottom: '0.4rem',
+              }}
+            >
+              Protection That Lasts
+            </p>
+            <h1
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '2.75rem',
+                fontWeight: 800,
+                color: 'var(--nrg-text-heading)',
+                lineHeight: 1.1,
+                marginBottom: '0.9rem',
+              }}
+            >
+              Industry-Leading Warranty Coverage
+            </h1>
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.92rem',
+                color: 'var(--nrg-text-secondary)',
+                lineHeight: 1.65,
+                maxWidth: '58ch',
+              }}
+            >
+              Solar is a long-term investment. Our warranty package is designed to give you complete
+              peace of mind for the life of your system — and beyond.
+            </p>
+          </div>
+
+          {/* Right: phone image */}
+          <div style={{ flexShrink: 0 }}>
+            <Image
+              src="/northernnrg-phone.png"
+              alt="NRG monitoring app"
+              width={364}
+              height={338}
+              style={{ display: 'block', objectFit: 'contain', marginTop: '-78px' }}
+            />
+          </div>
         </div>
 
         {/* 2×2 warranty card grid */}
@@ -162,117 +172,94 @@ export function WarrantyPage() {
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gridTemplateRows: '1fr 1fr',
             gap: '1.1rem',
-            flex: 1,
-            overflow: 'hidden',
+            marginBottom: '1.25rem',
           }}
         >
-          {warrantyCards.map((card) => (
+          {WARRANTY_CARDS.map((card) => (
             <div
               key={card.title}
               style={{
-                background: 'var(--nrg-card-bg)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                borderTop: '4px solid var(--nrg-green)',
+                background: '#ffffff',
+                border: '1.5px solid rgba(0,121,63,0.2)',
+                borderRadius: '16px',
+                padding: '1.4rem 1.6rem',
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-                boxShadow: '0 1px 10px rgba(0,121,63,0.07)',
-                overflow: 'hidden',
+                alignItems: 'center',
+                gap: '1.25rem',
               }}
             >
-              {/* Icon + term row */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                <div
+              <IconCircle>{card.icon}</IconCircle>
+
+              <div>
+                <p
                   style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '10px',
-                    background: 'var(--nrg-light-green-bg)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    color: 'var(--nrg-text-heading)',
+                    margin: 0,
+                    lineHeight: 1.3,
                   }}
                 >
-                  {card.icon}
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-montserrat)',
-                      fontSize: '1.75rem',
-                      fontWeight: 700,
-                      color: 'var(--nrg-green)',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {card.term}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '0.72rem',
-                      color: 'var(--nrg-text-secondary)',
-                      marginTop: '0.15rem',
-                    }}
-                  >
-                    {card.termSub}
-                  </p>
-                </div>
+                  {card.title}
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '0.8rem',
+                    color: 'var(--nrg-text-secondary)',
+                    margin: '0.25rem 0 0.4rem',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {card.desc}
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '1.7rem',
+                    color: 'var(--nrg-green)',
+                    lineHeight: 1,
+                    margin: 0,
+                    letterSpacing: '0.03em',
+                  }}
+                >
+                  {card.term}
+                </p>
               </div>
-
-              {/* Card title */}
-              <h3
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                  color: 'var(--nrg-text-heading)',
-                }}
-              >
-                {card.title}
-              </h3>
-
-              {/* Description */}
-              <p
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.83rem',
-                  color: 'var(--nrg-text-secondary)',
-                  lineHeight: 1.6,
-                }}
-              >
-                {card.description}
-              </p>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          height: '36px',
-          background: 'var(--nrg-green)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <span
+        {/* Bottom callout */}
+        <div
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.75rem',
-            color: 'rgba(255,255,255,0.7)',
-            letterSpacing: '0.15em',
+            background: '#ffffff',
+            border: '1.5px solid rgba(0,121,63,0.2)',
+            borderRadius: '14px',
+            padding: '1.25rem 1.6rem',
           }}
         >
-          NORTHERN NRG — ENERGY SAVINGS REPORT
-        </span>
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.93rem',
+              color: '#2a3a2a',
+              lineHeight: 1.7,
+              margin: 0,
+            }}
+          >
+            <strong style={{ color: 'var(--nrg-gold)' }}>
+              A warranty is only as good as the company standing behind it.
+            </strong>{' '}
+            If the company that installed your system goes out of business in 8 years, your
+            &ldquo;25-year warranty&rdquo; is worthless. We&#39;ve been operating since 2011 with
+            16,000+ completed installs. We plan to be here when your system turns 25 — and so does
+            your warranty.
+          </p>
+        </div>
+
       </div>
     </div>
   );

@@ -39,40 +39,26 @@ export function CoverPage({
         overflow: 'hidden',
       }}
     >
-      {/* Right-side decorative house photo panel */}
-      {/* Replace the inner div background with: background: 'url(/house-cover.jpg) center/cover' when asset available */}
+      {/* House photo panel — oversized circle bleeds off top/bottom for immersive feel */}
       <div
         style={{
           position: 'absolute',
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: '44%',
-          borderTopLeftRadius: '140px',
-          borderBottomLeftRadius: '140px',
+          right: '-30vh',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: '110vh',
+          height: '110vh',
+          borderRadius: '50%',
           overflow: 'hidden',
+          flexShrink: 0,
         }}
       >
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            background: 'linear-gradient(150deg, #d0ede8 0%, #a8d5cc 25%, #6db8ae 55%, #3d9e93 80%, #1a8278 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <svg width="140" height="140" viewBox="0 0 140 140" fill="none" aria-hidden="true" style={{ opacity: 0.18 }}>
-            <path d="M25 68 L70 18 L115 68 L115 122 H25 Z" fill="white" />
-            <rect x="52" y="88" width="36" height="34" fill="white" opacity="0.9" />
-            <rect x="28" y="72" width="24" height="18" fill="white" opacity="0.7" />
-            <rect x="88" y="72" width="24" height="18" fill="white" opacity="0.7" />
-            <rect x="35" y="50" width="90" height="10" rx="3" fill="white" opacity="0.5" />
-            <rect x="40" y="40" width="80" height="10" rx="3" fill="white" opacity="0.4" />
-            <rect x="45" y="30" width="70" height="10" rx="3" fill="white" opacity="0.3" />
-          </svg>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/house-solar.jpg"
+          alt="House with solar panels"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '60% 50%' }}
+        />
       </div>
 
       {/* Main content — left 56% to stay clear of right panel */}

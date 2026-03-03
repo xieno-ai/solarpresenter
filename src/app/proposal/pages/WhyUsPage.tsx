@@ -1,105 +1,120 @@
-const stats = [
-  { number: '500+', label: 'Installations', sub: 'across Alberta' },
-  { number: '25yr', label: 'Panel Warranty', sub: 'product & performance' },
-  { number: '100%', label: 'Alberta-Based', sub: 'local team, local service' },
-  { number: '10yr', label: 'Workmanship', sub: 'installation guarantee' },
-];
+function GoogleLogo() {
+  const style = (color: string) => ({
+    fontFamily: 'var(--font-sans)',
+    fontSize: '2rem',
+    fontWeight: 700 as const,
+    color,
+    lineHeight: 1,
+  });
+  return (
+    <span aria-label="Google" style={{ display: 'inline-flex', letterSpacing: '-0.02em' }}>
+      <span style={style('#4285F4')}>G</span>
+      <span style={style('#EA4335')}>o</span>
+      <span style={style('#FBBC05')}>o</span>
+      <span style={style('#4285F4')}>g</span>
+      <span style={style('#34A853')}>l</span>
+      <span style={style('#EA4335')}>e</span>
+    </span>
+  );
+}
+
+function StarIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M10 1.5l2.4 5 5.5.6-4 3.9 1.1 5.5L10 14l-5 2.5 1.1-5.5-4-3.9 5.5-.6z"
+        fill={filled ? '#FBBC05' : 'rgba(255,255,255,0.3)'}
+      />
+    </svg>
+  );
+}
 
 export function WhyUsPage() {
   return (
-    <div
-      className="proposal-page"
-      style={{
-        background: 'var(--nrg-page-bg)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Green banner header */}
-      <div
-        style={{
-          background: 'var(--nrg-green)',
-          padding: '2rem 2.5rem',
-          flexShrink: 0,
-        }}
-      >
+    <div className="proposal-page" style={{ background: 'var(--nrg-page-bg)' }}>
+      <div className="proposal-inner" style={{ height: 'auto' }}>
+
+        {/* Eyebrow */}
         <p
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.9rem',
-            color: 'rgba(255,255,255,0.7)',
-            letterSpacing: '0.22em',
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            color: 'var(--nrg-green)',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
             marginBottom: '0.4rem',
           }}
         >
-          OUR COMMITMENT TO QUALITY
+          Who You&#39;re Working With
         </p>
-        <h2
+
+        {/* H1 */}
+        <h1
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '2.25rem',
-            fontWeight: 700,
-            color: '#ffffff',
-            lineHeight: 1.1,
-            marginBottom: '0.5rem',
+            fontSize: '3.1rem',
+            fontWeight: 900,
+            color: 'var(--nrg-text-heading)',
+            lineHeight: 1.05,
+            textTransform: 'uppercase',
+            letterSpacing: '-0.01em',
+            marginBottom: '0.9rem',
           }}
         >
-          Why Northern NRG
-        </h2>
+          Alberta&#39;s Most Installed Solar
+        </h1>
+
+        {/* Subtitle */}
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '0.95rem',
-            color: 'rgba(255,255,255,0.85)',
-            maxWidth: '580px',
-            lineHeight: 1.55,
+            fontSize: '0.92rem',
+            color: 'var(--nrg-text-secondary)',
+            lineHeight: 1.6,
+            maxWidth: '60ch',
+            marginBottom: '2rem',
           }}
         >
-          Alberta-born, Alberta-focused. We&apos;ve been designing and installing solar systems for northern
-          homeowners since 2015 — with unmatched local expertise and a long-term service commitment.
+          Solar is a 25-year commitment. You deserve a company with the track record, the team, and
+          the staying power to back it up.
         </p>
-      </div>
 
-      {/* Main content */}
-      <div
-        style={{
-          flex: 1,
-          padding: '1.75rem 2.5rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Stats grid */}
+        {/* Stats row — 3 cards */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1rem',
-            flexShrink: 0,
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '1.25rem',
+            marginBottom: '1.5rem',
           }}
         >
-          {stats.map((stat) => (
+          {[
+            { number: '16,000+', label: 'Installs Completed' },
+            { number: '13+',     label: 'Years in Business' },
+            { number: '100%',    label: 'In-House Installation' },
+          ].map((stat) => (
             <div
               key={stat.label}
               style={{
-                background: 'var(--nrg-card-bg)',
-                borderRadius: '10px',
-                padding: '1.25rem',
-                textAlign: 'center',
-                boxShadow: '0 1px 8px rgba(0,121,63,0.07)',
-                borderBottom: '3px solid var(--nrg-green)',
+                background: '#ffffff',
+                border: '1.5px solid rgba(0,121,63,0.28)',
+                borderRadius: '16px',
+                padding: '2.25rem 1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.5rem',
               }}
             >
               <p
                 style={{
                   fontFamily: 'var(--font-montserrat)',
-                  fontSize: '2rem',
+                  fontSize: '3rem',
                   fontWeight: 700,
                   color: 'var(--nrg-green)',
                   lineHeight: 1,
-                  marginBottom: '0.35rem',
+                  margin: 0,
                 }}
               >
                 {stat.number}
@@ -107,220 +122,139 @@ export function WhyUsPage() {
               <p
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  color: 'var(--nrg-text-heading)',
-                  marginBottom: '0.2rem',
+                  fontSize: '0.95rem',
+                  color: 'var(--nrg-text-secondary)',
+                  margin: 0,
+                  textAlign: 'center',
                 }}
               >
                 {stat.label}
-              </p>
-              <p
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.72rem',
-                  color: 'var(--nrg-text-secondary)',
-                }}
-              >
-                {stat.sub}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Body + testimonial row */}
+        {/* Google reviews bar */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '1.25rem',
-            flex: 1,
-            overflow: 'hidden',
+            background: '#4a90d9',
+            borderRadius: '16px',
+            padding: '1.5rem 2rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0',
+            marginBottom: '1.5rem',
           }}
         >
-          {/* Left — body text with feature bullets */}
+          {/* Left: Google logo + rating + stars */}
           <div
             style={{
-              background: 'var(--nrg-card-bg)',
-              borderRadius: '12px',
-              padding: '1.75rem',
               display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              overflow: 'hidden',
+              alignItems: 'center',
+              gap: '1.5rem',
+              flex: '0 0 auto',
+              paddingRight: '2rem',
             }}
           >
-            <h3
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '1.1rem',
-                fontWeight: 700,
-                color: 'var(--nrg-text-heading)',
-              }}
-            >
-              What Sets Us Apart
-            </h3>
-            {[
-              {
-                icon: '✓',
-                title: 'Canadian-Made Quality',
-                body: 'We specify Tier-1 panels and premium string inverters — no low-cost substitutions.',
-              },
-              {
-                icon: '✓',
-                title: 'Full In-House Installation',
-                body: "No subcontractors. Our certified crew installs every system start to finish.",
-              },
-              {
-                icon: '✓',
-                title: 'Post-Install Monitoring',
-                body: 'Real-time production monitoring with annual system health reviews included.',
-              },
-              {
-                icon: '✓',
-                title: 'Permitting & Utility Liaison',
-                body: 'We handle all municipal permits and ENMAX / ATCO interconnection paperwork for you.',
-              },
-            ].map((item) => (
-              <div key={item.title} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-montserrat)',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    color: 'var(--nrg-green)',
-                    flexShrink: 0,
-                    marginTop: '0.1rem',
-                  }}
-                >
-                  {item.icon}
-                </span>
-                <div>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '0.88rem',
-                      fontWeight: 700,
-                      color: 'var(--nrg-text-heading)',
-                      marginBottom: '0.15rem',
-                    }}
-                  >
-                    {item.title}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '0.82rem',
-                      color: 'var(--nrg-text-secondary)',
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {item.body}
-                  </p>
-                </div>
+            {/* Logo + stars */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.4rem' }}>
+              <div
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '8px',
+                  padding: '0.3rem 0.7rem',
+                  display: 'inline-flex',
+                }}
+              >
+                <GoogleLogo />
               </div>
-            ))}
+              <div style={{ display: 'flex', gap: '2px', paddingLeft: '0.25rem' }}>
+                {[1,2,3,4,5].map((n) => (
+                  <StarIcon key={n} filled={n <= 5} />
+                ))}
+              </div>
+            </div>
+
+            {/* Rating + label */}
+            <div>
+              <p
+                style={{
+                  fontFamily: 'var(--font-montserrat)',
+                  fontSize: '2.75rem',
+                  fontWeight: 700,
+                  color: '#ffffff',
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
+                4.7
+              </p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.85rem',
+                  color: 'rgba(255,255,255,0.85)',
+                  margin: '0.3rem 0 0',
+                }}
+              >
+                500+ Stars — Google Reviews
+              </p>
+            </div>
           </div>
 
-          {/* Right — testimonial callout */}
+          {/* Divider */}
           <div
             style={{
-              background: 'var(--nrg-light-green-bg)',
-              borderRadius: '12px',
-              padding: '1.75rem',
-              borderLeft: '4px solid var(--nrg-green)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              overflow: 'hidden',
+              width: '1px',
+              alignSelf: 'stretch',
+              background: 'rgba(255,255,255,0.35)',
+              marginRight: '2rem',
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Right: quote */}
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '1rem',
+              color: '#ffffff',
+              fontStyle: 'italic',
+              lineHeight: 1.6,
+              margin: 0,
             }}
           >
-            {/* Quote mark */}
-            <svg width="36" height="28" viewBox="0 0 36 28" fill="none" aria-hidden="true">
-              <path
-                d="M0 28V16C0 7.163 6.04 1.493 14 0l2 3.5C10.88 4.97 8.5 8.1 8 12h8v16H0zm20 0V16C20 7.163 26.04 1.493 34 0l2 3.5C30.88 4.97 28.5 8.1 28 12h8v16H20z"
-                fill="var(--nrg-green)"
-                opacity="0.25"
-              />
-            </svg>
-
-            <p
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '1rem',
-                color: 'var(--nrg-dark-green)',
-                lineHeight: 1.7,
-                fontStyle: 'italic',
-                flex: 1,
-              }}
-            >
-              &ldquo;Northern NRG handled everything — from the permit to the utility connection. The install took
-              three days and my bill dropped by over 80% in the first month. I wish I&apos;d done it sooner.&rdquo;
-            </p>
-
-            <div
-              style={{
-                borderTop: '1px solid rgba(0,121,63,0.2)',
-                paddingTop: '0.75rem',
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  color: 'var(--nrg-text-heading)',
-                }}
-              >
-                M. Kowalski
-              </p>
-              <p
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.78rem',
-                  color: 'var(--nrg-text-secondary)',
-                }}
-              >
-                8.4 kW System — St. Albert, AB — 2024
-              </p>
-            </div>
-
-            {/* Star rating */}
-            <div style={{ display: 'flex', gap: '0.2rem' }}>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <svg key={n} width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path
-                    d="M8 1l1.9 4.1 4.5.5-3.3 3 .9 4.5L8 11 3.9 13.1l.9-4.5L1.6 5.6l4.5-.5L8 1z"
-                    fill="var(--nrg-gold)"
-                  />
-                </svg>
-              ))}
-            </div>
-          </div>
+            &ldquo;With 16,000+ installs and 13+ years in the industry, our reputation is built on
+            real outcomes — not promises.&rdquo;
+          </p>
         </div>
-      </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          height: '36px',
-          background: 'var(--nrg-green)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <span
+        {/* Bottom callout — Why in-house matters */}
+        <div
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.75rem',
-            color: 'rgba(255,255,255,0.7)',
-            letterSpacing: '0.15em',
+            background: 'var(--nrg-light-green-bg)',
+            borderLeft: '4px solid var(--nrg-green)',
+            borderRadius: '0 10px 10px 0',
+            padding: '1.25rem 1.5rem',
           }}
         >
-          NORTHERN NRG — ENERGY SAVINGS REPORT
-        </span>
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.92rem',
+              color: '#2a3a2a',
+              lineHeight: 1.7,
+              margin: 0,
+            }}
+          >
+            <strong style={{ color: 'var(--nrg-green)' }}>Why in-house matters</strong>: Many solar
+            companies use third-party subcontractors to install their systems. That means no
+            accountability when something goes wrong, and no one to call if the installer company
+            closes. Our team — the same people who designed your system — handle every install. Your
+            warranty means something because we did the work.
+          </p>
+        </div>
+
       </div>
     </div>
   );

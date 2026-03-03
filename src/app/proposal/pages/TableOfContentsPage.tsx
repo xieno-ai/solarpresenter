@@ -1,251 +1,193 @@
 const sections = [
   {
-    number: 1,
+    number: '01',
+    title: 'Design',
+    description: 'Initial review of what can be achieved for your property.',
+    accent: 'green' as const,
+  },
+  {
+    number: '02',
     title: 'Net Metering',
-    description: 'Month-by-month solar production vs. consumption analysis',
+    description: 'Month by month breakdown. You sell at 33.5¢ back to grid.',
+    accent: 'green' as const,
   },
   {
-    number: 2,
+    number: '03',
     title: 'Carbon Credits',
-    description: 'Annual CO\u2082 offset and Alberta carbon credit estimates',
+    description: "Earn $1,000 over 10 years via Alberta's Solar Offset program.",
+    accent: 'green' as const,
   },
   {
-    number: 3,
-    title: 'True All-In Costs',
-    description: 'Cash purchase and finance option cost breakdown',
+    number: '04',
+    title: 'Costs',
+    description: 'What investing in Solar looks like 20 years from now.',
+    accent: 'green' as const,
   },
   {
-    number: 4,
-    title: 'Electricity Price History',
-    description: '30-year trend showing rate increases',
+    number: '05',
+    title: 'Price History',
+    description: '20 years of Alberta rates. From 4¢ to 23¢ — a 170% increase.',
+    accent: 'red' as const,
   },
   {
-    number: 5,
+    number: '06',
     title: "What's Coming",
-    description: 'Forces driving electricity prices higher',
+    description: 'AI data centres, population growth, and more. 2 big forces driving rates to 40¢.',
+    accent: 'red' as const,
   },
   {
-    number: 6,
-    title: 'Why Northern NRG',
-    description: 'Our commitment to quality and service',
+    number: '07',
+    title: 'Why Us',
+    description: '100+ solar companies in Alberta. Why the cheapest will cost you the most.',
+    accent: 'green' as const,
   },
   {
-    number: 7,
-    title: 'Warranty & Protection',
-    description: 'Comprehensive coverage for your investment',
+    number: '08',
+    title: 'Warranty',
+    description: '25-year performance, 25-year inverter, lifetime workmanship.',
+    accent: 'green' as const,
   },
   {
-    number: 8,
-    title: 'Frequently Asked Questions',
-    description: 'Common questions from solar customers',
-  },
-  {
-    number: 9,
-    title: 'Your Next Steps',
-    description: 'How we get your solar system installed',
+    number: '09',
+    title: 'Next Steps',
+    description: 'Site survey — PTO. Your 6-step turn-key timeline from sign to live.',
+    accent: 'green' as const,
   },
 ];
 
 export function TableOfContentsPage() {
   return (
-    <div
-      className="proposal-page"
-      style={{
-        background: 'var(--nrg-page-bg)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Header bar */}
+    <div className="proposal-page" style={{ background: 'var(--nrg-page-bg)' }}>
+      <div className="proposal-inner" style={{ height: 'auto' }}>
+      {/* Header */}
       <div
         style={{
-          background: 'var(--nrg-green)',
-          padding: '0 2.5rem',
-          height: '72px',
           display: 'flex',
-          alignItems: 'center',
           justifyContent: 'space-between',
+          alignItems: 'flex-start',
           flexShrink: 0,
+          marginBottom: '2rem',
         }}
       >
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '2rem',
-            color: '#ffffff',
-            letterSpacing: '0.08em',
-          }}
-        >
-          NORTHERN NRG
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.85)',
-            letterSpacing: '0.12em',
-          }}
-        >
-          ENERGY SAVINGS REPORT
-        </span>
-      </div>
-
-      {/* Main content */}
-      <div
-        style={{
-          flex: 1,
-          padding: '2rem 2.5rem',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Page heading area */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem', marginBottom: '1.75rem' }}>
-          {/* Left accent strip */}
-          <div
+        {/* Left: labels + H1 + subtitle */}
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {/* Level 2 label */}
+          <p
             style={{
-              width: '4px',
-              alignSelf: 'stretch',
-              background: 'var(--nrg-green)',
-              borderRadius: '2px',
-              flexShrink: 0,
+              fontFamily: 'var(--font-sans)',
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--nrg-green)',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              margin: '0 0 0.5rem',
             }}
-          />
-          <div>
-            <p
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '0.9rem',
-                color: 'var(--nrg-green)',
-                letterSpacing: '0.2em',
-                marginBottom: '0.2rem',
-              }}
-            >
-              TABLE OF CONTENTS
-            </p>
-            <h2
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '2rem',
-                fontWeight: 700,
-                color: 'var(--nrg-text-heading)',
-                lineHeight: 1.1,
-              }}
-            >
-              Your Proposal
-            </h2>
-            <p
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.95rem',
-                color: 'var(--nrg-text-secondary)',
-                marginTop: '0.4rem',
-              }}
-            >
-              Everything you need to make an informed solar decision — all in one place.
-            </p>
-          </div>
+          >
+            What We'll Cover
+          </p>
+          {/* Level 1 H1 */}
+          <h2
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+              fontWeight: 800,
+              color: 'var(--nrg-text-heading)',
+              lineHeight: 1.05,
+              margin: '0 0 0.5rem',
+            }}
+          >
+            Your Complete Solar Roadmap
+          </h2>
+          {/* Subtitle */}
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '1.15rem',
+              color: 'var(--nrg-text-secondary)',
+              margin: 0,
+            }}
+          >
+            The Last Electricity Bill You'll Ever{' '}
+            <span style={{ color: 'var(--nrg-gold)', fontWeight: 600 }}>Dread.</span>
+          </p>
         </div>
 
-        {/* 9-section grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '0.85rem',
-            flex: 1,
-          }}
-        >
-          {sections.map((section) => (
+        {/* Right: logo */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/northernnrg-logo.png"
+          alt="Northern NRG"
+          style={{ height: '140px', width: 'auto', flexShrink: 0, display: 'block', alignSelf: 'flex-start' }}
+        />
+      </div>
+
+      {/* 3×3 card grid — natural height */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: '16px',
+        }}
+      >
+        {sections.map((section) => {
+          const isRed = section.accent === 'red';
+          const accentColor = isRed ? 'var(--nrg-red-badge)' : 'var(--nrg-green)';
+          return (
             <div
               key={section.number}
               style={{
-                background: 'var(--nrg-card-bg)',
-                borderRadius: '10px',
-                padding: '1rem 1.25rem',
+                background: '#ffffff',
+                borderRadius: '12px',
+                border: `1px solid ${accentColor}`,
+                borderLeft: `4px solid ${accentColor}`,
+                padding: '24px',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                boxShadow: '0 1px 8px rgba(0,121,63,0.06)',
+                flexDirection: 'column',
+                gap: '8px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
               }}
             >
-              {/* Red number badge */}
-              <div
-                style={{
-                  width: '2.75rem',
-                  height: '2.75rem',
-                  borderRadius: '50%',
-                  background: 'var(--nrg-red-badge)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
+              {/* Card title row: number + title */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
                 <span
                   style={{
                     fontFamily: 'var(--font-sans)',
-                    fontSize: '1.15rem',
-                    fontWeight: 700,
-                    color: '#ffffff',
+                    fontSize: '2rem',
+                    fontWeight: 800,
+                    color: accentColor,
+                    flexShrink: 0,
                   }}
                 >
                   {section.number}
                 </span>
-              </div>
-
-              {/* Section text */}
-              <div>
-                <p
+                <span
                   style={{
                     fontFamily: 'var(--font-sans)',
-                    fontSize: '0.95rem',
+                    fontSize: '1.75rem',
                     fontWeight: 700,
                     color: 'var(--nrg-text-heading)',
                     lineHeight: 1.2,
-                    marginBottom: '0.2rem',
                   }}
                 >
                   {section.title}
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.78rem',
-                    color: 'var(--nrg-text-secondary)',
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {section.description}
-                </p>
+                </span>
               </div>
+              {/* Description — Level 4 */}
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '1.05rem',
+                  color: 'var(--nrg-text-secondary)',
+                  lineHeight: 1.55,
+                  margin: 0,
+                }}
+              >
+                {section.description}
+              </p>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
-
-      {/* Footer */}
-      <div
-        style={{
-          height: '36px',
-          background: 'var(--nrg-green)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.75rem',
-            color: 'rgba(255,255,255,0.7)',
-            letterSpacing: '0.15em',
-          }}
-        >
-          NORTHERN NRG — ENERGY SAVINGS REPORT
-        </span>
       </div>
     </div>
   );
