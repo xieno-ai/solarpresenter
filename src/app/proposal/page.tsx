@@ -16,6 +16,11 @@ import { NetMeteringPage } from './pages/NetMeteringPage';
 import { CarbonCreditsPage } from './pages/CarbonCreditsPage';
 import { AllInCostsPage } from './pages/AllInCostsPage';
 import { PriceHistoryPage } from './pages/PriceHistoryPage';
+import { WhatsComingPage } from './pages/WhatsComingPage';
+import { WhyUsPage } from './pages/WhyUsPage';
+import { WarrantyPage } from './pages/WarrantyPage';
+import { FAQPage } from './pages/FAQPage';
+import { NextStepsPage } from './pages/NextStepsPage';
 
 // ---------------------------------------------------------------------------
 // Satellite image URL builder (server-side only — API key never sent to client)
@@ -188,12 +193,20 @@ export default async function ProposalPage({
       {/* Page 6 — Price History */}
       <PriceHistoryPage />
 
-      {/* Pages 7–11 — static marketing content (Plan 03 Task 2) */}
-      <div className="proposal-page" />
-      <div className="proposal-page" />
-      <div className="proposal-page" />
-      <div className="proposal-page" />
-      <div className="proposal-page" />
+      {/* Page 7 — What's Coming */}
+      <WhatsComingPage />
+
+      {/* Page 8 — Why Northern NRG */}
+      <WhyUsPage />
+
+      {/* Page 9 — Warranty & Protection */}
+      <WarrantyPage />
+
+      {/* Page 10 — FAQ */}
+      <FAQPage />
+
+      {/* Page 11 — Next Steps */}
+      <NextStepsPage />
     </div>
   );
 }
