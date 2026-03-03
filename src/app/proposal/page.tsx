@@ -10,6 +10,8 @@ import type { ProposalInputs, MonthlyValues } from '@/lib/types';
 import type { ProposalOutputs, SavingsSummary } from '@/lib/types';
 import type { SerializedProposalOutputs, SerializedSavingsSummary } from '@/app/actions/calculate';
 
+import { CoverPage } from './pages/CoverPage';
+
 // ---------------------------------------------------------------------------
 // Satellite image URL builder (server-side only — API key never sent to client)
 // ---------------------------------------------------------------------------
@@ -144,25 +146,36 @@ export default async function ProposalPage({
   // Satellite image URL built server-side — API key stays on server
   const satelliteUrl = buildSatelliteImageUrl(formValues.customer.address);
 
-  // Suppress unused variable warning until pages 02/03 use them
-  void serialized;
-  void satelliteUrl;
-
   return (
     <div className="proposal-root proposal-snap-container">
-      {/* Placeholder page — filled by plans 02 and 03 */}
-      <div className="proposal-page flex items-center justify-center">
-        <p
-          style={{
-            color: 'var(--nrg-green)',
-            fontFamily: 'var(--font-display)',
-            fontSize: '2rem',
-            letterSpacing: '0.05em',
-          }}
-        >
-          PROPOSAL LOADING — {formValues.customer.name}
-        </p>
-      </div>
+      {/* Page 1 — Cover */}
+      <CoverPage
+        customerName={formValues.customer.name}
+        address={formValues.customer.address}
+        systemSizeKw={formValues.system.systemSizeKw}
+        outputs={serialized}
+        satelliteUrl={satelliteUrl}
+      />
+
+      {/* Page 2 — placeholder (Plan 03) */}
+      <div className="proposal-page" />
+
+      {/* Page 3 — Net Metering (Task 2 below) */}
+      <div className="proposal-page" />
+
+      {/* Page 4 — Carbon Credits (Task 3 below) */}
+      <div className="proposal-page" />
+
+      {/* Page 5 — All-In Costs (Task 3 below) */}
+      <div className="proposal-page" />
+
+      {/* Pages 6–11 — static marketing content (Plan 03) */}
+      <div className="proposal-page" />
+      <div className="proposal-page" />
+      <div className="proposal-page" />
+      <div className="proposal-page" />
+      <div className="proposal-page" />
+      <div className="proposal-page" />
     </div>
   );
 }
