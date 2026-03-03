@@ -21,8 +21,8 @@ describe('calculateProposal — full integration', () => {
       expect(outputs.utilityProjection30Year).toHaveLength(30);
     });
 
-    it('utilityProjection20Year[0] equals 4212 × 1.05^1 = 4422.60', () => {
-      expect(outputs.utilityProjection20Year[0].toFixed(2)).toBe('4422.60');
+    it('utilityProjection20Year[0] equals 4212 × 1.05^0 = 4212.00 (no escalation Year 1)', () => {
+      expect(outputs.utilityProjection20Year[0].toFixed(2)).toBe('4212.00');
     });
 
     it('twentyYearUtilityCost equals sum of all 20 projected years', () => {

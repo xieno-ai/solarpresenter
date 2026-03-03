@@ -21,6 +21,7 @@ import { WhyUsPage } from './pages/WhyUsPage';
 import { WarrantyPage } from './pages/WarrantyPage';
 import { FAQPage } from './pages/FAQPage';
 import { NextStepsPage } from './pages/NextStepsPage';
+import { ProposalFAB } from './ProposalFAB';
 
 // ---------------------------------------------------------------------------
 // Satellite image URL builder (server-side only — API key never sent to client)
@@ -175,19 +176,36 @@ export default async function ProposalPage({
         monthlyNetMetering={serialized.monthlyNetMetering}
         annualGridPurchaseCost={serialized.annualGridPurchaseCost}
         annualSellRevenue={serialized.annualSellRevenue}
+        allInRate={formValues.rates.allInRate}
         gridBuyRate={formValues.rates.netMeteringBuyRate}
         sellRate={formValues.rates.netMeteringSellRate}
+        preSolarRate={config.defaultPreSolarRate.toString()}
       />
 
       {/* Page 4 — Carbon Credits */}
-      <CarbonCreditsPage carbonCredits={serialized.carbonCredits} />
+      <CarbonCreditsPage
+        carbonCredits={serialized.carbonCredits}
+        annualProductionKwh={formValues.system.annualProductionKwh}
+      />
 
       {/* Page 5 — All-In Costs */}
       <AllInCostsPage
         cashPurchase={serialized.cashPurchase}
         financeOption={serialized.financeOption}
-        utilityProjection20Year={serialized.utilityProjection20Year}
         systemCost={formValues.financing.cashPurchasePrice}
+        annualGridPurchaseCost={serialized.annualGridPurchaseCost}
+        annualSellRevenue={serialized.annualSellRevenue}
+        annualGridBuyKwh={serialized.monthlyNetMetering
+          .reduce((s, m) => s + parseFloat(m.gridBuyKwh), 0)
+          .toFixed(0)}
+        annualSurplusKwh={serialized.monthlyNetMetering
+          .reduce((s, m) => s + parseFloat(m.surplusSoldKwh), 0)
+          .toFixed(0)}
+        gridBuyRate={formValues.rates.netMeteringBuyRate}
+        sellRate={formValues.rates.netMeteringSellRate}
+        escalationRate={formValues.rates.annualEscalationRate}
+        financeTermMonths={formValues.financing.financeTermMonths}
+        carbonCredits={serialized.carbonCredits}
       />
 
       {/* Page 6 — Price History */}
@@ -203,10 +221,13 @@ export default async function ProposalPage({
       <WarrantyPage />
 
       {/* Page 10 — FAQ */}
-      <FAQPage />
+      <FAQPage systemCost={formValues.financing.cashPurchasePrice} />
 
       {/* Page 11 — Next Steps */}
       <NextStepsPage />
+
+      {/* Persistent floating action button */}
+      <ProposalFAB />
     </div>
   );
 }

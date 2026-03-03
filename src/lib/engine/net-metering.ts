@@ -56,7 +56,8 @@ export function computeNetMeteringProjection(
   let totalGridPurchaseCost = d('0');
 
   for (let n = 1; n <= years; n++) {
-    const factor = d('1').plus(escalationRate).pow(n);
+    // Year 1 = no escalation (1+r)^0; Year N = (1+r)^(N-1)
+    const factor = d('1').plus(escalationRate).pow(n - 1);
     totalSellRevenue = totalSellRevenue.plus(annualSellRevenue.times(factor));
     totalGridPurchaseCost = totalGridPurchaseCost.plus(annualGridPurchaseCost.times(factor));
   }

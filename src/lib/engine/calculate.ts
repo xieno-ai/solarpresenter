@@ -70,8 +70,8 @@ export function calculateProposal(inputs: ProposalInputs, config: AlbertaConfig)
   // CALC-05: Carbon credits (CO2 avoidance × benchmark schedule)
   const carbonCredits = computeCarbonCredits(inputs.system.annualProductionKwh, config);
 
-  // Annual carbon credit = tenYearPayoutLow / 10 (average per year, conservative)
-  const annualCarbonCredit = carbonCredits.tenYearPayoutLow.dividedBy(d('10'));
+  // Annual carbon credit = tenYearPayoutHigh / 10 (matches doc Section 8.2)
+  const annualCarbonCredit = carbonCredits.tenYearPayoutHigh.dividedBy(d('10'));
 
   // CALC-06: Cash back over 20 and 30 years
   const cashBack20 = computeCashBack(
@@ -87,10 +87,8 @@ export function calculateProposal(inputs: ProposalInputs, config: AlbertaConfig)
     30,
   );
 
-  // Year 1 cash back for the finance option snapshot (base-year escalation only)
-  const cashBackYear1 = annualGridPurchaseCost
-    .times(d('1').plus(inputs.rates.annualEscalationRate))
-    .times(config.cashBackRate);
+  // Year 1 cash back for the finance option snapshot — no escalation in Year 1
+  const cashBackYear1 = annualGridPurchaseCost.times(config.cashBackRate);
 
   // Utility avoided = sum of projection arrays (all years of avoided utility bills)
   const utilityAvoided20 = twentyYearUtilityCost;
@@ -100,17 +98,18 @@ export function calculateProposal(inputs: ProposalInputs, config: AlbertaConfig)
   );
 
   // CALC-07: True all-in savings summaries (cash purchase, 20 and 30 year)
+  // Doc Section 6.1 + 7.2 both use HIGH carbon estimate for savings
   const cashPurchase20 = computeSavingsSummary(
     utilityAvoided20,
     nmProjection20.totalSellRevenue,
-    carbonCredits.tenYearPayoutLow,
+    carbonCredits.tenYearPayoutHigh,
     cashBack20,
     inputs.financing.cashPurchasePrice,
   );
   const cashPurchase30 = computeSavingsSummary(
     utilityAvoided30,
     nmProjection30.totalSellRevenue,
-    carbonCredits.tenYearPayoutLow,
+    carbonCredits.tenYearPayoutHigh,
     cashBack30,
     inputs.financing.cashPurchasePrice,
   );

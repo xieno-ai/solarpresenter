@@ -1,557 +1,450 @@
-import dynamic from 'next/dynamic';
 import type { SerializedProposalOutputs } from '@/app/actions/calculate';
-
-const UtilityTrendChart = dynamic(
-  () => import('../charts/UtilityTrendChart').then((m) => m.UtilityTrendChart),
-  {
-    ssr: false,
-    loading: () => (
-      <div style={{ height: 200, background: '#f0f0f0', borderRadius: 8 }} />
-    ),
-  },
-);
 
 interface AllInCostsPageProps {
   cashPurchase: SerializedProposalOutputs['cashPurchase'];
   financeOption: SerializedProposalOutputs['financeOption'];
-  utilityProjection20Year: string[];
   systemCost: string;
+  annualGridPurchaseCost: string;
+  annualSellRevenue: string;
+  annualGridBuyKwh: string;
+  annualSurplusKwh: string;
+  gridBuyRate: string;        // $/kWh
+  sellRate: string;           // $/kWh
+  escalationRate: string;     // e.g. "0.05"
+  financeTermMonths: string;  // e.g. "60"
+  carbonCredits: SerializedProposalOutputs['carbonCredits'];
 }
 
-function formatCAD(value: string, decimals = 0): string {
-  return parseFloat(value).toLocaleString('en-CA', {
+function fmtCAD(v: number, decimals = 0): string {
+  return v.toLocaleString('en-CA', {
     style: 'currency',
     currency: 'CAD',
-    maximumFractionDigits: decimals,
     minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
   });
 }
 
-function LineItem({
-  label,
-  value,
-  color = 'var(--nrg-green)',
-  prefix = '+',
-  bold = false,
-}: {
-  label: string;
-  value: string;
-  color?: string;
-  prefix?: string;
-  bold?: boolean;
-}) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '0.4rem 0',
-        borderBottom: '1px solid rgba(0,0,0,0.05)',
-      }}
-    >
-      <span
-        style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: '0.8rem',
-          color: 'var(--nrg-text-secondary)',
-          fontWeight: bold ? 600 : 400,
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.82rem',
-          color,
-          fontWeight: bold ? 700 : 500,
-        }}
-      >
-        {prefix}{value}
-      </span>
-    </div>
-  );
+function fmtCents(rate: string): string {
+  return (parseFloat(rate) * 100).toFixed(1);
 }
 
 export function AllInCostsPage({
   cashPurchase,
   financeOption,
-  utilityProjection20Year,
   systemCost,
+  annualGridPurchaseCost,
+  annualSellRevenue,
+  annualGridBuyKwh,
+  annualSurplusKwh,
+  gridBuyRate,
+  sellRate,
+  escalationRate,
+  financeTermMonths,
+  carbonCredits,
 }: AllInCostsPageProps) {
+  const escalationPct = (parseFloat(escalationRate) * 100).toFixed(0);
+  const financeYears = Math.round(parseInt(financeTermMonths, 10) / 12);
   const { twentyYear, thirtyYear } = cashPurchase;
 
-  return (
-    <div
-      className="proposal-page"
-      style={{
-        background: 'var(--nrg-page-bg)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          background: 'var(--nrg-green)',
-          padding: '0 2.5rem',
-          height: '72px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexShrink: 0,
-        }}
-      >
-        <div>
-          <h2
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '1.25rem',
-              fontWeight: 700,
-              color: '#ffffff',
-              margin: 0,
-              lineHeight: 1.1,
-            }}
-          >
-            TRUE ALL-IN COSTS
-          </h2>
-          <p
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.8rem',
-              color: 'rgba(255,255,255,0.8)',
-              margin: 0,
-              letterSpacing: '0.1em',
-            }}
-          >
-            CASH PURCHASE VS FINANCE OPTION
-          </p>
-        </div>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '1.5rem',
-            color: 'rgba(255,255,255,0.9)',
-            letterSpacing: '0.08em',
-          }}
-        >
-          NORTHERN NRG
-        </span>
-      </div>
+  // ── Monthly finance breakdown (mirrors CALC-08 from savings.ts) ────────────
+  const monthlyFinance = parseFloat(financeOption.totalMonthlyPayment);
+  const monthlyGridCost = parseFloat(annualGridPurchaseCost) / 12;
+  const monthlyNMRev = parseFloat(annualSellRevenue) / 12;
+  const monthlyCarbonCredit = parseFloat(carbonCredits.tenYearPayoutHigh) / 120; // tenYrHigh / 10yr / 12mo (doc §8.2)
+  const monthlyAllIn = parseFloat(financeOption.monthlyAllInCost);
+  // Derive cash back exactly so numbers add up: finance + grid - nm - carbon - cashBack = allIn
+  const monthlyCashBack = monthlyFinance + monthlyGridCost - monthlyNMRev - monthlyCarbonCredit - monthlyAllIn;
 
-      {/* Two-column body */}
-      <div
-        style={{
-          flex: 1,
+  // ── Formatted values ───────────────────────────────────────────────────────
+  const systemCostFmt = fmtCAD(parseFloat(systemCost), 2);
+  const gridBuyCents = fmtCents(gridBuyRate);
+  const sellCents = fmtCents(sellRate);
+  const gridBuyKwhRounded = Math.round(parseFloat(annualGridBuyKwh)).toLocaleString('en-CA');
+  const surplusKwhRounded = Math.round(parseFloat(annualSurplusKwh)).toLocaleString('en-CA');
+
+  // ── Styles ─────────────────────────────────────────────────────────────────
+  const sepLine: React.CSSProperties = {
+    height: '1px',
+    background: 'rgba(0,0,0,0.07)',
+    margin: '0.6rem 0',
+  };
+
+  function LeftLineItem({
+    label,
+    sub,
+    value,
+    prefix = '+',
+    green = true,
+    bold = false,
+    totalRow = false,
+  }: {
+    label: string;
+    sub?: string;
+    value: string;
+    prefix?: string;
+    green?: boolean;
+    bold?: boolean;
+    totalRow?: boolean;
+  }) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        padding: '0.45rem 0',
+        borderBottom: totalRow ? 'none' : '1px solid rgba(0,0,0,0.06)',
+      }}>
+        <div style={{ flex: 1, paddingRight: '1rem' }}>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: totalRow ? '0.68rem' : '0.82rem',
+            fontWeight: totalRow ? 700 : (bold ? 600 : 400),
+            color: totalRow ? 'var(--nrg-text-secondary)' : 'var(--nrg-text-heading)',
+            letterSpacing: totalRow ? '0.08em' : '0',
+            textTransform: totalRow ? 'uppercase' : 'none',
+            margin: 0,
+          }}>{label}</p>
+          {sub && (
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.7rem',
+              color: 'var(--nrg-text-secondary)',
+              margin: '0.1rem 0 0',
+              lineHeight: 1.4,
+            }}>{sub}</p>
+          )}
+        </div>
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: totalRow ? '1.1rem' : '0.88rem',
+          fontWeight: totalRow ? 800 : (bold ? 700 : 600),
+          color: totalRow ? 'var(--nrg-text-heading)' : (green ? 'var(--nrg-surplus-green)' : 'var(--nrg-text-heading)'),
+          margin: 0,
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
+        }}>
+          {totalRow ? '' : prefix}{value}
+        </p>
+      </div>
+    );
+  }
+
+  function RightLineItem({
+    label,
+    sub,
+    value,
+    credit = false,
+    totalRow = false,
+  }: {
+    label: string;
+    sub?: string;
+    value: string;
+    credit?: boolean;
+    totalRow?: boolean;
+  }) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        padding: '0.45rem 0',
+        borderBottom: totalRow ? 'none' : '1px solid rgba(0,0,0,0.07)',
+      }}>
+        <div style={{ flex: 1, paddingRight: '1rem' }}>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: totalRow ? '0.68rem' : '0.82rem',
+            fontWeight: totalRow ? 700 : 400,
+            color: totalRow ? 'var(--nrg-text-secondary)' : 'var(--nrg-text-heading)',
+            letterSpacing: totalRow ? '0.08em' : '0',
+            textTransform: totalRow ? 'uppercase' : 'none',
+            margin: 0,
+          }}>{label}</p>
+          {sub && (
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.7rem',
+              color: 'var(--nrg-text-secondary)',
+              margin: '0.1rem 0 0',
+              lineHeight: 1.4,
+            }}>{sub}</p>
+          )}
+        </div>
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: totalRow ? '1.1rem' : '0.88rem',
+          fontWeight: totalRow ? 800 : 600,
+          color: totalRow
+            ? 'var(--nrg-text-heading)'
+            : credit
+              ? 'var(--nrg-surplus-green)'
+              : 'var(--nrg-text-heading)',
+          margin: 0,
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
+        }}>
+          {value}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="proposal-page" style={{ background: 'var(--nrg-card-bg)' }}>
+      <div className="proposal-inner" style={{ height: 'auto' }}>
+
+        {/* ── Eyebrow + H1 + Subtitle ── */}
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '0.75rem',
+          fontWeight: 700,
+          color: 'var(--nrg-green)',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          margin: '0 0 0.45rem',
+        }}>
+          True All In Costs
+        </p>
+
+        <h2 style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'clamp(2rem, 3.5vw, 2.75rem)',
+          fontWeight: 800,
+          color: 'var(--nrg-text-heading)',
+          lineHeight: 1.1,
+          margin: '0 0 0.75rem',
+        }}>
+          What You Actually Pay
+        </h2>
+
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '0.95rem',
+          color: 'var(--nrg-text-secondary)',
+          lineHeight: 1.6,
+          margin: '0 0 1.5rem',
+          maxWidth: '640px',
+        }}>
+          When you factor in every offset, credit, and saving against the solar payment,
+          here&#8217;s your true all&#8209;in costs &#8212; everything accounted for.
+        </p>
+
+        {/* ── Two-panel grid ── */}
+        <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: '1.25rem',
-          padding: '1.25rem 2.5rem',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Left column — Cash Purchase */}
-        <div
-          style={{
+          gap: '1.5rem',
+          marginBottom: '1.25rem',
+        }}>
+
+          {/* ── Left: Cash Purchase ── */}
+          <div style={{
             background: 'var(--nrg-cash-col-bg)',
-            borderRadius: '10px',
-            overflow: 'hidden',
+            border: '1.5px solid #9dd0f0',
+            borderRadius: '16px',
+            padding: '1.5rem 1.75rem',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 2px 12px rgba(65,148,216,0.1)',
-          }}
-        >
-          {/* Blue badge header */}
-          <div
-            style={{
-              background: 'var(--nrg-cash-header)',
-              padding: '0.75rem 1.25rem',
-              flexShrink: 0,
-            }}
-          >
-            <p
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '0.95rem',
+          }}>
+            {/* Badge */}
+            <div style={{ marginBottom: '0.75rem' }}>
+              <span style={{
+                display: 'inline-block',
+                background: 'var(--nrg-cash-header)',
                 color: '#ffffff',
-                letterSpacing: '0.1em',
-                margin: 0,
-              }}
-            >
-              CASH PURCHASE
-            </p>
-          </div>
-
-          <div style={{ padding: '1rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            {/* 20-year line items */}
-            <p
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '0.72rem',
-                color: 'var(--nrg-text-secondary)',
-                letterSpacing: '0.1em',
-                marginBottom: '0.25rem',
-              }}
-            >
-              20-YEAR SAVINGS
-            </p>
-
-            <LineItem
-              label="Utility Avoided"
-              value={formatCAD(twentyYear.utilityAvoided)}
-              color="var(--nrg-green)"
-              prefix="+ "
-            />
-            <LineItem
-              label="Net Metering Revenue"
-              value={formatCAD(twentyYear.netMeteringRevenue)}
-              color="var(--nrg-green)"
-              prefix="+ "
-            />
-            <LineItem
-              label="Carbon Credits"
-              value={formatCAD(twentyYear.carbonCredits)}
-              color="var(--nrg-green)"
-              prefix="+ "
-            />
-            <LineItem
-              label="Cash Back (3%)"
-              value={formatCAD(twentyYear.cashBack)}
-              color="var(--nrg-green)"
-              prefix="+ "
-            />
-            <LineItem
-              label="System Cost"
-              value={formatCAD(systemCost)}
-              color="#df584d"
-              prefix="- "
-            />
-
-            <div
-              style={{
-                background: 'var(--nrg-light-green-bg)',
-                borderRadius: '6px',
-                padding: '0.75rem 1rem',
-                marginTop: '0.5rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  color: 'var(--nrg-text-primary)',
-                }}
-              >
-                20-Year Net Savings
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-montserrat)',
-                  fontSize: '1.1rem',
-                  fontWeight: 700,
-                  color: 'var(--nrg-green)',
-                }}
-              >
-                {formatCAD(twentyYear.netSavingsAfterCost)}
-              </span>
-            </div>
-
-            <p
-              style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: '0.72rem',
-                color: 'var(--nrg-text-secondary)',
-                marginTop: '0.25rem',
-              }}
-            >
-              30-Year: <strong style={{ color: 'var(--nrg-green)' }}>{formatCAD(thirtyYear.netSavingsAfterCost)}</strong>
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                padding: '0.3rem 0.875rem',
+                borderRadius: '100px',
+              }}>Cash Purchase</span>
+            </div>
+
+            {/* Subtitle */}
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.82rem',
+              color: 'var(--nrg-text-heading)',
+              margin: '0 0 0.5rem',
+              fontWeight: 500,
+            }}>
+              Maximum ROI. Zero Utility Payments
             </p>
 
-            {/* Utility trend chart */}
-            <div style={{ flex: 1, minHeight: 0, marginTop: '0.5rem' }}>
-              <p
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '0.68rem',
-                  color: 'var(--nrg-text-secondary)',
-                  letterSpacing: '0.08em',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                20-YEAR UTILITY COST TREND
-              </p>
-              <UtilityTrendChart projection20Year={utilityProjection20Year} />
-            </div>
-          </div>
-        </div>
+            {/* Big number */}
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
+              fontWeight: 800,
+              color: 'var(--nrg-text-heading)',
+              lineHeight: 1,
+              margin: '0 0 1rem',
+            }}>
+              {systemCostFmt}
+            </p>
 
-        {/* Right column — Finance Option */}
-        <div
-          style={{
+            <div style={sepLine} />
+
+            {/* Line items */}
+            <div style={{ flex: 1 }}>
+              <LeftLineItem
+                label="System Cost"
+                value={systemCostFmt}
+                prefix=""
+                green={false}
+              />
+              <LeftLineItem
+                label="20-Year Utility Bill Avoided"
+                sub={`Alberta's historical ${escalationPct}% annual increase per year`}
+                value={fmtCAD(parseFloat(twentyYear.utilityAvoided))}
+              />
+              <LeftLineItem
+                label="20-Year Net Metering Sell Revenue"
+                sub="Assuming 5% annual increase per year"
+                value={fmtCAD(parseFloat(twentyYear.netMeteringRevenue))}
+              />
+              <LeftLineItem
+                label="10-Year Carbon Credits"
+                sub="Via Solar Offset"
+                value={fmtCAD(parseFloat(twentyYear.carbonCredits))}
+              />
+              <LeftLineItem
+                label="3% Cash Back on Grid Purchases"
+                value={fmtCAD(parseFloat(twentyYear.cashBack))}
+              />
+            </div>
+
+            <div style={{ height: '1px', background: 'var(--nrg-text-heading)', margin: '0.5rem 0' }} />
+
+            {/* Total row */}
+            <LeftLineItem
+              label="True Savings All-In (20 Years)"
+              value={fmtCAD(parseFloat(twentyYear.netSavingsAfterCost))}
+              green={false}
+              bold
+              totalRow
+            />
+          </div>
+
+          {/* ── Right: Finance Option ── */}
+          <div style={{
             background: 'var(--nrg-finance-col-bg)',
-            borderRadius: '10px',
-            overflow: 'hidden',
+            border: '1.5px solid #8dd3b0',
+            borderRadius: '16px',
+            padding: '1.5rem 1.75rem',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 2px 12px rgba(17,131,75,0.1)',
-          }}
-        >
-          {/* Green badge header */}
-          <div
-            style={{
-              background: 'var(--nrg-finance-header)',
-              padding: '0.75rem 1.25rem',
-              flexShrink: 0,
-            }}
-          >
-            <p
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '0.95rem',
+          }}>
+            {/* Badge */}
+            <div style={{ marginBottom: '0.75rem' }}>
+              <span style={{
+                display: 'inline-block',
+                background: 'var(--nrg-dark-green)',
                 color: '#ffffff',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.68rem',
+                fontWeight: 700,
                 letterSpacing: '0.1em',
-                margin: 0,
-              }}
-            >
-              FINANCE OPTION
-            </p>
-          </div>
-
-          <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {/* Monthly all-in cost — big display */}
-            <div
-              style={{
-                background: 'var(--nrg-card-bg)',
-                borderRadius: '8px',
-                padding: '1.25rem',
-                textAlign: 'center',
-                boxShadow: '0 1px 6px rgba(17,131,75,0.08)',
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '0.75rem',
-                  color: 'var(--nrg-text-secondary)',
-                  letterSpacing: '0.12em',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                MONTHLY ALL-IN COST
-              </p>
-              <p
-                style={{
-                  fontFamily: 'var(--font-montserrat)',
-                  fontSize: '2.5rem',
-                  fontWeight: 700,
-                  color: 'var(--nrg-finance-header)',
-                  lineHeight: 1,
-                }}
-              >
-                {formatCAD(financeOption.monthlyAllInCost, 0)}
-              </p>
-              <p
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.75rem',
-                  color: 'var(--nrg-text-secondary)',
-                  marginTop: '0.25rem',
-                }}
-              >
-                per month
-              </p>
+                textTransform: 'uppercase',
+                padding: '0.3rem 0.875rem',
+                borderRadius: '100px',
+              }}>Finance Option</span>
             </div>
 
-            {/* Monthly breakdown */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-              <p
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '0.72rem',
-                  color: 'var(--nrg-text-secondary)',
-                  letterSpacing: '0.1em',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                MONTHLY BREAKDOWN
-              </p>
-
-              <LineItem
-                label="Finance Payment"
-                value={formatCAD(financeOption.totalMonthlyPayment, 2)}
-                color="#df584d"
-                prefix="- "
-              />
-              <LineItem
-                label="Remaining Utility"
-                value={formatCAD(financeOption.monthlyAllInCost, 2)}
-                color="var(--nrg-text-secondary)"
-                prefix=""
-              />
-
-              <div
-                style={{
-                  marginTop: '0.75rem',
-                  background: 'var(--nrg-card-bg)',
-                  borderRadius: '6px',
-                  padding: '0.75rem 1rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  borderLeft: '3px solid var(--nrg-finance-header)',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: 'var(--nrg-text-primary)',
-                  }}
-                >
-                  Total Monthly with Solar
-                </span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-montserrat)',
-                    fontSize: '1.1rem',
-                    fontWeight: 700,
-                    color: 'var(--nrg-finance-header)',
-                  }}
-                >
-                  {formatCAD(financeOption.monthlyAllInCost)}
-                </span>
-              </div>
-            </div>
-
-            {/* Value props */}
-            <div
-              style={{
-                background: 'var(--nrg-card-bg)',
-                borderRadius: '8px',
-                padding: '1rem',
-                flex: 1,
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '0.72rem',
-                  color: 'var(--nrg-text-secondary)',
-                  letterSpacing: '0.1em',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                INCLUDED BENEFITS
-              </p>
-              {[
-                'Net Metering Credits Applied Monthly',
-                'Carbon Credit Revenue (Alberta Program)',
-                '3% Cash Back on System Purchase',
-                'Transferable Solar Warranty',
-                'Production Monitoring Included',
-              ].map((benefit) => (
-                <div
-                  key={benefit}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.3rem 0',
-                    borderBottom: '1px solid rgba(0,121,63,0.08)',
-                  }}
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                    style={{ flexShrink: 0 }}
-                  >
-                    <circle cx="7" cy="7" r="7" fill="#00793f" opacity="0.15" />
-                    <path
-                      d="M4 7l2 2 4-4"
-                      stroke="#00793f"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '0.75rem',
-                      color: 'var(--nrg-text-primary)',
-                    }}
-                  >
-                    {benefit}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Gold banner */}
-      <div
-        style={{
-          background: 'var(--nrg-gold-banner)',
-          padding: '0.9rem 2.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexShrink: 0,
-        }}
-      >
-        <div>
-          <p
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.85rem',
-              color: 'rgba(0,0,0,0.6)',
-              letterSpacing: '0.12em',
-              margin: 0,
-            }}
-          >
-            YOUR 30-YEAR SAVINGS
-          </p>
-          <p
-            style={{
+            {/* Subtitle */}
+            <p style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: '0.72rem',
-              color: 'rgba(0,0,0,0.5)',
-              margin: 0,
-            }}
-          >
-            Cash purchase, including all sources of value
-          </p>
+              fontSize: '0.82rem',
+              color: 'var(--nrg-text-heading)',
+              margin: '0 0 0.5rem',
+              fontWeight: 500,
+            }}>
+              Predictable Expense at 0% Interest for 60&#8209;Months
+            </p>
+
+            {/* Big number */}
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
+              fontWeight: 800,
+              color: 'var(--nrg-text-heading)',
+              lineHeight: 1,
+              margin: '0 0 1rem',
+            }}>
+              {fmtCAD(monthlyFinance, 0)}{' '}
+              <span style={{ fontSize: '0.55em', fontWeight: 600, color: 'var(--nrg-text-secondary)' }}>
+                / Month
+              </span>
+            </p>
+
+            <div style={sepLine} />
+
+            {/* Monthly line items */}
+            <div style={{ flex: 1 }}>
+              <RightLineItem
+                label="Finance Payment"
+                sub={`0% interest for first ${financeYears} years`}
+                value={`+${fmtCAD(monthlyFinance, 2)}`}
+              />
+              <RightLineItem
+                label="Remaining Utility Bill"
+                sub={`${gridBuyKwhRounded} kWh @ ~${gridBuyCents}¢ (energy + T&D) ÷ 12 months`}
+                value={`+${fmtCAD(monthlyGridCost, 2)}`}
+              />
+              <RightLineItem
+                label="Less: Net Metering Sell Revenue"
+                sub={`${surplusKwhRounded} kWh surplus @ ${sellCents}¢ ÷ 12`}
+                value={`\u2212${fmtCAD(monthlyNMRev, 2)}`}
+                credit
+              />
+              <RightLineItem
+                label="Less: Carbon Credits (Year 1 avg.)"
+                sub="Via Solar Offset — paid annually, shown monthly"
+                value={`\u2212${fmtCAD(monthlyCarbonCredit, 2)}`}
+                credit
+              />
+              <RightLineItem
+                label="Less: 3% Cash Back on Grid Purchases"
+                value={`\u2212${fmtCAD(monthlyCashBack, 2)}`}
+                credit
+              />
+            </div>
+
+            <div style={{ height: '1px', background: 'var(--nrg-text-heading)', margin: '0.5rem 0' }} />
+
+            {/* Total row */}
+            <RightLineItem
+              label="Solar Monthly All-In"
+              value={`${fmtCAD(monthlyAllIn, 2)} / MO`}
+              totalRow
+            />
+          </div>
         </div>
-        <div
-          style={{
-            background: 'var(--nrg-gold-banner-inner)',
-            borderRadius: '8px',
-            padding: '0.5rem 1.5rem',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-montserrat)',
-              fontSize: '1.75rem',
-              fontWeight: 700,
-              color: '#7a4e00',
-            }}
-          >
-            {formatCAD(thirtyYear.netSavingsAfterCost)}
-          </span>
+
+        {/* ── Bottom 30-year banner ── */}
+        <div style={{
+          background: 'rgba(245,166,35,0.08)',
+          borderLeft: '4px solid var(--nrg-gold)',
+          borderRadius: '0 8px 8px 0',
+          padding: '0.875rem 1.25rem',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '0.9rem',
+          color: 'var(--nrg-text-heading)',
+          lineHeight: 1.65,
+        }}>
+          <strong style={{ color: 'var(--nrg-gold)' }}>Savings over 30 years:</strong>{' '}
+          Assuming you stay in your property for 30 years, you would pay an astonishing{' '}
+          <strong style={{ color: 'var(--nrg-gold)' }}>
+            {fmtCAD(parseFloat(thirtyYear.utilityAvoided))}
+          </strong>{' '}
+          in electricity without solar, increasing your overall savings to{' '}
+          <strong style={{ color: 'var(--nrg-gold)' }}>
+            {fmtCAD(parseFloat(thirtyYear.netSavingsAfterCost))}.
+          </strong>
         </div>
+
       </div>
     </div>
   );

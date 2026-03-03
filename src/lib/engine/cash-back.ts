@@ -18,7 +18,8 @@ export function computeCashBack(
   let total = d('0');
 
   for (let n = 1; n <= years; n++) {
-    const yearCost = annualGridPurchaseCost.times(d('1').plus(escalationRate).pow(n));
+    // Year 1 = no escalation (1+r)^0; Year N = (1+r)^(N-1)
+    const yearCost = annualGridPurchaseCost.times(d('1').plus(escalationRate).pow(n - 1));
     total = total.plus(yearCost.times(cashBackRate));
   }
 

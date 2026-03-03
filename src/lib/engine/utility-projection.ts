@@ -14,7 +14,8 @@ export function projectUtilityCosts(
   years: number,
 ): Decimal[] {
   return Array.from({ length: years }, (_, i) => {
-    const n = i + 1; // Year 1 through Year N
-    return annualCost.times(d('1').plus(escalationRate).pow(n));
+    // Year 1 (i=0) = annualCost × (1+r)^0 = annualCost (no escalation in Year 1)
+    // Year N (i=N-1) = annualCost × (1+r)^(N-1)
+    return annualCost.times(d('1').plus(escalationRate).pow(i));
   });
 }

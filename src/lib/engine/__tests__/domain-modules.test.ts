@@ -32,13 +32,12 @@ describe('projectUtilityCosts — CALC-01', () => {
     expect(costs30).toHaveLength(30);
   });
 
-  it('Year 1 = $4212 × 1.05^1 = $4422.60', () => {
-    expect(costs20[0].toFixed(2)).toBe('4422.60');
+  it('Year 1 = $4212 × 1.05^0 = $4212.00 (no escalation in Year 1)', () => {
+    expect(costs20[0].toFixed(2)).toBe('4212.00');
   });
 
-  it('index 0 = Year 1 (not Year 0)', () => {
-    // Year 1 = annualCost × (1+rate)^1, NOT annualCost × (1+rate)^0 = annualCost
-    expect(costs20[0].toFixed(2)).not.toBe('4212.00');
+  it('Year 2 = $4212 × 1.05^1 = $4422.60', () => {
+    expect(costs20[1].toFixed(2)).toBe('4422.60');
   });
 });
 
@@ -126,14 +125,14 @@ describe('computeNetMeteringProjection — CALC-04', () => {
     expect(result.totalGridPurchaseCost.toFixed(2)).toBe('10000.00');
   });
 
-  it('year 1 with 5% escalation = base × 1.05', () => {
+  it('year 1 = base value (no escalation in Year 1)', () => {
     const result = computeNetMeteringProjection(
       d('1000'),
       d('0'),
       d('0.05'),
       1,
     );
-    expect(result.totalSellRevenue.toFixed(2)).toBe('1050.00');
+    expect(result.totalSellRevenue.toFixed(2)).toBe('1000.00');
   });
 });
 
@@ -190,10 +189,10 @@ describe('computeCashBack — CALC-06', () => {
     expect(typeof cb.toFixed).toBe('function');
   });
 
-  it('year 1: cashBack = annualGridPurchaseCost × 1.05 × 0.03', () => {
+  it('year 1: cashBack = annualGridPurchaseCost × 1.05^0 × 0.03 (no escalation Year 1)', () => {
     const cb = computeCashBack(d('500'), d('0.05'), d('0.03'), 1);
-    // 500 × 1.05^1 × 0.03 = 500 × 1.05 × 0.03 = 15.75
-    expect(cb.toFixed(2)).toBe('15.75');
+    // 500 × 1.05^0 × 0.03 = 500 × 0.03 = 15.00
+    expect(cb.toFixed(2)).toBe('15.00');
   });
 
   it('with zero escalation, result = annualGridPurchaseCost × cashBackRate × years', () => {
