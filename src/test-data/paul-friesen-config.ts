@@ -17,6 +17,7 @@ export const paulFriesenConfig: AlbertaConfig = {
   payoutPercentageHigh: d('0.65'),
   cashBackRate: d('0.03'),
   defaultEscalationRate: d('0.05'),
+  defaultPreSolarRate: d('0.0725'),
   defaultNetMeteringBuyRate: d('0.1680'),
   defaultNetMeteringSellRate: d('0.3350'),
   carbonBenchmarkSchedule: [

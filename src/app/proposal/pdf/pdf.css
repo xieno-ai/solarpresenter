@@ -1,0 +1,27 @@
+/* PDF-specific overrides — scoped to .proposal-pdf-root */
+
+/* Disable scroll-snap — irrelevant in PDF context */
+.proposal-pdf-root {
+  height: auto;
+  overflow: visible;
+  scroll-snap-type: none;
+}
+
+/* Each proposal page breaks onto a new PDF page */
+.proposal-pdf-root .proposal-page {
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
+  break-after: page;
+  overflow: visible;
+}
+
+/* Prevent blank trailing page after last section */
+.proposal-pdf-root .proposal-page:last-child {
+  break-after: auto;
+}
+
+/* Force exact color reproduction for backgrounds and gradients */
+.proposal-pdf-root * {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
