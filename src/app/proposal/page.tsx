@@ -11,6 +11,7 @@ import type { ProposalOutputs, SavingsSummary } from '@/lib/types';
 import type { SerializedProposalOutputs, SerializedSavingsSummary } from '@/app/actions/calculate';
 
 import { CoverPage } from './pages/CoverPage';
+import { NetMeteringPage } from './pages/NetMeteringPage';
 
 // ---------------------------------------------------------------------------
 // Satellite image URL builder (server-side only — API key never sent to client)
@@ -160,8 +161,14 @@ export default async function ProposalPage({
       {/* Page 2 — placeholder (Plan 03) */}
       <div className="proposal-page" />
 
-      {/* Page 3 — Net Metering (Task 2 below) */}
-      <div className="proposal-page" />
+      {/* Page 3 — Net Metering */}
+      <NetMeteringPage
+        monthlyNetMetering={serialized.monthlyNetMetering}
+        annualGridPurchaseCost={serialized.annualGridPurchaseCost}
+        annualSellRevenue={serialized.annualSellRevenue}
+        gridBuyRate={formValues.rates.netMeteringBuyRate}
+        sellRate={formValues.rates.netMeteringSellRate}
+      />
 
       {/* Page 4 — Carbon Credits (Task 3 below) */}
       <div className="proposal-page" />
