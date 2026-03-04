@@ -2,7 +2,7 @@
 
 ## Overview
 
-Solar Presenter delivers a branded 11-page solar proposal generator for Northern NRG, built in nine phases following the natural dependency chain: foundation and data contracts first, then the manual-entry-to-calculation-to-rendering pipeline that forms the core product, followed by PDF export, external integrations (SunPitch scraping, AI bill extraction), Alberta-specific intelligence, and finally sharing capabilities. Each phase produces a usable checkpoint -- after Phase 4, a sales rep can manually enter data and see a complete branded proposal in-browser; after Phase 5, they can download it as a PDF; after Phase 6, they can paste a SunPitch URL and skip manual entry entirely.
+Solar Presenter delivers a branded 11-page solar proposal generator for Northern NRG, built in eight phases following the natural dependency chain: foundation and data contracts first, then the manual-entry-to-calculation-to-rendering pipeline that forms the core product, followed by PDF export, external integrations (SunPitch scraping, AI bill extraction), and finally sharing capabilities. Each phase produces a usable checkpoint -- after Phase 4, a sales rep can manually enter data and see a complete branded proposal in-browser; after Phase 5, they can download it as a PDF; after Phase 6, they can paste a SunPitch URL and skip manual entry entirely.
 
 ## Phases
 
@@ -19,8 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: PDF Generation** - Playwright-based PDF export matching the web preview pixel-for-pixel
 - [x] **Phase 6: SunPitch Scraping** - Headless browser extraction from SunPitch proposal URLs with graceful fallback (completed 2026-03-04)
 - [x] **Phase 7: Bill Extraction** - AI-powered utility bill reading that pre-fills the manual entry form (completed 2026-03-04)
-- [ ] **Phase 8: Alberta Rate Intelligence** - Built-in rate tables for major Alberta utility providers with admin configuration
-- [ ] **Phase 9: Sharing & Scenarios** - Shareable proposal URLs and cash vs finance toggle
+- [ ] **Phase 8: Sharing & Scenarios** - Shareable proposal URLs and cash vs finance toggle
 
 ## Phase Details
 
@@ -139,21 +138,7 @@ Plans:
 - [ ] 07-02-PLAN.md -- Landing hub at / (card grid), /proposal → /enter redirect
 - [ ] 07-03-PLAN.md -- /bill page client UI: upload zone, loading indicator, results card with copy buttons + human verification
 
-### Phase 8: Alberta Rate Intelligence
-**Goal**: The system has built-in knowledge of Alberta utility provider rate structures, reducing the "wrong rate" error class and enabling provider-aware defaults
-**Depends on**: Phase 2
-**Requirements**: RATE-01, RATE-02, RATE-03
-**Success Criteria** (what must be TRUE):
-  1. Built-in rate tables exist for all five major Alberta providers (EPCOR, Encor, ATCOenergy, ENMAX, Direct Energy) and selecting a provider auto-fills the energy rate and all-in rate fields with current values
-  2. When a utility bill is uploaded and the provider is identifiable, the provider is auto-detected and the corresponding rate table is suggested to the user
-  3. An admin configuration interface (config file or simple UI) allows updating rate values when Alberta rates change, without modifying application code
-**Plans**: TBD
-
-Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
-
-### Phase 9: Sharing & Scenarios
+### Phase 8: Sharing & Scenarios
 **Goal**: Generated proposals are shareable via unique URLs and support toggling between cash and finance purchase scenarios without re-entering data
 **Depends on**: Phase 5
 **Requirements**: SHARE-01, SHARE-02
@@ -164,14 +149,14 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 08-01: TBD
+- [ ] 08-02: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
-Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they could theoretically execute in parallel after Phase 5 completes the core pipeline. However, the recommended order prioritizes the primary sales workflow (SunPitch scraping) over convenience features.
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
+Note: Phases 6 and 7 both depend on Phase 2 (not on each other), so they could theoretically execute in parallel after Phase 5 completes the core pipeline. Phase 8 (Sharing) depends on Phase 5. The recommended order prioritizes the primary sales workflow (SunPitch scraping) over convenience features.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
@@ -182,5 +167,4 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | 5. PDF Generation | 1/2 | In progress | - |
 | 6. SunPitch Scraping | 3/3 | Complete   | 2026-03-04 |
 | 7. Bill Extraction | 3/3 | Complete   | 2026-03-04 |
-| 8. Alberta Rate Intelligence | 0/TBD | Not started | - |
-| 9. Sharing & Scenarios | 0/TBD | Not started | - |
+| 8. Sharing & Scenarios | 0/TBD | Not started | - |
