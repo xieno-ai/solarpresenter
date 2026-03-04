@@ -144,9 +144,10 @@ None yet.
 | 5 | add SunPitch import tab polished UI on the enter page | 2026-03-04 | 48fc6a7 | [5-add-sunpitch-import-tab-and-ui-on-the-en](./quick/5-add-sunpitch-import-tab-and-ui-on-the-en/) |
 | 8 | fix /api/scrape and /api/pdf 500 errors on Vercel — add outputFileTracingIncludes for @sparticuz/chromium bin files | 2026-03-04 | 6d8bc81 | [8-fix-api-scrape-500-error-on-vercel-deplo](./quick/8-fix-api-scrape-500-error-on-vercel-deplo/) |
 | 9 | scrape financeMonthlyPayment and financeTermMonths from SunPitch DOM and sub-API | 2026-03-04 | e3e5567 | [9-scrape-cash-and-finance-values-from-sunp](./quick/9-scrape-cash-and-finance-values-from-sunp/) |
+| 10 | monthly-first priority: preserve scraped monthly values in MonthlyGrid and scraper | 2026-03-04 | ff26423 | [10-monthly-values-priority-use-monthly-data](./quick/10-monthly-values-priority-use-monthly-data/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 9 — Added sub-route interceptor and DOM scrape for financeMonthlyPayment/financeTermMonths in sunpitch.ts; graceful degradation preserved.
+Stopped at: Completed quick task 10 — Monthly-first priority enforced in MonthlyGrid (monthlySum guard) and sunpitch.ts (monthlyUsage array tried in all branches).
 Resume file: None
