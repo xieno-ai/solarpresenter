@@ -68,7 +68,7 @@ interface SunPitchProposalApiResponse {
     companyName?: string;
   };
   config?: {
-    /** JSON string: {"production": [[zone1_kWh/day×12], [zone2_kWh/day×12], ...]} */
+    /** JSON string: {"production": [[zone1_kWh/panel/month×12], [zone2_kWh/panel/month×12], ...]} */
     projections?: string;
     /** JSON string: {manufacturer, panel: {valueWh, equipmentName}, inverter: {...}} */
     equipment?: string;
@@ -93,7 +93,7 @@ interface SunPitchProposalApiResponse {
  *   rates.netMeteringBuyRate         ← utility.rate (same — Alberta flat-rate net metering)
  *   rates.netMeteringSellRate        ← utility.creditPerKwh (if > 0)
  *   system.monthlyProductionKwh      ← sum of all zones in config.projections.production
- *                                     (kWh/day × days_per_month)
+ *                                     (kWh/panel/month × AllZones[i].TotalSolarPanel)
  *   system.annualProductionKwh       ← sum of monthlyProductionKwh
  *   system.systemSizeKw              ← editor.TotalSolarPanel × equipment.panel.valueWh / 1000
  *   financing.cashPurchasePrice      ← sum of selected adders (PerWatt × system_watts + Fixed × qty)
@@ -215,8 +215,9 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
   }
 
   // --- Monthly production from config.projections ---
-  // projections.production: array of zones, each zone = array of 12 kWh/day values.
-  // Sum all zones → multiply by days_per_month → kWh/month.
+  // projections.production: array of zones, each zone = array of 12 kWh/panel/month values.
+  // Each zone must be multiplied by its panel count (from editor.AllZones[i].TotalSolarPanel).
+  // Zones with 0 panels contribute 0 kWh (multiplied out implicitly).
   if (raw.config?.projections) {
     try {
       const proj = JSON.parse(raw.config.projections) as {
@@ -224,13 +225,38 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
       };
 
       if (Array.isArray(proj.production) && proj.production.length > 0) {
-        // Sum all zone kWh/day for each month index
-        const monthlyKwhPerDay = proj.production.reduce<number[]>((acc, zone) => {
-          return zone.map((v, i) => (acc[i] ?? 0) + (Number(v) || 0));
-        }, new Array(12).fill(0) as number[]);
+        // Parse editor to get per-zone panel counts (AllZones array)
+        const editorForProd = raw.config?.editor
+          ? (JSON.parse(raw.config.editor) as {
+              TotalSolarPanel?: number;
+              AllZones?: { Name?: string; TotalSolarPanel?: number }[];
+            })
+          : null;
 
-        // Convert kWh/day × actual_days_in_month → kWh/month
-        const monthlyKwh = monthlyKwhPerDay.map((v, i) => Math.round(v * DAYS_PER_MONTH[i]));
+        // Build per-zone panel counts aligned with production array index.
+        // Falls back to TotalSolarPanel on the root editor object if AllZones is absent
+        // and there is only one zone.
+        const zonePanels: number[] = proj.production.map((_, zoneIdx) => {
+          if (editorForProd?.AllZones && editorForProd.AllZones[zoneIdx] !== undefined) {
+            return Number(editorForProd.AllZones[zoneIdx].TotalSolarPanel) || 0;
+          }
+          // Fallback: single-zone proposal with no AllZones array
+          if (proj.production!.length === 1) {
+            return Number(editorForProd?.TotalSolarPanel) || 0;
+          }
+          return 0;
+        });
+        console.log('[scraper] zone panel counts:', zonePanels);
+
+        // Sum: for each month, sum(zone[month] × panelCount[zone])
+        // Unit of production[zone][month] is kWh/panel/month — NOT kWh/day.
+        const monthlyKwh = Array.from({ length: 12 }, (_, month) =>
+          Math.round(
+            proj.production!.reduce((sum, zone, zoneIdx) =>
+              sum + (Number(zone[month]) || 0) * zonePanels[zoneIdx], 0
+            )
+          )
+        );
         const annualKwh = monthlyKwh.reduce((sum, v) => sum + v, 0);
 
         data.system = {
@@ -239,7 +265,6 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
           annualProductionKwh: String(annualKwh),
           systemSizeKw: data.system?.systemSizeKw ?? '',
         } as typeof data.system;
-        console.log('[scraper] system.monthlyProductionKwh from', proj.production.length, 'zone(s)');
         console.log('[scraper] system.annualProductionKwh:', annualKwh);
       } else {
         missingFields.push('system.monthlyProductionKwh');
