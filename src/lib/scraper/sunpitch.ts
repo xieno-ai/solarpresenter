@@ -77,6 +77,9 @@ interface SunPitchProposalApiResponse {
     /** JSON string: array of adder objects with priceType/price_ab/selected/qty */
     adders?: string;
     systemLoss?: string;
+    /** JSON string: financing product details (monthlyPayment, termMonths, etc.) */
+    finance?: string;
+    incentive?: string;
   };
 }
 
@@ -371,25 +374,67 @@ function parseApiResponse(
     missingFields.push('financing.cashPurchasePrice');
   }
 
-  // Financing details (financeMonthlyPayment, financeTermMonths) are not in the public proposal
-  // API — they come from DOM scraping or a finance sub-API intercepted at page load time.
-  if (domMonthlyPayment != null) {
+  // --- Finance details from config.finance (JSON string) ---
+  // config.finance is a JSON object containing the selected financing product details.
+  // Log its keys to understand the structure, then extract monthlyPayment + termMonths.
+  let configMonthlyPayment: string | null = null;
+  let configTermMonths: string | null = null;
+  if (raw.config?.finance) {
+    try {
+      const financeObj = JSON.parse(raw.config.finance) as Record<string, unknown>;
+      console.log('[scraper] config.finance keys:', Object.keys(financeObj).join(', '));
+      console.log('[scraper] config.finance raw:', JSON.stringify(financeObj));
+
+      // Try common field name variations for monthly payment
+      const payment =
+        financeObj.monthlyPayment ??
+        financeObj.monthly_payment ??
+        financeObj.payment ??
+        financeObj.monthlyAmount ??
+        financeObj.installment;
+      if (payment != null && Number(payment) > 0) {
+        configMonthlyPayment = String(Math.round(Number(payment)));
+        console.log('[scraper] config.finance monthlyPayment:', configMonthlyPayment);
+      }
+
+      // Try common field name variations for term in months
+      const term =
+        financeObj.termMonths ??
+        financeObj.term_months ??
+        financeObj.term ??
+        financeObj.months ??
+        financeObj.loanTerm ??
+        financeObj.loanTermMonths;
+      if (term != null && Number(term) > 0) {
+        configTermMonths = String(Number(term));
+        console.log('[scraper] config.finance termMonths:', configTermMonths);
+      }
+    } catch (e) {
+      console.log('[scraper] config.finance parse error:', e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  // Priority: config.finance API > DOM scrape > missingFields
+  const resolvedMonthlyPayment = configMonthlyPayment ?? domMonthlyPayment;
+  const resolvedTermMonths = configTermMonths ?? domTermMonths;
+
+  if (resolvedMonthlyPayment != null) {
     data.financing = {
       ...(data.financing ?? {}),
-      financeMonthlyPayment: domMonthlyPayment,
+      financeMonthlyPayment: resolvedMonthlyPayment,
     } as typeof data.financing;
-    console.log('[scraper] financing.financeMonthlyPayment (DOM/API):', domMonthlyPayment);
+    console.log('[scraper] financing.financeMonthlyPayment:', resolvedMonthlyPayment);
   } else {
     missingFields.push('financing.financeMonthlyPayment');
     console.log('[scraper] financing.financeMonthlyPayment: not found — added to missingFields');
   }
 
-  if (domTermMonths != null) {
+  if (resolvedTermMonths != null) {
     data.financing = {
       ...(data.financing ?? {}),
-      financeTermMonths: domTermMonths,
+      financeTermMonths: resolvedTermMonths,
     } as typeof data.financing;
-    console.log('[scraper] financing.financeTermMonths (DOM/API):', domTermMonths);
+    console.log('[scraper] financing.financeTermMonths:', resolvedTermMonths);
   } else {
     missingFields.push('financing.financeTermMonths');
     console.log('[scraper] financing.financeTermMonths: not found — added to missingFields');
