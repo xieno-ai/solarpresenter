@@ -175,16 +175,29 @@ function parseApiResponse(
       console.log('[scraper] utility.infoType:', infoType, '| infoData keys:', Object.keys(info).join(', '));
 
       if (infoType === 'AvgYearlyUsage' && info.avgYearlyUsage) {
-        const annualNum = Number(info.avgYearlyUsage);
-        const monthly = distributeByAlbertaCurve(annualNum);
-        data.consumption = {
-          ...(data.consumption ?? {}),
-          annualConsumptionKwh: String(annualNum),
-          monthlyConsumptionKwh: monthly,
-          annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
-        } as typeof data.consumption;
-        console.log('[scraper] consumption (AvgYearlyUsage + Alberta curve):', annualNum, 'kWh →', monthly);
-        missingFields.push('consumption.monthlyConsumptionKwh'); // estimated, not from SunPitch
+        // If monthly values are also present, prefer them (more accurate than annual+curve)
+        if (Array.isArray(info.monthlyUsage) && info.monthlyUsage.length > 0) {
+          const normalized = normalizeMonthlyArray(info.monthlyUsage as (string | number)[]);
+          const annual = normalized.reduce((sum, v) => sum + Number(v), 0);
+          data.consumption = {
+            ...(data.consumption ?? {}),
+            annualConsumptionKwh: String(annual),
+            monthlyConsumptionKwh: normalized,
+            annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
+          } as typeof data.consumption;
+          console.log('[scraper] consumption: AvgYearlyUsage path but monthlyUsage array present — using monthly:', normalized);
+        } else {
+          const annualNum = Number(info.avgYearlyUsage);
+          const monthly = distributeByAlbertaCurve(annualNum);
+          data.consumption = {
+            ...(data.consumption ?? {}),
+            annualConsumptionKwh: String(annualNum),
+            monthlyConsumptionKwh: monthly,
+            annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
+          } as typeof data.consumption;
+          console.log('[scraper] consumption (AvgYearlyUsage + Alberta curve):', annualNum, 'kWh →', monthly);
+          missingFields.push('consumption.monthlyConsumptionKwh'); // estimated, not from SunPitch
+        }
       } else if (infoType === 'MonthlyUsage' && Array.isArray(info.monthlyUsage)) {
         const monthly = info.monthlyUsage as (string | number)[];
         const normalized = normalizeMonthlyArray(monthly);
@@ -197,23 +210,36 @@ function parseApiResponse(
         } as typeof data.consumption;
         console.log('[scraper] consumption from MonthlyUsage:', normalized);
       } else {
-        // Try generic keys in infoData
-        const yearlyVal = (info.annualUsage ?? info.yearlyUsage ?? info.avgYearlyUsage) as string | number | undefined;
-        if (yearlyVal != null) {
-          const annualNum = Number(yearlyVal);
-          const monthly = distributeByAlbertaCurve(annualNum);
+        // Try monthlyUsage array first — may exist under an unexpected infoType
+        if (Array.isArray(info.monthlyUsage) && info.monthlyUsage.length > 0) {
+          const normalized = normalizeMonthlyArray(info.monthlyUsage as (string | number)[]);
+          const annual = normalized.reduce((sum, v) => sum + Number(v), 0);
           data.consumption = {
             ...(data.consumption ?? {}),
-            annualConsumptionKwh: String(annualNum),
-            monthlyConsumptionKwh: monthly,
+            annualConsumptionKwh: String(annual),
+            monthlyConsumptionKwh: normalized,
             annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
           } as typeof data.consumption;
-          console.log('[scraper] consumption (generic key + Alberta curve):', annualNum, 'kWh →', monthly);
-          missingFields.push('consumption.monthlyConsumptionKwh'); // estimated, not from SunPitch
+          console.log('[scraper] consumption from monthlyUsage (infoType:', infoType, '):', normalized);
         } else {
-          missingFields.push('consumption.annualConsumptionKwh');
-          missingFields.push('consumption.monthlyConsumptionKwh');
-          console.log('[scraper] infoData has no recognized consumption keys');
+          // Fall back to annual keys + Alberta curve
+          const yearlyVal = (info.annualUsage ?? info.yearlyUsage ?? info.avgYearlyUsage) as string | number | undefined;
+          if (yearlyVal != null) {
+            const annualNum = Number(yearlyVal);
+            const monthly = distributeByAlbertaCurve(annualNum);
+            data.consumption = {
+              ...(data.consumption ?? {}),
+              annualConsumptionKwh: String(annualNum),
+              monthlyConsumptionKwh: monthly,
+              annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
+            } as typeof data.consumption;
+            console.log('[scraper] consumption (generic key + Alberta curve):', annualNum, 'kWh →', monthly);
+            missingFields.push('consumption.monthlyConsumptionKwh'); // estimated, not from SunPitch
+          } else {
+            missingFields.push('consumption.annualConsumptionKwh');
+            missingFields.push('consumption.monthlyConsumptionKwh');
+            console.log('[scraper] infoData has no recognized consumption keys');
+          }
         }
       }
     } catch (e) {
