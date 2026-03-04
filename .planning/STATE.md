@@ -146,9 +146,10 @@ None yet.
 | 9 | scrape financeMonthlyPayment and financeTermMonths from SunPitch DOM and sub-API | 2026-03-04 | e3e5567 | [9-scrape-cash-and-finance-values-from-sunp](./quick/9-scrape-cash-and-finance-values-from-sunp/) |
 | 10 | monthly-first priority: preserve scraped monthly values in MonthlyGrid and scraper | 2026-03-04 | ff26423 | [10-monthly-values-priority-use-monthly-data](./quick/10-monthly-values-priority-use-monthly-data/) |
 | 11 | fix form not populating from scrape result — setValue force-writes + tab-before-reset | 2026-03-04 | ab711b8 | [11-fix-form-not-populating-from-scrape-resu](./quick/11-fix-form-not-populating-from-scrape-resu/) |
+| 13 | double netMeteringBuyRate at engine input and display props to account for transmission fees | 2026-03-04 | 78e730b | [13-double-the-grid-buy-rate-to-account-for-](./quick/13-double-the-grid-buy-rate-to-account-for-/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 11 — form population fix: setActiveTab before reset + setValue force-writes for consumption/production fields + monthly-sum fallback guard.
+Stopped at: Completed quick task 13 — doubled netMeteringBuyRate at engine input boundary and display props for transmission-adjusted grid buy cost.
 Resume file: None
