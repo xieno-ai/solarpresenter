@@ -34,6 +34,6 @@
     "@tailwindcss/postcss": "^4.2.1",
     "@vitest/coverage-v8": "^4.0.18",
     "tailwindcss": "^4.2.1",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.18"
   }
 }
