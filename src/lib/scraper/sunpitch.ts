@@ -1,4 +1,4 @@
-import type { Browser } from 'playwright';
+import type { Browser } from 'playwright-core';
 import type { ScrapeResult } from './types';
 import type { ProposalFormValues } from '@/lib/form/schema';
 

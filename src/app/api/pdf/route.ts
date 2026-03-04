@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { chromium } from 'playwright';
+import { chromium } from 'playwright-core';
+import chromiumPkg from '@sparticuz/chromium';
 
 // REQUIRED: Playwright cannot run in Edge runtime
 export const runtime = 'nodejs';
@@ -15,9 +16,16 @@ export async function GET(request: NextRequest) {
   const protocol = host.startsWith('localhost') ? 'http' : 'https';
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${protocol}://${host}`;
 
+  const executablePath = process.env.VERCEL
+    ? await chromiumPkg.executablePath()
+    : undefined;
+
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    args: process.env.VERCEL
+      ? chromiumPkg.args
+      : ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    executablePath,
   });
 
   try {

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { chromium } from 'playwright';
+import { chromium } from 'playwright-core';
+import chromiumPkg from '@sparticuz/chromium';
 import { scrapeSunPitch } from '@/lib/scraper/sunpitch';
 import type { ScrapeResult } from '@/lib/scraper/types';
 
@@ -27,9 +28,18 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
   }
 
+  // On Vercel (and Lambda): use the @sparticuz/chromium binary (Lambda-compatible).
+  // Locally: pass undefined so playwright-core uses the system browser or PLAYWRIGHT_BROWSERS_PATH.
+  const executablePath = process.env.VERCEL
+    ? await chromiumPkg.executablePath()
+    : undefined;
+
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    args: process.env.VERCEL
+      ? chromiumPkg.args
+      : ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    executablePath,
   });
 
   try {
