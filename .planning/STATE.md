@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-03T22:59:40.596Z"
+last_updated: "2026-03-04T00:18:00Z"
 progress:
   total_phases: 5
   completed_phases: 5
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 6 of 9 (SunPitch Scraping) — IN PROGRESS
-Plan: 1 of 2 in Phase 6 — COMPLETE
-Status: Phase 6 Plan 1 complete — scraper backend (types, url-validator, dual-strategy Playwright scraper, POST /api/scrape) built and TypeScript clean
-Last activity: 2026-03-04 - Completed 06-01-PLAN.md — SunPitch scraper backend complete
+Phase: 6 of 9 (SunPitch Scraping) — COMPLETE
+Plan: 2 of 2 in Phase 6 — COMPLETE
+Status: Phase 6 complete — SunPitch URL tab UI with SunPitchTab component, tab switcher, highlight wrappers, handleImportSuccess pre-fill wiring all done and TypeScript clean
+Last activity: 2026-03-04 - Completed 06-02-PLAN.md — SunPitch UI wiring complete
 
-Progress: [████████████████░░░░] 80% (16/~20 plans)
+Progress: [█████████████████░░░] 85% (17/~20 plans)
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [████████████████░░░░] 80% (16
 | Phase 04-proposal-rendering P02 | 5 | 3 tasks | 7 files |
 | Phase 04-proposal-rendering P03 | 5 | 2 tasks | 8 files |
 | Phase 05-pdf-generation P01 | 3 | 2 tasks | 6 files |
+| Phase 06-sunpitch-scraping P02 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,10 @@ Recent decisions affecting current work:
 - [06-01]: normalizeMonthlyArray() always pads/trims to exactly 12 string entries using '0' as fill
 - [06-01]: annualElectricityCost excluded from missingFields — computed by watch() in form, not scraped
 - [06-01]: Redirect detection checks page.url() for /facing/proposals/ after goto — catches silent auth redirects
+- [06-02]: highlightClass() helper centralizes ring/bg ternary logic rather than repeating at each of 14+ fields
+- [06-02]: Form sections and GenerateFooter wrapped in {activeTab === 'manual'} — footer never shows on sunpitch tab
+- [06-02]: annualElectricityCost Controller has no highlight wrapper — computed by watch(), never scraped
+- [06-02]: markScraped() walker is shallow (one level) — matches flat ScrapeResult.data shape from Plan 01
 
 ### Pending Todos
 
@@ -131,5 +136,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 06-01-PLAN.md — SunPitch scraper backend. types.ts, url-validator.ts, sunpitch.ts (dual-strategy Playwright scraper), POST /api/scrape route. TypeScript clean. Ready for Plan 06-02 (URL tab UI).
+Stopped at: Completed 06-02-PLAN.md — SunPitch UI wiring. SunPitchTab component, tab switcher on /enter page, highlight wrappers on all 14 Controller fields, handleImportSuccess pre-fill wiring. Phase 6 complete. TypeScript clean. Ready for Phase 7 (bill extraction).
 Resume file: None

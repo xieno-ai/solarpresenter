@@ -178,7 +178,7 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | 3. Calculation Engine | 3/3 | Complete | 2026-03-03 |
 | 4. Proposal Rendering | 4/4 | Complete | 2026-03-03 |
 | 5. PDF Generation | 1/2 | In progress | - |
-| 6. SunPitch Scraping | 1/3 | In progress | - |
+| 6. SunPitch Scraping | 2/3 | In Progress|  |
 | 7. Bill Extraction | 0/TBD | Not started | - |
 | 8. Alberta Rate Intelligence | 0/TBD | Not started | - |
 | 9. Sharing & Scenarios | 0/TBD | Not started | - |
