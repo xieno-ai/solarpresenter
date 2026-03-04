@@ -142,9 +142,10 @@ None yet.
 | 6 | fix vitest and coverage-v8 peer dependency mismatch blocking Vercel deploy | 2026-03-04 | 4615bbd | [6-fix-vitest-and-coverage-v8-peer-dependen](./quick/6-fix-vitest-and-coverage-v8-peer-dependen/) |
 | 7 | fix scraper on Vercel: replace playwright with playwright-core and sparticuz chromium | 2026-03-04 | da1cd21 | [7-fix-scraper-on-vercel-replace-playwright](./quick/7-fix-scraper-on-vercel-replace-playwright/) |
 | 5 | add SunPitch import tab polished UI on the enter page | 2026-03-04 | 48fc6a7 | [5-add-sunpitch-import-tab-and-ui-on-the-en](./quick/5-add-sunpitch-import-tab-and-ui-on-the-en/) |
+| 8 | fix /api/scrape and /api/pdf 500 errors on Vercel — add outputFileTracingIncludes for @sparticuz/chromium bin files | 2026-03-04 | 6d8bc81 | [8-fix-api-scrape-500-error-on-vercel-deplo](./quick/8-fix-api-scrape-500-error-on-vercel-deplo/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 5 — Redesigned SunPitchTab.tsx with polished import panel (header eyebrow, URL input card, 7-step animated progress panel, error reset link). TypeScript clean. All existing fetch/validation logic preserved.
+Stopped at: Completed quick task 8 — Added outputFileTracingIncludes to next.config.ts to bundle @sparticuz/chromium .br binaries in Vercel deployment; fixes cold-start 500 on /api/scrape and /api/pdf.
 Resume file: None
