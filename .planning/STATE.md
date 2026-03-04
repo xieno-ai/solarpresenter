@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 Phase: 6 of 9 (SunPitch Scraping) — COMPLETE (all 3 plans done)
 Plan: 3 of 3 in Phase 6 — COMPLETE
 Status: Phase 6 complete — SunPitch scraper calibrated against real API; correct field mapping confirmed for customer name/address, utility rate, annual consumption, monthly production (per zone), system size, and system cost
-Last activity: 2026-03-03 - Completed 06-03-PLAN.md — Scraper rewrite with real SunPitch API field mapping
+Last activity: 2026-03-04 - Completed quick task 5 — Redesigned SunPitchTab.tsx with polished import panel UI (header, URL input card, step-list progress panel, error panel). Zero logic changes.
 
 Progress: [██████████████████░░] 90% (18/~20 plans)
 
@@ -138,6 +138,7 @@ None yet.
 | 2 | add annualGridPurchaseCost and annualSellRevenue props | 2026-03-03 | — | [2-add-annualgridpurchasecost-and-annualsell](./quick/2-add-annualgridpurchasecost-and-annualsell/) |
 | 3 | mark phase 4 as complete. all pages reviewed. write summary | 2026-03-03 | 8736cd1 | [3-mark-phase-4-as-complete-all-pages-revie](./quick/3-mark-phase-4-as-complete-all-pages-revie/) |
 | 4 | fix SunPitch scraper production total — kWh/panel/month × zone panel counts | 2026-03-04 | 11069db | [4-fix-sunpitch-scraper-production-total-an](./quick/4-fix-sunpitch-scraper-production-total-an/) |
+| 5 | add SunPitch import tab and UI on the enter page | 2026-03-04 | 0d8884c | [5-add-sunpitch-import-tab-and-ui-on-the-en](./quick/5-add-sunpitch-import-tab-and-ui-on-the-en/) |
 | 5 | add SunPitch import tab polished UI on the enter page | 2026-03-04 | 48fc6a7 | [5-add-sunpitch-import-tab-and-ui-on-the-en](./quick/5-add-sunpitch-import-tab-and-ui-on-the-en/) |
 
 ## Session Continuity
