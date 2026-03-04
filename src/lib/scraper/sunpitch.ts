@@ -448,10 +448,13 @@ function parseApiResponse(
         const rate2 = Number(financeObj.rate_2 ?? 0);
         console.log('[scraper] config.finance rate_1:', rate1, '| rate_2:', rate2);
 
-        if (rate1 > 0) {
-          // rate_1 appears to be the monthly payment dollar amount for period 1
+        if (rate1 >= 10) {
+          // rate_1 is a dollar payment amount (>= $10) — use directly
           configMonthlyPayment = String(Math.round(rate1));
           console.log('[scraper] config.finance monthlyPayment (rate_1):', configMonthlyPayment);
+        } else if (rate1 > 0) {
+          // rate_1 < 10 is a fractional interest rate, not a dollar amount — skip
+          console.log('[scraper] config.finance rate_1:', rate1, '— appears to be interest rate, not payment amount — skipping');
         } else {
           // Fallback: compute from cash price + provincial dealer fee
           // price_ab etc. are dealer fee percentages (e.g. 5 = 5%)
@@ -482,8 +485,8 @@ function parseApiResponse(
     }
   }
 
-  // Priority: config.finance API > DOM scrape > missingFields
-  const resolvedMonthlyPayment = configMonthlyPayment ?? domMonthlyPayment;
+  // Priority: DOM scrape > config.finance API > missingFields
+  const resolvedMonthlyPayment = domMonthlyPayment ?? configMonthlyPayment;
   const resolvedTermMonths = '240';
 
   if (resolvedMonthlyPayment != null) {
@@ -755,17 +758,22 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
         // Wait briefly for Angular to finish rendering finance sections
         await page.waitForSelector('[class*="finance"], [class*="payment"], [class*="monthly"]', { timeout: 10000 }).catch(() => null);
 
-        // Targeted query for the monthly payment amount shown in span.mb-1.text span.float-right
+        // Targeted query for the monthly payment — SunPitch renders it in span.float-right
+        // Try nested selector first, then standalone float-right containing a $ amount
         const rawPaymentText = await page.evaluate(() => {
-          const el = document.querySelector('span.mb-1.text span.float-right');
-          return el ? el.textContent ?? '' : '';
+          const nested = document.querySelector('span.mb-1.text span.float-right');
+          if (nested?.textContent?.includes('$')) return nested.textContent ?? '';
+          // Fallback: find any span.float-right whose text contains a dollar amount
+          const all = Array.from(document.querySelectorAll('span.float-right'));
+          const match = all.find(el => el.textContent?.includes('$'));
+          return match ? match.textContent ?? '' : '';
         }).catch(() => '');
         const paymentMatch = rawPaymentText.match(/\$([\d,]+(?:\.\d+)?)/);
         if (paymentMatch) {
           scrapedMonthlyPayment = String(Math.round(Number(paymentMatch[1].replace(/,/g, ''))));
-          console.log('[scraper] DOM payment (span.mb-1.text span.float-right):', rawPaymentText.trim(), '→', scrapedMonthlyPayment);
+          console.log('[scraper] DOM payment (span.float-right):', rawPaymentText.trim(), '→', scrapedMonthlyPayment);
         } else {
-          console.log('[scraper] DOM payment: span.mb-1.text span.float-right not found or empty');
+          console.log('[scraper] DOM payment: no span.float-right with $ amount found');
         }
 
         console.log('[scraper] DOM finance scan — payment:', scrapedMonthlyPayment);
