@@ -67,8 +67,11 @@ export function calculateProposal(inputs: ProposalInputs, config: AlbertaConfig)
     30,
   );
 
-  // CALC-05: Carbon credits (CO2 avoidance × benchmark schedule)
-  const carbonCredits = computeCarbonCredits(inputs.system.annualProductionKwh, config);
+  // CALC-05: Carbon credits (SolarOffset.ca GDF schedule, tiered platform fee)
+  const carbonCredits = computeCarbonCredits(
+    inputs.system.annualProductionKwh,
+    inputs.system.systemSizeKw,
+  );
 
   // Annual carbon credit = tenYearPayoutHigh / 10 (matches doc Section 8.2)
   const annualCarbonCredit = carbonCredits.tenYearPayoutHigh.dividedBy(d('10'));

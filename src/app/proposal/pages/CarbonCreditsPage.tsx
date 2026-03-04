@@ -166,7 +166,7 @@ export function CarbonCreditsPage({ carbonCredits, annualProductionKwh }: Carbon
               margin: '0 0 1.5rem',
               lineHeight: 1.5,
             }}>
-              tonnes per year &middot; {productionDisplay} kWh &times; 0.55 t/MWh Alberta grid factor
+              tonnes per year &middot; {productionDisplay} kWh production &middot; SolarOffset.ca GDF schedule (2026&#8211;2035)
             </p>
 
             <div style={{

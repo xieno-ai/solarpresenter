@@ -100,12 +100,12 @@ describe('calculateProposal — full integration', () => {
   });
 
   describe('CALC-05 — carbon credits', () => {
-    it('annualCo2Avoided = 15408 / 1000 × 0.55 = 8.4744', () => {
-      expect(outputs.carbonCredits.annualCo2Avoided.toFixed(4)).toBe('8.4744');
+    it('annualCo2Avoided = 15408 / 1000 × 0.4588 (Year 1 GDF) = 7.0692', () => {
+      expect(outputs.carbonCredits.annualCo2Avoided.toFixed(4)).toBe('7.0692');
     });
 
-    it('benchmarkSchedule has at least 10 entries', () => {
-      expect(outputs.carbonCredits.benchmarkSchedule.length).toBeGreaterThanOrEqual(10);
+    it('benchmarkSchedule has exactly 10 entries (2026-2035)', () => {
+      expect(outputs.carbonCredits.benchmarkSchedule.length).toBe(10);
     });
 
     it('tenYearPayoutLow is greater than 0', () => {
