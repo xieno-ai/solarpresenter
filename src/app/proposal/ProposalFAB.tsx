@@ -33,6 +33,22 @@ const ITEMS = [
       </svg>
     ),
   },
+  {
+    label: 'Solar Offset Calculator',
+    href: 'https://www.solaroffset.ca/calculator',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="2" width="14" height="16" rx="2" stroke="#fff" strokeWidth="1.75"/>
+        <rect x="6" y="5" width="8" height="3" rx="1" fill="#fff"/>
+        <circle cx="6.5" cy="11.5" r="1" fill="#fff"/>
+        <circle cx="10" cy="11.5" r="1" fill="#fff"/>
+        <circle cx="13.5" cy="11.5" r="1" fill="#fff"/>
+        <circle cx="6.5" cy="14.5" r="1" fill="#fff"/>
+        <circle cx="10" cy="14.5" r="1" fill="#fff"/>
+        <circle cx="13.5" cy="14.5" r="1" fill="#fff"/>
+      </svg>
+    ),
+  },
 ];
 
 const downloadIcon = (
