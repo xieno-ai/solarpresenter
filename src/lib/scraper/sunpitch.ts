@@ -97,8 +97,14 @@ interface SunPitchProposalApiResponse {
  *   system.annualProductionKwh       ← sum of monthlyProductionKwh
  *   system.systemSizeKw              ← editor.TotalSolarPanel × equipment.panel.valueWh / 1000
  *   financing.cashPurchasePrice      ← sum of selected adders (PerWatt × system_watts + Fixed × qty)
+ *   financing.financeMonthlyPayment  ← DOM scrape or finance sub-API (not in main proposals API)
+ *   financing.financeTermMonths      ← DOM scrape or finance sub-API (not in main proposals API)
  */
-function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
+function parseApiResponse(
+  raw: SunPitchProposalApiResponse,
+  domMonthlyPayment?: string | null,
+  domTermMonths?: string | null,
+): ScrapeResult {
   console.log('[scraper] parseApiResponse: mapping SunPitch API fields');
 
   const data: Partial<ProposalFormValues> = {};
@@ -362,9 +368,29 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
     missingFields.push('financing.cashPurchasePrice');
   }
 
-  // Financing details are not in the public proposal API
-  missingFields.push('financing.financeMonthlyPayment');
-  missingFields.push('financing.financeTermMonths');
+  // Financing details (financeMonthlyPayment, financeTermMonths) are not in the public proposal
+  // API — they come from DOM scraping or a finance sub-API intercepted at page load time.
+  if (domMonthlyPayment != null) {
+    data.financing = {
+      ...(data.financing ?? {}),
+      financeMonthlyPayment: domMonthlyPayment,
+    } as typeof data.financing;
+    console.log('[scraper] financing.financeMonthlyPayment (DOM/API):', domMonthlyPayment);
+  } else {
+    missingFields.push('financing.financeMonthlyPayment');
+    console.log('[scraper] financing.financeMonthlyPayment: not found — added to missingFields');
+  }
+
+  if (domTermMonths != null) {
+    data.financing = {
+      ...(data.financing ?? {}),
+      financeTermMonths: domTermMonths,
+    } as typeof data.financing;
+    console.log('[scraper] financing.financeTermMonths (DOM/API):', domTermMonths);
+  } else {
+    missingFields.push('financing.financeTermMonths');
+    console.log('[scraper] financing.financeTermMonths: not found — added to missingFields');
+  }
 
   // Interest rate default — always 0%
   data.financing = {
@@ -488,9 +514,46 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
 
   let capturedData: SunPitchProposalApiResponse | null = null;
   let captureError: string | null = null;
+  let capturedFinanceData: { monthlyPayment?: number; termMonths?: number } | null = null as { monthlyPayment?: number; termMonths?: number } | null;
 
-  // Set up route interception BEFORE goto — reliably buffers the full response body
-  await page.route(`**/api/proposals/${uuid}**`, async (route) => {
+  // Set up sub-route interceptor BEFORE goto — captures any finance sub-API endpoints.
+  // Pattern: **/api/proposals/{uuid}/** (with trailing slash) matches sub-routes only.
+  await page.route(`**/api/proposals/${uuid}/**`, async (route) => {
+    const reqUrl = route.request().url();
+    console.log('[scraper] sub-route intercepted:', reqUrl);
+    try {
+      const response = await route.fetch({ timeout: 60000 });
+      if (response.status() === 200) {
+        const body = await response.body();
+        const text = body.toString('utf8');
+        if (text.length > 0 && text.trimStart().startsWith('{')) {
+          try {
+            const json = JSON.parse(text) as Record<string, unknown>;
+            console.log('[scraper] sub-route JSON keys:', Object.keys(json).join(', '));
+            // Look for finance-shaped keys: monthlyPayment, loanAmount, termMonths, months, payment
+            const payment = json.monthlyPayment ?? json.payment ?? json.monthly_payment;
+            const term = json.termMonths ?? json.term_months ?? json.months ?? json.loanTermMonths;
+            if (payment != null || term != null) {
+              capturedFinanceData = {
+                monthlyPayment: payment != null ? Number(payment) : undefined,
+                termMonths: term != null ? Number(term) : undefined,
+              };
+              console.log('[scraper] finance API data captured:', capturedFinanceData);
+            }
+          } catch { /* not JSON — skip */ }
+        }
+      }
+      await route.fulfill({ response });
+    } catch (e) {
+      console.log('[scraper] sub-route error:', e instanceof Error ? e.message : String(e));
+      await route.continue();
+    }
+  });
+
+  // Set up route interception BEFORE goto — reliably buffers the full response body.
+  // NOTE: This exact-UUID pattern (**/api/proposals/{uuid}) matches only the main proposals endpoint,
+  // not sub-routes (which are handled by the interceptor above).
+  await page.route(`**/api/proposals/${uuid}`, async (route) => {
     try {
       // SunPitch API can take up to 240 seconds to respond — increase route.fetch timeout
       const response = await route.fetch({ timeout: 240000 });
@@ -561,7 +624,48 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
     }
 
     if (capturedData !== null) {
-      return parseApiResponse(capturedData);
+      // DOM scrape for finance values — only attempt if the main API responded (page is loaded)
+      let scrapedMonthlyPayment: string | null = null;
+      let scrapedTermMonths: string | null = null;
+
+      try {
+        // Wait briefly for Angular to finish rendering finance sections
+        await page.waitForSelector('[class*="finance"], [class*="payment"], [class*="monthly"]', { timeout: 10000 }).catch(() => null);
+
+        const financeText = await page.evaluate(() => document.body.innerText).catch(() => '');
+
+        // Match patterns like "$220/mo", "$220/month", "$220 /month", "$1,200/mo"
+        const paymentMatch = financeText.match(/\$\s*([\d,]+(?:\.\d+)?)\s*\/\s*mo(?:nth)?/i);
+        if (paymentMatch) {
+          scrapedMonthlyPayment = paymentMatch[1].replace(/,/g, '');
+          console.log('[scraper] DOM finance scan — raw payment match:', paymentMatch[0], '→', scrapedMonthlyPayment);
+        }
+
+        // Match patterns like "MONTHS 1-60", "60 months", "60-month"
+        const termMatch =
+          financeText.match(/MONTHS\s+1[-\u2013](\d+)/i) ||
+          financeText.match(/(\d+)[- ]months?/i);
+        if (termMatch) {
+          scrapedTermMonths = termMatch[1];
+          console.log('[scraper] DOM finance scan — raw term match:', termMatch[0], '→', scrapedTermMonths);
+        }
+
+        console.log('[scraper] DOM finance scan — payment:', scrapedMonthlyPayment, '| term:', scrapedTermMonths);
+      } catch (e) {
+        console.log('[scraper] DOM finance scan error:', e instanceof Error ? e.message : String(e));
+      }
+
+      // Prefer API-intercepted finance values (capturedFinanceData) over DOM-scraped values
+      const finalMonthlyPayment = capturedFinanceData?.monthlyPayment != null
+        ? String(Math.round(capturedFinanceData.monthlyPayment))
+        : scrapedMonthlyPayment;
+      const finalTermMonths = capturedFinanceData?.termMonths != null
+        ? String(capturedFinanceData.termMonths)
+        : scrapedTermMonths;
+
+      console.log('[scraper] final finance values — monthlyPayment:', finalMonthlyPayment, '| termMonths:', finalTermMonths);
+
+      return parseApiResponse(capturedData, finalMonthlyPayment, finalTermMonths);
     }
 
     // API never responded within timeout
