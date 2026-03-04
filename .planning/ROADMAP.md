@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Proposal Rendering** - Complete 11-page branded proposal viewable in-browser with charts and Northern NRG design
 - [ ] **Phase 5: PDF Generation** - Playwright-based PDF export matching the web preview pixel-for-pixel
 - [x] **Phase 6: SunPitch Scraping** - Headless browser extraction from SunPitch proposal URLs with graceful fallback (completed 2026-03-04)
-- [ ] **Phase 7: Bill Extraction** - AI-powered utility bill reading that pre-fills the manual entry form
+- [x] **Phase 7: Bill Extraction** - AI-powered utility bill reading that pre-fills the manual entry form (completed 2026-03-04)
 - [ ] **Phase 8: Alberta Rate Intelligence** - Built-in rate tables for major Alberta utility providers with admin configuration
 - [ ] **Phase 9: Sharing & Scenarios** - Shareable proposal URLs and cash vs finance toggle
 
@@ -181,6 +181,6 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | 4. Proposal Rendering | 4/4 | Complete | 2026-03-03 |
 | 5. PDF Generation | 1/2 | In progress | - |
 | 6. SunPitch Scraping | 3/3 | Complete   | 2026-03-04 |
-| 7. Bill Extraction | 2/3 | In Progress|  |
+| 7. Bill Extraction | 3/3 | Complete   | 2026-03-04 |
 | 8. Alberta Rate Intelligence | 0/TBD | Not started | - |
 | 9. Sharing & Scenarios | 0/TBD | Not started | - |
