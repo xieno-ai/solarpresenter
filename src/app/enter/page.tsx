@@ -107,13 +107,23 @@ export default function ManualEntryPage() {
     // don't lose their empty-string defaults for un-scraped sibling fields.
     const empty = getEmptyDefaults();
     const d = result.data;
+    const consumption = { ...empty.consumption, ...(d.consumption ?? {}) };
+    const rates = { ...empty.rates, ...(d.rates ?? {}) };
+
+    // Compute annualElectricityCost — watch() won't fire after reset()
+    const kwh = Number(consumption.annualConsumptionKwh);
+    const rate = Number(rates.allInRate);
+    if (kwh > 0 && rate > 0) {
+      consumption.annualElectricityCost = (kwh * rate).toFixed(2);
+    }
+
     const merged = {
       ...empty,
       ...d,
       customer: { ...empty.customer, ...(d.customer ?? {}) },
       system: { ...empty.system, ...(d.system ?? {}) },
-      consumption: { ...empty.consumption, ...(d.consumption ?? {}) },
-      rates: { ...empty.rates, ...(d.rates ?? {}) },
+      consumption,
+      rates,
       financing: { ...empty.financing, ...(d.financing ?? {}) },
     };
     reset(merged);
