@@ -55,6 +55,11 @@ export function MonthlyGrid({
       const annualVal = raw?.[annualFieldName] ?? '';
       const annual = Number(annualVal);
       if (isNaN(annual) || annual <= 0) return;
+      // Skip distribution if monthly values are already populated (e.g. scraped from SunPitch)
+      const sectionVals = (values as Record<string, unknown>)?.[section] as Record<string, unknown> | undefined;
+      const months = (sectionVals?.[monthlyFieldName] ?? []) as string[];
+      const monthlySum = months.reduce((acc, v) => acc + (Number(v) || 0), 0);
+      if (monthlySum > 0) return;
       syncSource.current = 'annual';
       const curve = useAlbertaCurve ? ALBERTA_SOLAR_CURVE : Array(12).fill(1 / 12);
       curve.forEach((fraction: number, i: number) => {
