@@ -5,7 +5,7 @@ milestone_name: milestone
 status: unknown
 last_updated: "2026-03-04T23:06:02.708Z"
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 7
   total_plans: 20
   completed_plans: 21
@@ -22,7 +22,7 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 7 of 9 (Bill Extraction) — COMPLETE (all 3 plans done)
+Phase: 7 of 8 (Bill Extraction) — COMPLETE (all 3 plans done)
 Plan: 3 of 3 in Phase 7 — COMPLETE
 Status: Phase 7 complete — Bill Extractor page at /bill fully built and human-verified; Gemini Flash extracts all 7 fields from PDF/image utility bills; per-field copy buttons with clipboard fallback; landing hub updated
 Last activity: 2026-03-04 - Completed 07-03: Bill Extractor UI page — upload, loading, and results phases
@@ -70,7 +70,7 @@ Progress: [████████████████████] 95% (19
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap]: 9-phase build order follows dependency chain: foundation -> manual entry -> calculations -> rendering -> PDF -> scraping -> bill extraction -> rates -> sharing
+- [Roadmap]: 8-phase build order follows dependency chain: foundation -> manual entry -> calculations -> rendering -> PDF -> scraping -> bill extraction -> sharing
 - [Roadmap]: Decimal.js and centralized Alberta config are Phase 1 foundations -- cannot be retrofitted
 - [01-01]: Nested type grouping (CustomerInfo, SystemInfo, ConsumptionInfo, RateInfo, FinancingInfo) for ProposalInputs
 - [01-01]: MonthlyValues as 12-element Decimal tuple type for compile-time length enforcement
