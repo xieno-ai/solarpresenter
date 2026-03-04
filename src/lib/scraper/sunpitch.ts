@@ -685,6 +685,13 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
         return;
       }
 
+      if (response.status() !== 200) {
+        captureError = `SunPitch API returned ${response.status()} — ${text.slice(0, 200)}`;
+        console.log('[scraper] API error:', response.status(), text.slice(0, 200));
+        await route.fulfill({ response });
+        return;
+      }
+
       if (response.status() === 200 && text.length > 0) {
         try {
           capturedData = JSON.parse(text) as SunPitchProposalApiResponse;
