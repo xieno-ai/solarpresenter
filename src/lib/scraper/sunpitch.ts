@@ -432,9 +432,9 @@ function buildResult(
  * the body reference is consumed before Playwright's listener can read it.
  * page.route() interception buffers the full response body reliably.
  *
- * WHY THE TIMEOUT IS 40s:
- * SunPitch's API takes 10–16 seconds to respond after the page loads. The original scraper
- * only waited 2 seconds after domcontentloaded, which is why it captured nothing.
+ * WHY THE TIMEOUT IS 240s:
+ * SunPitch's API can take anywhere from 10–240 seconds to respond after the page loads,
+ * depending on server load. The original scraper only waited 2 seconds after domcontentloaded.
  *
  * Diagnosed 2026-03-03 using real URL: https://app.sunpitch.com/facing/proposals/db9b7ee9-...
  */
@@ -465,8 +465,8 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
   // Set up route interception BEFORE goto — reliably buffers the full response body
   await page.route(`**/api/proposals/${uuid}**`, async (route) => {
     try {
-      // SunPitch API can take up to 60 seconds to respond — increase route.fetch timeout
-      const response = await route.fetch({ timeout: 60000 });
+      // SunPitch API can take up to 240 seconds to respond — increase route.fetch timeout
+      const response = await route.fetch({ timeout: 240000 });
       const body = await response.body();
       const text = body.toString('utf8');
       console.log('[scraper] route intercepted /api/proposals — status:', response.status(), '| bytes:', text.length);
@@ -511,9 +511,9 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
     }
 
     // Poll for the route interceptor to fire.
-    // SunPitch API takes 10–60 seconds to respond after page load (depending on server load).
-    // route.fetch timeout is set to 60s; poll for up to 55s to give it time.
-    const TIMEOUT_MS = 55000;
+    // SunPitch API takes 10–240 seconds to respond after page load (depending on server load).
+    // route.fetch timeout is set to 240s; poll for up to 235s to give it time.
+    const TIMEOUT_MS = 235000;
     const POLL_INTERVAL_MS = 500;
     let waited = 0;
 
@@ -543,7 +543,7 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
       data: null,
       missingFields: [],
       message:
-        'SunPitch API did not respond within 40 seconds. Check server logs for [scraper] entries.',
+        'SunPitch API did not respond within 240 seconds. Check server logs for [scraper] entries.',
     };
   } finally {
     await context.close();

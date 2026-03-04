@@ -5,6 +5,8 @@ import type { ScrapeResult } from '@/lib/scraper/types';
 
 // REQUIRED: Playwright cannot run in Edge runtime
 export const runtime = 'nodejs';
+// Allow up to 240 seconds for SunPitch's slow API
+export const maxDuration = 240;
 
 export async function POST(request: NextRequest): Promise<Response> {
   let body: { url?: string };
