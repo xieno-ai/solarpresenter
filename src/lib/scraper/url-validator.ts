@@ -1,5 +1,5 @@
 export const SUNPITCH_URL_PATTERN =
-  /^https?:\/\/app\.sunpitch\.com\/facing\/proposals\/[0-9a-f-]{36}$/i;
+  /^https?:\/\/(app\.sunpitch\.com|fluent-quotes-staging\.azurewebsites\.net)\/facing\/proposals\/[0-9a-f-]{36}$/i;
 
 /**
  * Validates a SunPitch proposal URL.

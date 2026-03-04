@@ -580,7 +580,7 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
       data: null,
       missingFields: [],
       message:
-        'URL does not match expected SunPitch format: https://app.sunpitch.com/facing/proposals/{uuid}',
+        'URL does not match expected SunPitch format: https://app.sunpitch.com/facing/proposals/{uuid} or https://fluent-quotes-staging.azurewebsites.net/facing/proposals/{uuid}',
     };
   }
   const uuid = uuidMatch[1];
