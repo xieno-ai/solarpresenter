@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-04T22:07:11.817Z"
+last_updated: "2026-03-04T22:07:16.241Z"
 progress:
   total_phases: 7
   completed_phases: 6
@@ -122,6 +122,8 @@ Recent decisions affecting current work:
 - [06-03]: API field mapping: customer.firstName/lastName, utility.rate ($/kWh), config.projections (kWh/day/zone), editor.TotalSolarPanel × equipment.panel.valueWh for system size, selected adders for cash price
 - [06-03]: netMeteringSellRate and annualEscalationRate always missing from SunPitch API — user enters manually
 - [Phase 07-02]: Used next.config.ts redirects array for /proposal → /enter to avoid overwriting the proposal renderer; missing guard preserves /proposal?d= renderer access
+- [Phase 07-01]: zodToJsonSchema cast as any to bridge zod v4 types with zod-to-json-schema v3 — runtime correct, type mismatch only
+- [Phase 07-01]: GEMINI_MODEL constant with env var override for easy model updates without code changes
 
 ### Pending Todos
 
@@ -157,5 +159,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 15 — replaced carbon credits engine with SolarOffset.ca GDF schedule and tiered platform fees.
+Stopped at: Completed 07-01 — bill extraction API contracts (schema, prompt, route handler).
 Resume file: None
