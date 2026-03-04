@@ -58,7 +58,9 @@ function buildProposalInputs(formValues: ProposalFormValues): ProposalInputs {
     },
     rates: {
       allInRate: d(formValues.rates.allInRate),
-      netMeteringBuyRate: d(formValues.rates.netMeteringBuyRate),
+      netMeteringBuyRate: d(formValues.rates.netMeteringBuyRate).greaterThan(0)
+        ? d(formValues.rates.netMeteringBuyRate).times(2)
+        : d(formValues.rates.netMeteringBuyRate),
       netMeteringSellRate: d(formValues.rates.netMeteringSellRate),
       annualEscalationRate: d(formValues.rates.annualEscalationRate),
     },
@@ -177,7 +179,9 @@ export default async function ProposalPage({
         annualGridPurchaseCost={serialized.annualGridPurchaseCost}
         annualSellRevenue={serialized.annualSellRevenue}
         allInRate={formValues.rates.allInRate}
-        gridBuyRate={formValues.rates.netMeteringBuyRate}
+        gridBuyRate={parseFloat(formValues.rates.netMeteringBuyRate) > 0
+          ? String(parseFloat(formValues.rates.netMeteringBuyRate) * 2)
+          : formValues.rates.netMeteringBuyRate}
         sellRate={formValues.rates.netMeteringSellRate}
         preSolarRate={config.defaultPreSolarRate.toString()}
       />
@@ -201,7 +205,9 @@ export default async function ProposalPage({
         annualSurplusKwh={serialized.monthlyNetMetering
           .reduce((s, m) => s + parseFloat(m.surplusSoldKwh), 0)
           .toFixed(0)}
-        gridBuyRate={formValues.rates.netMeteringBuyRate}
+        gridBuyRate={parseFloat(formValues.rates.netMeteringBuyRate) > 0
+          ? String(parseFloat(formValues.rates.netMeteringBuyRate) * 2)
+          : formValues.rates.netMeteringBuyRate}
         sellRate={formValues.rates.netMeteringSellRate}
         escalationRate={formValues.rates.annualEscalationRate}
         financeTermMonths={formValues.financing.financeTermMonths}
