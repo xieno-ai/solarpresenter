@@ -1,56 +1,59 @@
 /**
- * Gemini extraction prompt for Alberta electricity utility bills.
+ * Gemini extraction prompt for electricity utility bills.
  *
  * Kept in a separate file so prompt tuning doesn't require touching the route handler.
- * Alberta context: major providers are EPCOR, ENMAX, ATCOenergy, Encor, Direct Energy.
- * Typical all-in rates: 14–25 cents/kWh (varies by zone, season, and retailer).
+ * The route sends this alongside responseSchema (Zod → JSON Schema), so Gemini returns
+ * structured JSON regardless of the text output format described here.
  */
-export const BILL_EXTRACTION_PROMPT = `You are an expert at reading Alberta electricity utility bills.
+export const BILL_EXTRACTION_PROMPT = `You are a solar energy proposal assistant. When a user uploads an electricity bill (any format, any utility provider), extract the following data accurately. Bills may be PDFs, photos, or scans and can vary significantly in layout and terminology.
 
-Extract the following fields from the provided utility bill document and return them as JSON.
+--- ELECTRICITY USAGE ---
 
-Fields to extract:
+Extract in order of preference — use the FIRST option you can reliably extract:
 
-monthlyKwh
-  An array of exactly 12 monthly electricity consumption values in kWh, ordered January through December.
-  If the bill only shows some months, place those values in the correct month positions and fill the remaining positions with null.
-  If no monthly data exists at all, return null for the entire array (not an array of nulls).
+Option A — Monthly Usage (kWh) [PREFERRED]
+Extract 12 months of individual monthly kWh usage if available. Sources include:
+- A bar graph/chart labeled something like "Your Electricity Use at a Glance," "Monthly Electricity Total (kWh)," or similar
+- A table of monthly consumption values
+If the graph is readable and contains data for a full 12-month period (or close to it), estimate the kWh values from the bar heights using the Y-axis scale.
+If the graph shows two years of data, use the most recent complete year. If neither year is fully complete, use whichever has more months of data.
+Return as an array of 12 values ordered Jan–Dec. Use null for any month with no data.
 
-annualKwh
-  Total annual electricity consumption in kWh.
-  If not explicitly stated on the bill, calculate it by summing all non-null values in monthlyKwh.
-  If neither monthly nor annual data is available, return null.
+Option B — Annual Usage (kWh)
+If monthly breakdown is unavailable but a total annual kWh figure is stated, return that as annualKwh.
 
-allInRateCentsPerKwh
-  The effective all-in rate in cents per kWh.
-  Calculate as: (total bill amount in dollars ÷ total kWh consumed) × 100.
-  This rate MUST include all charges: energy, distribution, transmission, administration, and any other fees.
-  It should NOT be just the energy or commodity charge line item — it is the total cost per kWh.
-  Alberta all-in rates are typically 14–25 cents/kWh. If you calculate a value far outside this range, re-check your calculation.
+Option C — No kWh data
+If neither is available, return null for both monthlyKwh and annualKwh.
 
-energyRateCentsPerKwh
-  The energy or commodity rate in cents per kWh.
-  This is ONLY the energy/electricity charge line item, excluding distribution, transmission, and fixed charges.
-  Look for line items labelled "Energy Charge", "Commodity Charge", "Electricity Rate", or similar.
-  Return null if you cannot identify the energy-only rate with confidence.
+--- RATES ---
 
-utilityProvider
-  The name of the electricity utility company as shown on the bill.
-  Common Alberta providers: EPCOR, ENMAX, ATCOenergy, Encor, Direct Energy, FortisAlberta.
-  Return the name exactly as printed on the bill.
+energyRateCentsPerKwh:
+The per-kWh rate charged for the electricity commodity itself. Look for line items like:
+- "Electric Energy Charges" with a ¢/kWh rate
+- "Fixed Electricity" with a $/kWh rate
+- "Guaranteed Rate" or contract rate per kWh
+- The rate on the RoLR (Retailer of Last Resort) or regulated rate
+Return in cents per kWh (multiply by 100 if shown as $/kWh). Return null if not identifiable.
 
-accountHolderName
-  The full name of the account holder as shown on the bill.
-  This is typically near the top of the bill, on the address block, or under "Bill To" / "Account Holder".
+allInRateCentsPerKwh:
+Calculate the total effective cost per kWh including ALL charges on the electricity portion of the bill: energy charges + delivery/distribution + transmission + riders + admin charges + any other fees — everything except GST.
+Formula: (Total Electricity Charges before GST) ÷ (kWh consumed in billing period) × 100
+GST is excluded. Do not include tax in this calculation.
+Alberta all-in rates are typically 14–25 cents/kWh. If your result is far outside this range, re-check your calculation.
 
-serviceAddress
-  The service or delivery address — where the electricity is physically delivered.
-  This may differ from the mailing/billing address; prefer the service address if both are present.
-  Include street number, street name, city, province, and postal code if visible.
+--- OTHER FIELDS ---
 
-Rules:
-- Return null for any field you cannot find or are not confident about. Never guess.
-- Do not return 0 when data is missing — return null.
-- Rates should be in cents per kWh (not dollars per kWh). Multiply by 100 if the bill shows $/kWh.
-- Monthly kWh values should be whole numbers or decimals as shown on the bill — do not round.
+utilityProvider: The energy retailer/provider name as printed on the bill. Examples: EPCOR, Encor by EPCOR, ATCOenergy, ENMAX, Direct Energy.
+accountHolderName: The full name of the account holder.
+serviceAddress: The service/delivery address (street, city, province, postal code). Prefer service address over mailing address if both are present.
+
+--- IMPORTANT RULES ---
+
+- Electricity only. If the bill includes natural gas charges, ignore the gas section entirely.
+- Return null for any field you cannot find or are not confident about. Never guess or return 0 for missing data.
+- Rates must be in cents per kWh. Multiply by 100 if the bill shows $/kWh.
+- Monthly kWh values should match the bill exactly — do not round.
+- If a number is unclear in a photo/scan, provide your best estimate.
+- Different providers use different terminology. Distribution Charge, Delivery Charge, Transmission Charge, Rate Riders, A1 Rider, Balancing Pool Allocation Rider, Energy Market Trading Charge, Local Access Fee, Administration Charge, RoLR Implementation Cost Rider — these are all part of the all-in cost.
+- Some bills combine electricity and gas (e.g., ATCO). Only use electricity section totals.
 `;

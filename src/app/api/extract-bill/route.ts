@@ -10,7 +10,6 @@ export const maxDuration = 60; // Gemini typically responds in 5-15s; 60s safety
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY! });
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash';
 
-// Accepted file types for utility bill uploads
 const ALLOWED_MIME_TYPES = [
   'application/pdf',
   'image/jpeg',
@@ -19,9 +18,10 @@ const ALLOWED_MIME_TYPES = [
   'image/heif',
 ];
 
+const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4MB per file
+
 export async function POST(request: NextRequest): Promise<Response> {
   // 1. Parse multipart form data
-  // NOTE: Do NOT set Content-Type on the client fetch — browser sets the multipart boundary automatically.
   let formData: FormData;
   try {
     formData = await request.formData();
@@ -32,49 +32,56 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
   }
 
-  // 2. Validate file presence
-  const file = formData.get('file') as File | null;
-  if (!file) {
+  // 2. Collect all uploaded files (client appends each under the key 'file')
+  const files = formData.getAll('file') as File[];
+  if (files.length === 0) {
     return Response.json(
       { status: 'error', fields: null, message: 'No file provided' } satisfies ExtractBillResult,
       { status: 400 },
     );
   }
 
-  // 3. Validate MIME type
-  if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-    return Response.json(
-      {
-        status: 'error',
-        fields: null,
-        message: `Unsupported file type: ${file.type}. Accepted types: PDF, JPEG, PNG, HEIC.`,
-      } satisfies ExtractBillResult,
-      { status: 400 },
-    );
+  // 3. Validate each file
+  for (const file of files) {
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return Response.json(
+        {
+          status: 'error',
+          fields: null,
+          message: `Unsupported file type: ${file.type}. Accepted types: PDF, JPEG, PNG, HEIC.`,
+        } satisfies ExtractBillResult,
+        { status: 400 },
+      );
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      return Response.json(
+        {
+          status: 'error',
+          fields: null,
+          message: `"${file.name}" exceeds 4MB. Please compress or use a smaller scan.`,
+        } satisfies ExtractBillResult,
+        { status: 413 },
+      );
+    }
   }
 
-  // 4. Validate file size — Vercel serverless functions cap at 4.5MB; enforce 4MB here
-  if (file.size > 4 * 1024 * 1024) {
-    return Response.json(
-      {
-        status: 'error',
-        fields: null,
-        message: 'File exceeds 4MB limit. Please compress the image or use a smaller scan.',
-      } satisfies ExtractBillResult,
-      { status: 413 },
-    );
-  }
-
-  // 5. Convert file to base64 for Gemini inline data
-  const base64Data = Buffer.from(await file.arrayBuffer()).toString('base64');
+  // 4. Convert all files to base64 inline data parts
+  const fileParts = await Promise.all(
+    files.map(async (file) => ({
+      inlineData: {
+        mimeType: file.type,
+        data: Buffer.from(await file.arrayBuffer()).toString('base64'),
+      },
+    })),
+  );
 
   try {
-    // 6. Call Gemini Flash with inline file data and structured output schema
+    // 5. Call Gemini with all pages/images as separate parts in one request
     const response = await ai.models.generateContent({
       model: GEMINI_MODEL,
       contents: [
         { text: BILL_EXTRACTION_PROMPT },
-        { inlineData: { mimeType: file.type, data: base64Data } },
+        ...fileParts,
       ],
       config: {
         responseMimeType: 'application/json',
@@ -83,11 +90,19 @@ export async function POST(request: NextRequest): Promise<Response> {
       },
     });
 
-    // 7. Parse and validate response with Zod (guarantees typed fields, catches partial/missing)
+    // 6. Parse and validate with Zod
     const raw = JSON.parse(response.text ?? '{}');
     const fields = extractedBillSchema.parse(raw);
 
-    // 8. Determine status based on how many fields were successfully extracted
+    // 6a. Auto-compute annualKwh from monthly values if Gemini didn't return it
+    if (fields.annualKwh === null && fields.monthlyKwh !== null) {
+      const nonNullMonths = fields.monthlyKwh.filter((v): v is number => v !== null);
+      if (nonNullMonths.length > 0) {
+        fields.annualKwh = Math.round(nonNullMonths.reduce((sum, v) => sum + v, 0));
+      }
+    }
+
+    // 7. Determine status
     const scalarFields = [
       fields.annualKwh,
       fields.allInRateCentsPerKwh,
@@ -102,25 +117,19 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     let status: ExtractBillResult['status'];
     if (totalNonNull === 0) {
-      // No fields extracted at all
-      status = 'error';
       return Response.json({
-        status,
+        status: 'error',
         fields,
         message: 'Could not extract data from this document. Please check that it is a utility bill.',
       } satisfies ExtractBillResult);
     } else if (totalNonNull < 7) {
-      // Some fields found, some missing
       status = 'partial';
     } else {
-      // All fields extracted
       status = 'success';
     }
 
-    // 9. Return HTTP 200 always — client reads status field, not HTTP code (same as /api/scrape)
     return Response.json({ status, fields } satisfies ExtractBillResult);
   } catch (err) {
-    // Gemini call or Zod parse failed
     const message = err instanceof Error ? err.message : 'Extraction failed — unknown error';
     return Response.json(
       { status: 'error', fields: null, message } satisfies ExtractBillResult,

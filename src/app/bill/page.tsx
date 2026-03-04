@@ -72,7 +72,7 @@ function CopyButton({ value }: { value: string }) {
 
 // ─── Field Row ────────────────────────────────────────────────────────────────
 
-function FieldRow({ label, value }: { label: string; value: string | null }) {
+function FieldRow({ label, value, copyValue }: { label: string; value: string | null; copyValue?: string }) {
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-neutral-800 last:border-0">
       <span className="text-sm text-neutral-400 shrink-0 mr-4">{label}</span>
@@ -80,7 +80,7 @@ function FieldRow({ label, value }: { label: string; value: string | null }) {
         {value !== null ? (
           <>
             <span className="text-sm text-neutral-100 truncate">{value}</span>
-            <CopyButton value={value} />
+            <CopyButton value={copyValue ?? value} />
           </>
         ) : (
           <span className="bg-amber-400/10 text-amber-400 rounded px-2 py-0.5 text-xs">
@@ -101,6 +101,56 @@ function SectionHeader({ title }: { title: string }) {
         {title}
       </span>
     </div>
+  );
+}
+
+// ─── Month Chip ───────────────────────────────────────────────────────────────
+
+function MonthChip({ month, value }: { month: string; value: number | null }) {
+  const [flash, setFlash] = useState(false);
+
+  async function handleCopy() {
+    if (value === null) return;
+    try {
+      await navigator.clipboard.writeText(String(value));
+    } catch {
+      try {
+        const input = document.createElement('input');
+        input.value = String(value);
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+      } catch { /* silent */ }
+    }
+    setFlash(true);
+    setTimeout(() => setFlash(false), 600);
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      disabled={value === null}
+      title={value !== null ? `Copy ${value.toLocaleString()}` : undefined}
+      style={{
+        transition: 'background-color 600ms ease-out',
+        backgroundColor: flash ? 'rgba(251,191,36,0.18)' : undefined,
+      }}
+      className={`flex flex-col items-center gap-0.5 rounded-lg p-1.5 ${
+        value !== null
+          ? 'bg-neutral-800/60 hover:bg-neutral-700/80 cursor-pointer active:scale-95'
+          : 'bg-neutral-800/30 cursor-default'
+      }`}
+    >
+      <span className="text-[9px] font-mono text-neutral-500 uppercase">{month}</span>
+      <span className={`text-xs font-medium ${value !== null ? 'text-neutral-200' : 'text-neutral-600'}`}>
+        {value !== null ? value.toLocaleString() : '—'}
+      </span>
+    </button>
   );
 }
 
@@ -214,12 +264,7 @@ function ResultsCard({
     <div className="space-y-2">
       <div className="grid grid-cols-6 gap-1.5">
         {fields.monthlyKwh.map((val, i) => (
-          <div key={i} className="flex flex-col items-center gap-0.5 bg-neutral-800/60 rounded-lg p-1.5">
-            <span className="text-[9px] font-mono text-neutral-500 uppercase">{MONTH_ABBRS[i]}</span>
-            <span className={`text-xs font-medium ${val !== null ? 'text-neutral-200' : 'text-neutral-600'}`}>
-              {val !== null ? val.toLocaleString() : '—'}
-            </span>
-          </div>
+          <MonthChip key={i} month={MONTH_ABBRS[i]} value={val} />
         ))}
       </div>
       <p className="text-xs text-neutral-600">
@@ -292,10 +337,12 @@ function ResultsCard({
         <FieldRow
           label="All-in Rate"
           value={fields.allInRateCentsPerKwh !== null ? `${fields.allInRateCentsPerKwh.toFixed(1)} ¢/kWh` : null}
+          copyValue={fields.allInRateCentsPerKwh !== null ? (fields.allInRateCentsPerKwh / 100).toFixed(3) : undefined}
         />
         <FieldRow
           label="Energy Rate"
           value={fields.energyRateCentsPerKwh !== null ? `${fields.energyRateCentsPerKwh.toFixed(1)} ¢/kWh` : null}
+          copyValue={fields.energyRateCentsPerKwh !== null ? (fields.energyRateCentsPerKwh / 100).toFixed(3) : undefined}
         />
 
         {/* Account section */}
@@ -330,6 +377,7 @@ export default function BillPage() {
   const [result, setResult] = useState<ExtractBillResult | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [statusIndex, setStatusIndex] = useState(0);
+  const [queuedFiles, setQueuedFiles] = useState<File[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -355,51 +403,63 @@ export default function BillPage() {
     };
   }, [phase]);
 
-  async function handleUpload(file: File) {
-    // Client-side size check
-    if (file.size > MAX_FILE_SIZE) {
-      setUploadError('File too large — please use a file under 4 MB.');
-      return;
+  function addFiles(incoming: FileList | File[]) {
+    const arr = Array.from(incoming);
+    setUploadError(null);
+
+    for (const file of arr) {
+      if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
+        setUploadError('Unsupported file type. Please upload PDF, JPG, PNG, or HEIC files.');
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setUploadError(`"${file.name}" exceeds 4 MB — please use a smaller file.`);
+        return;
+      }
     }
 
-    // MIME type check
-    if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
-      setUploadError('Unsupported file type. Please upload a PDF, JPG, PNG, or HEIC file.');
-      return;
-    }
+    setQueuedFiles((prev) => {
+      // Deduplicate by name+size
+      const existing = new Set(prev.map((f) => `${f.name}:${f.size}`));
+      return [...prev, ...arr.filter((f) => !existing.has(`${f.name}:${f.size}`))];
+    });
+  }
 
+  function removeFile(index: number) {
+    setQueuedFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function handleExtract() {
+    if (queuedFiles.length === 0) return;
     setPhase('loading');
     setUploadError(null);
 
     const formData = new FormData();
-    formData.append('file', file);
+    for (const file of queuedFiles) {
+      formData.append('file', file);
+    }
 
     try {
       const res = await fetch('/api/extract-bill', {
         method: 'POST',
         body: formData,
-        // Do NOT set Content-Type — browser sets multipart boundary automatically
       });
       const data: ExtractBillResult = await res.json();
       setResult(data);
       setPhase('results');
     } catch {
-      setResult({
-        status: 'error',
-        fields: null,
-        message: 'Network error — check your connection.',
-      });
+      setResult({ status: 'error', fields: null, message: 'Network error — check your connection.' });
       setPhase('results');
     }
   }
 
   function handleReupload() {
     setResult(null);
+    setQueuedFiles([]);
     setPhase('upload');
     setUploadError(null);
   }
 
-  // Drag-and-drop handlers
   function handleDragOver(e: React.DragEvent) {
     e.preventDefault();
     setIsDragging(true);
@@ -413,8 +473,7 @@ export default function BillPage() {
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleUpload(file);
+    if (e.dataTransfer.files.length > 0) addFiles(e.dataTransfer.files);
   }
 
   return (
@@ -451,8 +510,8 @@ export default function BillPage() {
                 Upload a Utility Bill
               </h1>
               <p className="text-sm text-neutral-500 leading-relaxed">
-                Upload a customer&rsquo;s utility bill to instantly extract usage data, rates, and account
-                information — ready to copy into your proposal tools.
+                Upload one or more pages of a customer&rsquo;s utility bill to extract usage data, rates,
+                and account info — ready to copy into your proposal tools.
               </p>
             </div>
 
@@ -473,10 +532,9 @@ export default function BillPage() {
                   : 'border-neutral-800 hover:border-neutral-700'
               }`}
             >
-              <div className="flex flex-col items-center justify-center gap-4 py-14 px-8">
-                {/* Cloud upload icon */}
+              <div className="flex flex-col items-center justify-center gap-4 py-12 px-8">
                 <svg
-                  className={`w-12 h-12 transition-colors duration-150 ${isDragging ? 'text-amber-400' : 'text-neutral-600'}`}
+                  className={`w-10 h-10 transition-colors duration-150 ${isDragging ? 'text-amber-400' : 'text-neutral-600'}`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -491,7 +549,7 @@ export default function BillPage() {
 
                 <div className="text-center space-y-1">
                   <p className={`text-base font-medium transition-colors duration-150 ${isDragging ? 'text-amber-300' : 'text-neutral-300'}`}>
-                    Drag &amp; drop your bill here
+                    {queuedFiles.length > 0 ? 'Add more pages' : 'Drag & drop your bill here'}
                   </p>
                   <p className="text-sm text-neutral-500">
                     or <span className="text-amber-400 underline underline-offset-2">click to browse</span>
@@ -499,41 +557,63 @@ export default function BillPage() {
                 </div>
 
                 <p className="text-xs text-neutral-600">
-                  PDF, JPG, PNG, HEIC &mdash; max 4 MB
+                  PDF, JPG, PNG, HEIC &mdash; up to 4 MB each
                 </p>
               </div>
 
-              {/* Hidden file input */}
               <input
                 ref={fileInputRef}
                 type="file"
+                multiple
                 accept=".pdf,.jpg,.jpeg,.png,.heic,.heif"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleUpload(file);
-                  // Reset so same file can be re-selected
+                  if (e.target.files && e.target.files.length > 0) addFiles(e.target.files);
                   e.target.value = '';
                 }}
               />
             </div>
 
+            {/* Queued files list */}
+            {queuedFiles.length > 0 && (
+              <div className="space-y-2">
+                {queuedFiles.map((file, i) => (
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-neutral-900 border border-neutral-800 rounded-lg">
+                    <svg className="w-4 h-4 shrink-0 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <span className="text-sm text-neutral-300 flex-1 truncate">{file.name}</span>
+                    <span className="text-xs text-neutral-600 shrink-0">{(file.size / 1024).toFixed(0)} KB</span>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                      className="shrink-0 w-5 h-5 flex items-center justify-center rounded text-neutral-600 hover:text-neutral-300 hover:bg-neutral-800 transition-all"
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={handleExtract}
+                  className="w-full mt-2 py-3 rounded-xl bg-amber-400 text-neutral-950 text-sm font-semibold hover:bg-amber-300 active:scale-[0.98] transition-all duration-150"
+                >
+                  Extract Bill{queuedFiles.length > 1 ? ` (${queuedFiles.length} files)` : ''}
+                </button>
+              </div>
+            )}
+
             {/* Upload error */}
             {uploadError && (
               <div className="p-4 rounded-lg bg-amber-400/5 border border-amber-400/20">
                 <div className="flex items-start gap-3">
-                  <svg
-                    className="w-4 h-4 text-amber-400 shrink-0 mt-0.5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                    <line x1="12" y1="9" x2="12" y2="13" />
-                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                    <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
                   </svg>
                   <p className="text-sm text-amber-300">{uploadError}</p>
                 </div>
