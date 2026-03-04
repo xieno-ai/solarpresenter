@@ -1,12 +1,6 @@
-import type { Browser, Page } from 'playwright';
+import type { Browser } from 'playwright';
 import type { ScrapeResult } from './types';
 import type { ProposalFormValues } from '@/lib/form/schema';
-
-/** Captured payload from a network response during page load */
-interface CapturedPayload {
-  url: string;
-  data: unknown;
-}
 
 /**
  * Normalizes a raw array to exactly 12 string entries.
@@ -16,331 +10,359 @@ function normalizeMonthlyArray(raw: (string | number | null | undefined)[]): str
   return Array.from({ length: 12 }, (_, i) => {
     const v = raw[i];
     if (v == null || v === '') return '0';
-    return String(v);
+    return String(Math.round(Number(v)));
   });
 }
 
 /**
- * Determines whether a parsed JSON object is likely to contain SunPitch proposal data.
- * Checks for known field names that appear in proposal API responses.
+ * Days per calendar month (non-leap year).
+ * Used to convert kWh/day production values to kWh/month.
  */
-function looksLikeProposalData(json: unknown): boolean {
-  if (!json || typeof json !== 'object') return false;
-  const obj = json as Record<string, unknown>;
-  const keys = [
-    'systemSize',
-    'monthlyProduction',
-    'production',
-    'proposal',
-    'customer',
-    'clientName',
-  ];
-  return keys.some((k) => k in obj);
+const DAYS_PER_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+/**
+ * The real SunPitch API response shape for /api/proposals/{uuid}.
+ * Derived from live DOM inspection on 2026-03-03.
+ */
+interface SunPitchProposalApiResponse {
+  id?: number;
+  uid?: string;
+  customer?: {
+    firstName?: string;
+    lastName?: string;
+    address?: {
+      address?: string;
+      city?: string;
+      state?: string;
+    };
+  };
+  address?: {
+    address?: string;
+    city?: string;
+    state?: string;
+  };
+  utility?: {
+    /** $/kWh — the effective rate the customer pays per kWh. Form allInRate range is 0.01–2.0 $/kWh. */
+    rate?: number;
+    /** $/kWh — sell/credit rate for net metering. Often 0 for Alberta. */
+    creditPerKwh?: number;
+    connectionRate?: number;
+    /** JSON string, e.g. {"avgYearlyUsage":"7650"} or {"monthlyUsage":[...]} */
+    infoData?: string;
+    /** "AvgYearlyUsage" | "MonthlyUsage" | etc. */
+    infoType?: string;
+    companyName?: string;
+  };
+  config?: {
+    /** JSON string: {"production": [[zone1_kWh/day×12], [zone2_kWh/day×12], ...]} */
+    projections?: string;
+    /** JSON string: {manufacturer, panel: {valueWh, equipmentName}, inverter: {...}} */
+    equipment?: string;
+    /** JSON string with TotalSolarPanel count used to compute system size */
+    editor?: string;
+    /** JSON string: array of adder objects with priceType/price_ab/selected/qty */
+    adders?: string;
+    systemLoss?: string;
+  };
 }
 
 /**
- * Extracts a numeric kW value from text like "10.2 kW" or "10kW".
+ * Parses the SunPitch /api/proposals/{uuid} JSON response into ProposalFormValues.
+ *
+ * Field mapping (from live API inspection, 2026-03-03):
+ *   customer.name                    ← `${customer.firstName} ${customer.lastName}`
+ *   customer.address                 ← address.address (full string)
+ *   consumption.annualConsumptionKwh ← utility.infoData.avgYearlyUsage (AvgYearlyUsage)
+ *                                   OR sum of utility.infoData.monthlyUsage (MonthlyUsage)
+ *   consumption.monthlyConsumptionKwh← utility.infoData.monthlyUsage (MonthlyUsage only)
+ *   rates.allInRate                  ← utility.rate ($/kWh)
+ *   rates.netMeteringBuyRate         ← utility.rate (same — Alberta flat-rate net metering)
+ *   rates.netMeteringSellRate        ← utility.creditPerKwh (if > 0)
+ *   system.monthlyProductionKwh      ← sum of all zones in config.projections.production
+ *                                     (kWh/day × days_per_month)
+ *   system.annualProductionKwh       ← sum of monthlyProductionKwh
+ *   system.systemSizeKw              ← editor.TotalSolarPanel × equipment.panel.valueWh / 1000
+ *   financing.cashPurchasePrice      ← sum of selected adders (PerWatt × system_watts + Fixed × qty)
  */
-function extractKwValue(text: string): string | null {
-  const match = text.match(/(\d+\.?\d*)\s*kW/i);
-  return match ? match[1] : null;
-}
-
-/**
- * Attempts to map a raw API JSON payload into Partial<ProposalFormValues>.
- * Since SunPitch's API shape is unknown until tested, this is a best-effort mapping
- * that logs what it finds for debugging.
- */
-function extractFromApiResponse(payloads: CapturedPayload[]): ScrapeResult {
-  console.log('[scraper] extractFromApiResponse: processing', payloads.length, 'captured payloads');
+function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
+  console.log('[scraper] parseApiResponse: mapping SunPitch API fields');
 
   const data: Partial<ProposalFormValues> = {};
   const missingFields: string[] = [];
 
-  // Try each payload in order — use the first one that yields data
-  for (const { url: payloadUrl, data: raw } of payloads) {
-    console.log('[scraper] examining payload from:', payloadUrl);
+  // --- Customer name ---
+  const firstName = raw.customer?.firstName?.trim() ?? '';
+  const lastName = raw.customer?.lastName?.trim() ?? '';
+  if (firstName || lastName) {
+    data.customer = {
+      name: `${firstName} ${lastName}`.trim(),
+      address: '',
+    };
+    console.log('[scraper] customer.name:', data.customer.name);
+  } else {
+    missingFields.push('customer.name');
+  }
 
-    if (!raw || typeof raw !== 'object') continue;
-    const obj = raw as Record<string, unknown>;
+  // --- Customer address ---
+  // Prefer top-level address (has lat/lng), fall back to customer.address
+  const addrStr =
+    raw.address?.address?.trim() ||
+    raw.customer?.address?.address?.trim() ||
+    '';
+  if (addrStr) {
+    data.customer = {
+      name: data.customer?.name ?? '',
+      address: addrStr,
+    };
+    console.log('[scraper] customer.address:', addrStr);
+  } else {
+    missingFields.push('customer.address');
+  }
 
-    // Customer name — try common field names
-    if (!data.customer?.name) {
-      const nameVal =
-        (obj.clientName as string | undefined) ??
-        (obj.customerName as string | undefined) ??
-        ((obj.customer as Record<string, unknown> | undefined)?.name as string | undefined) ??
-        ((obj.proposal as Record<string, unknown> | undefined)?.clientName as string | undefined);
-      if (nameVal && typeof nameVal === 'string') {
-        data.customer = { ...data.customer, name: nameVal, address: data.customer?.address ?? '' };
-        console.log('[scraper] customer.name found:', nameVal);
-      }
-    }
+  // --- Utility rate → allInRate and netMeteringBuyRate ---
+  // utility.rate is in $/kWh; form allInRate range is 0.01–2.0 ($/kWh)
+  const utilityRate = raw.utility?.rate;
+  if (utilityRate != null && utilityRate > 0) {
+    const rateStr = String(Math.round(utilityRate * 10000) / 10000); // up to 4 decimal places
+    data.rates = {
+      ...(data.rates ?? {}),
+      allInRate: rateStr,
+      netMeteringBuyRate: rateStr,
+    } as typeof data.rates;
+    console.log('[scraper] rates.allInRate / netMeteringBuyRate:', rateStr);
+  } else {
+    missingFields.push('rates.allInRate');
+    missingFields.push('rates.netMeteringBuyRate');
+  }
 
-    // Customer address
-    if (!data.customer?.address) {
-      const addrVal =
-        (obj.address as string | undefined) ??
-        (obj.clientAddress as string | undefined) ??
-        ((obj.customer as Record<string, unknown> | undefined)?.address as string | undefined);
-      if (addrVal && typeof addrVal === 'string') {
-        data.customer = { ...data.customer, address: addrVal, name: data.customer?.name ?? '' };
-        console.log('[scraper] customer.address found:', addrVal);
-      }
-    }
+  // --- Net metering sell rate (creditPerKwh) ---
+  const creditRate = raw.utility?.creditPerKwh;
+  if (creditRate != null && creditRate > 0) {
+    data.rates = {
+      ...(data.rates ?? {}),
+      netMeteringSellRate: String(Math.round(creditRate * 10000) / 10000),
+    } as typeof data.rates;
+    console.log('[scraper] rates.netMeteringSellRate:', creditRate);
+  } else {
+    // Alberta net metering sell rate is regulated — not stored in creditPerKwh for this proposal
+    missingFields.push('rates.netMeteringSellRate');
+  }
 
-    // System size kW
-    if (!data.system?.systemSizeKw) {
-      const sizeRaw =
-        (obj.systemSize as string | number | undefined) ??
-        ((obj.system as Record<string, unknown> | undefined)?.size as string | number | undefined) ??
-        ((obj.proposal as Record<string, unknown> | undefined)?.systemSize as string | number | undefined);
-      if (sizeRaw != null) {
-        const sizeStr = String(sizeRaw);
-        const kwVal = extractKwValue(sizeStr) ?? (isNaN(Number(sizeStr)) ? null : sizeStr);
-        if (kwVal) {
-          data.system = { ...data.system, systemSizeKw: kwVal } as typeof data.system;
-          console.log('[scraper] system.systemSizeKw found:', kwVal);
+  // --- Annual/monthly consumption from utility.infoData ---
+  if (raw.utility?.infoData) {
+    try {
+      const info = JSON.parse(raw.utility.infoData) as Record<string, unknown>;
+      const infoType = raw.utility.infoType ?? '';
+      console.log('[scraper] utility.infoType:', infoType, '| infoData keys:', Object.keys(info).join(', '));
+
+      if (infoType === 'AvgYearlyUsage' && info.avgYearlyUsage) {
+        // Annual only — monthly not available from this info type
+        const annual = String(info.avgYearlyUsage);
+        data.consumption = {
+          ...(data.consumption ?? {}),
+          annualConsumptionKwh: annual,
+          monthlyConsumptionKwh: data.consumption?.monthlyConsumptionKwh ?? normalizeMonthlyArray([]),
+          annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
+        } as typeof data.consumption;
+        console.log('[scraper] consumption.annualConsumptionKwh (AvgYearlyUsage):', annual);
+        // Monthly not available from this info type
+        missingFields.push('consumption.monthlyConsumptionKwh');
+      } else if (infoType === 'MonthlyUsage' && Array.isArray(info.monthlyUsage)) {
+        const monthly = info.monthlyUsage as (string | number)[];
+        const normalized = normalizeMonthlyArray(monthly);
+        const annual = normalized.reduce((sum, v) => sum + Number(v), 0);
+        data.consumption = {
+          ...(data.consumption ?? {}),
+          annualConsumptionKwh: String(annual),
+          monthlyConsumptionKwh: normalized,
+          annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
+        } as typeof data.consumption;
+        console.log('[scraper] consumption from MonthlyUsage:', normalized);
+      } else {
+        // Try generic keys in infoData
+        const yearlyVal = (info.annualUsage ?? info.yearlyUsage ?? info.avgYearlyUsage) as string | number | undefined;
+        if (yearlyVal != null) {
+          data.consumption = {
+            ...(data.consumption ?? {}),
+            annualConsumptionKwh: String(yearlyVal),
+            monthlyConsumptionKwh: data.consumption?.monthlyConsumptionKwh ?? normalizeMonthlyArray([]),
+            annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
+          } as typeof data.consumption;
+          console.log('[scraper] consumption.annualConsumptionKwh (generic key):', yearlyVal);
+          missingFields.push('consumption.monthlyConsumptionKwh');
+        } else {
+          missingFields.push('consumption.annualConsumptionKwh');
+          missingFields.push('consumption.monthlyConsumptionKwh');
+          console.log('[scraper] infoData has no recognized consumption keys');
         }
       }
+    } catch (e) {
+      console.log('[scraper] infoData parse error:', e);
+      missingFields.push('consumption.annualConsumptionKwh');
+      missingFields.push('consumption.monthlyConsumptionKwh');
     }
-
-    // Annual production
-    if (!data.system?.annualProductionKwh) {
-      const annualProd =
-        (obj.annualProduction as string | number | undefined) ??
-        ((obj.production as Record<string, unknown> | undefined)?.annual as string | number | undefined);
-      if (annualProd != null) {
-        data.system = {
-          ...data.system,
-          annualProductionKwh: String(annualProd),
-        } as typeof data.system;
-        console.log('[scraper] system.annualProductionKwh found:', annualProd);
-      }
-    }
-
-    // Monthly production
-    if (!data.system?.monthlyProductionKwh) {
-      const monthlyProd =
-        (obj.monthlyProduction as (string | number | null)[] | undefined) ??
-        ((obj.production as Record<string, unknown> | undefined)?.monthly as (string | number | null)[] | undefined);
-      if (Array.isArray(monthlyProd)) {
-        data.system = {
-          ...data.system,
-          monthlyProductionKwh: normalizeMonthlyArray(monthlyProd),
-        } as typeof data.system;
-        console.log('[scraper] system.monthlyProductionKwh found:', monthlyProd.length, 'entries');
-      }
-    }
-
-    // Annual consumption
-    if (!data.consumption?.annualConsumptionKwh) {
-      const annualCons =
-        (obj.annualConsumption as string | number | undefined) ??
-        ((obj.consumption as Record<string, unknown> | undefined)?.annual as string | number | undefined);
-      if (annualCons != null) {
-        data.consumption = {
-          ...data.consumption,
-          annualConsumptionKwh: String(annualCons),
-        } as typeof data.consumption;
-        console.log('[scraper] consumption.annualConsumptionKwh found:', annualCons);
-      }
-    }
-
-    // Monthly consumption
-    if (!data.consumption?.monthlyConsumptionKwh) {
-      const monthlyCons =
-        (obj.monthlyConsumption as (string | number | null)[] | undefined) ??
-        ((obj.consumption as Record<string, unknown> | undefined)?.monthly as (string | number | null)[] | undefined);
-      if (Array.isArray(monthlyCons)) {
-        data.consumption = {
-          ...data.consumption,
-          monthlyConsumptionKwh: normalizeMonthlyArray(monthlyCons),
-        } as typeof data.consumption;
-        console.log('[scraper] consumption.monthlyConsumptionKwh found:', monthlyCons.length, 'entries');
-      }
-    }
-
-    // Rates
-    if (!data.rates?.allInRate) {
-      const rate =
-        (obj.allInRate as string | number | undefined) ??
-        (obj.electricityRate as string | number | undefined) ??
-        ((obj.rates as Record<string, unknown> | undefined)?.allInRate as string | number | undefined);
-      if (rate != null) {
-        data.rates = { ...data.rates, allInRate: String(rate) } as typeof data.rates;
-        console.log('[scraper] rates.allInRate found:', rate);
-      }
-    }
-
-    // Financing
-    if (!data.financing?.cashPurchasePrice) {
-      const cashPrice =
-        (obj.cashPrice as string | number | undefined) ??
-        (obj.systemCost as string | number | undefined) ??
-        ((obj.financing as Record<string, unknown> | undefined)?.cashPrice as string | number | undefined);
-      if (cashPrice != null) {
-        data.financing = {
-          ...data.financing,
-          cashPurchasePrice: String(cashPrice),
-        } as typeof data.financing;
-        console.log('[scraper] financing.cashPurchasePrice found:', cashPrice);
-      }
-    }
-
-    if (!data.financing?.financeMonthlyPayment) {
-      const monthlyPayment =
-        (obj.monthlyPayment as string | number | undefined) ??
-        ((obj.financing as Record<string, unknown> | undefined)?.monthlyPayment as string | number | undefined);
-      if (monthlyPayment != null) {
-        data.financing = {
-          ...data.financing,
-          financeMonthlyPayment: String(monthlyPayment),
-        } as typeof data.financing;
-        console.log('[scraper] financing.financeMonthlyPayment found:', monthlyPayment);
-      }
-    }
+  } else {
+    missingFields.push('consumption.annualConsumptionKwh');
+    missingFields.push('consumption.monthlyConsumptionKwh');
   }
 
-  return buildResult(data, missingFields, 'API');
-}
-
-/**
- * Falls back to DOM extraction when no API payload is captured.
- * Uses flexible, resilient selectors since SunPitch's class names may be hashed.
- */
-async function extractFromDOM(page: Page): Promise<ScrapeResult> {
-  console.log('[scraper] extractFromDOM: falling back to DOM extraction');
-
-  const data: Partial<ProposalFormValues> = {};
-  const missingFields: string[] = [];
-
-  // -- Customer name --
-  try {
-    const nameText = await page
-      .locator('h1, h2, [class*="client"], [class*="customer"], [class*="name"]')
-      .first()
-      .textContent({ timeout: 5000 });
-    if (nameText?.trim()) {
-      data.customer = {
-        name: nameText.trim(),
-        address: '',
+  // --- Monthly production from config.projections ---
+  // projections.production: array of zones, each zone = array of 12 kWh/day values.
+  // Sum all zones → multiply by days_per_month → kWh/month.
+  if (raw.config?.projections) {
+    try {
+      const proj = JSON.parse(raw.config.projections) as {
+        production?: number[][];
       };
-      console.log('[scraper] DOM customer.name:', nameText.trim());
-    } else {
-      missingFields.push('customer.name');
-    }
-  } catch {
-    missingFields.push('customer.name');
-    console.log('[scraper] DOM customer.name: not found');
-  }
 
-  // -- Customer address --
-  try {
-    const addrText = await page
-      .locator('[class*="address"], [class*="location"]')
-      .first()
-      .textContent({ timeout: 3000 });
-    if (addrText?.trim()) {
-      data.customer = {
-        name: data.customer?.name ?? '',
-        address: addrText.trim(),
-      };
-      console.log('[scraper] DOM customer.address:', addrText.trim());
-    } else {
-      missingFields.push('customer.address');
-    }
-  } catch {
-    missingFields.push('customer.address');
-    console.log('[scraper] DOM customer.address: not found');
-  }
+      if (Array.isArray(proj.production) && proj.production.length > 0) {
+        // Sum all zone kWh/day for each month index
+        const monthlyKwhPerDay = proj.production.reduce<number[]>((acc, zone) => {
+          return zone.map((v, i) => (acc[i] ?? 0) + (Number(v) || 0));
+        }, new Array(12).fill(0) as number[]);
 
-  // -- System size --
-  try {
-    const kwLocator = page.locator('text=/\\d+\\.?\\d*\\s*kW/i').first();
-    const kwText = await kwLocator.textContent({ timeout: 5000 });
-    if (kwText) {
-      const kwVal = extractKwValue(kwText);
-      if (kwVal) {
+        // Convert kWh/day × actual_days_in_month → kWh/month
+        const monthlyKwh = monthlyKwhPerDay.map((v, i) => Math.round(v * DAYS_PER_MONTH[i]));
+        const annualKwh = monthlyKwh.reduce((sum, v) => sum + v, 0);
+
         data.system = {
-          systemSizeKw: kwVal,
-          annualProductionKwh: data.system?.annualProductionKwh ?? '',
-          monthlyProductionKwh: data.system?.monthlyProductionKwh ?? normalizeMonthlyArray([]),
-        };
-        console.log('[scraper] DOM system.systemSizeKw:', kwVal);
+          ...(data.system ?? {}),
+          monthlyProductionKwh: monthlyKwh.map(String),
+          annualProductionKwh: String(annualKwh),
+          systemSizeKw: data.system?.systemSizeKw ?? '',
+        } as typeof data.system;
+        console.log('[scraper] system.monthlyProductionKwh from', proj.production.length, 'zone(s)');
+        console.log('[scraper] system.annualProductionKwh:', annualKwh);
       } else {
-        missingFields.push('system.systemSizeKw');
+        missingFields.push('system.monthlyProductionKwh');
+        missingFields.push('system.annualProductionKwh');
+        console.log('[scraper] projections.production missing or empty');
+      }
+    } catch (e) {
+      console.log('[scraper] projections parse error:', e);
+      missingFields.push('system.monthlyProductionKwh');
+      missingFields.push('system.annualProductionKwh');
+    }
+  } else {
+    missingFields.push('system.monthlyProductionKwh');
+    missingFields.push('system.annualProductionKwh');
+  }
+
+  // --- System size from config.editor.TotalSolarPanel × config.equipment.panel.valueWh ---
+  let systemSizeKw: string | null = null;
+  try {
+    if (raw.config?.editor && raw.config?.equipment) {
+      const editor = JSON.parse(raw.config.editor) as { TotalSolarPanel?: number };
+      const equip = JSON.parse(raw.config.equipment) as {
+        panel?: { valueWh?: number; equipmentName?: string };
+      };
+      const panelCount = editor.TotalSolarPanel;
+      const panelWh = equip.panel?.valueWh;
+      if (panelCount && panelWh && panelCount > 0 && panelWh > 0) {
+        // Round to 1 decimal place (e.g., 13 × 445 = 5785W → 5.8 kW)
+        const kw = Math.round((panelCount * panelWh) / 100) / 10;
+        systemSizeKw = String(kw);
+        console.log('[scraper] system.systemSizeKw:', panelCount, 'panels ×', panelWh, 'W =', kw, 'kW');
+      }
+    }
+  } catch (e) {
+    console.log('[scraper] editor/equipment parse error:', e);
+  }
+
+  if (systemSizeKw) {
+    data.system = {
+      ...(data.system ?? {}),
+      systemSizeKw,
+    } as typeof data.system;
+  } else {
+    missingFields.push('system.systemSizeKw');
+    console.log('[scraper] system.systemSizeKw: could not compute from editor/equipment');
+  }
+
+  // --- System cost from config.adders ---
+  // Sum selected adders: PerWatt × system_watts + Fixed × qty
+  try {
+    if (raw.config?.adders && data.system?.systemSizeKw) {
+      const adders = JSON.parse(raw.config.adders) as Array<{
+        adderName?: string;
+        selected?: boolean;
+        qty?: number;
+        priceType?: string; // "PerWatt" | "Fixed"
+        price_ab?: number;
+        price_default?: number | string;
+      }>;
+
+      const systemWatts = Number(data.system.systemSizeKw) * 1000;
+      let totalCost = 0;
+
+      for (const adder of adders) {
+        if (!adder.selected || (adder.qty ?? 0) === 0) continue;
+        // Prefer Alberta price (price_ab), fall back to price_default
+        const priceRaw = adder.price_ab ?? adder.price_default;
+        const price = Number(priceRaw);
+        if (isNaN(price) || price <= 0) continue;
+
+        if (adder.priceType === 'PerWatt') {
+          totalCost += price * systemWatts;
+          console.log('[scraper] adder', adder.adderName, ':', price, '$/W ×', systemWatts, 'W =', price * systemWatts);
+        } else if (adder.priceType === 'Fixed') {
+          totalCost += price * (adder.qty ?? 1);
+          console.log('[scraper] adder', adder.adderName, ': Fixed', price, '×', adder.qty ?? 1);
+        }
+      }
+
+      if (totalCost > 0) {
+        data.financing = {
+          ...(data.financing ?? {}),
+          cashPurchasePrice: String(Math.round(totalCost)),
+        } as typeof data.financing;
+        console.log('[scraper] financing.cashPurchasePrice:', Math.round(totalCost));
+      } else {
+        missingFields.push('financing.cashPurchasePrice');
+        console.log('[scraper] financing.cashPurchasePrice: no cost from adders');
       }
     } else {
-      missingFields.push('system.systemSizeKw');
+      missingFields.push('financing.cashPurchasePrice');
     }
-  } catch {
-    missingFields.push('system.systemSizeKw');
-    console.log('[scraper] DOM system.systemSizeKw: not found');
+  } catch (e) {
+    console.log('[scraper] adders parse error:', e);
+    missingFields.push('financing.cashPurchasePrice');
   }
 
-  // -- Monthly production --
-  // Try to find a chart or table with 12 numeric values
-  try {
-    const monthlyTexts = await page
-      .locator('[class*="month"], [class*="production"], td')
-      .allTextContents();
-    // Filter to entries that look like numbers (kWh values)
-    const numericEntries = monthlyTexts
-      .map((t) => t.replace(/,/g, '').trim())
-      .filter((t) => /^\d+\.?\d*$/.test(t));
-    if (numericEntries.length >= 12) {
-      const monthly = normalizeMonthlyArray(numericEntries.slice(0, 12));
-      data.system = {
-        systemSizeKw: data.system?.systemSizeKw ?? '',
-        annualProductionKwh: data.system?.annualProductionKwh ?? '',
-        monthlyProductionKwh: monthly,
-      };
-      console.log('[scraper] DOM system.monthlyProductionKwh: found', numericEntries.length, 'entries');
-    } else {
-      missingFields.push('system.monthlyProductionKwh');
-      console.log('[scraper] DOM system.monthlyProductionKwh: only found', numericEntries.length, 'numeric entries');
-    }
-  } catch {
-    missingFields.push('system.monthlyProductionKwh');
-    console.log('[scraper] DOM system.monthlyProductionKwh: not found');
-  }
+  // Financing details and escalation rate are not in the public proposal API
+  missingFields.push('financing.financeMonthlyPayment');
+  missingFields.push('financing.financeTermMonths');
+  missingFields.push('financing.financeInterestRate');
+  missingFields.push('rates.annualEscalationRate');
 
-  // Mark remaining fields as missing if not yet populated
-  if (!data.system?.annualProductionKwh) missingFields.push('system.annualProductionKwh');
-  if (!data.consumption?.annualConsumptionKwh) missingFields.push('consumption.annualConsumptionKwh');
-  if (!data.consumption?.monthlyConsumptionKwh) missingFields.push('consumption.monthlyConsumptionKwh');
-  if (!data.rates?.allInRate) missingFields.push('rates.allInRate');
-  if (!data.rates?.netMeteringBuyRate) missingFields.push('rates.netMeteringBuyRate');
-  if (!data.rates?.netMeteringSellRate) missingFields.push('rates.netMeteringSellRate');
-  if (!data.rates?.annualEscalationRate) missingFields.push('rates.annualEscalationRate');
-  if (!data.financing?.cashPurchasePrice) missingFields.push('financing.cashPurchasePrice');
-  if (!data.financing?.financeMonthlyPayment) missingFields.push('financing.financeMonthlyPayment');
-  if (!data.financing?.financeTermMonths) missingFields.push('financing.financeTermMonths');
-  if (!data.financing?.financeInterestRate) missingFields.push('financing.financeInterestRate');
-
-  return buildResult(data, missingFields, 'DOM');
+  return buildResult(data, missingFields);
 }
 
 /**
  * Determines status based on extracted data and builds the final ScrapeResult.
- * Hard-error threshold: if customer name AND system size AND monthly production are ALL missing.
+ * Hard-error threshold: all three critical fields (name, system size, monthly production) missing.
  */
 function buildResult(
   data: Partial<ProposalFormValues>,
   extraMissingFields: string[],
-  strategy: 'API' | 'DOM',
 ): ScrapeResult {
   const missingFields = [...new Set(extraMissingFields)];
 
   const hasName = !!data.customer?.name;
   const hasSystemSize = !!data.system?.systemSizeKw;
-  const hasMonthlyProduction = Array.isArray(data.system?.monthlyProductionKwh) &&
+  const hasMonthlyProduction =
+    Array.isArray(data.system?.monthlyProductionKwh) &&
     data.system.monthlyProductionKwh.some((v) => v !== '0');
 
-  console.log('[scraper] buildResult via', strategy, '— hasName:', hasName, 'hasSystemSize:', hasSystemSize, 'hasMonthly:', hasMonthlyProduction);
+  console.log(
+    '[scraper] buildResult — hasName:',
+    hasName,
+    '| hasSystemSize:',
+    hasSystemSize,
+    '| hasMonthly:',
+    hasMonthlyProduction,
+  );
 
-  // Hard-error threshold: all three critical fields missing
   if (!hasName && !hasSystemSize && !hasMonthlyProduction) {
     return {
       status: 'error',
@@ -369,7 +391,7 @@ function buildResult(
     'financing.financeInterestRate',
   ];
 
-  // Note: annualElectricityCost is intentionally omitted — it is computed by watch() in the form
+  // annualElectricityCost is intentionally excluded — computed by watch() in the form, never scraped
   const isPartial = missingFields.some((f) => allExpectedFields.includes(f));
 
   return {
@@ -380,30 +402,77 @@ function buildResult(
 }
 
 /**
- * Scrapes a SunPitch proposal URL using a dual-strategy approach:
- * 1. Network interception — captures JSON API responses during page load (preferred)
- * 2. DOM fallback — extracts data from rendered elements if no API payload captured
+ * Scrapes a SunPitch proposal URL using Playwright browser with route interception.
+ *
+ * WHY BROWSER ONLY:
+ * The SunPitch /api/proposals/{uuid} endpoint requires the Angular app's session context.
+ * Direct server-side fetch hangs indefinitely (connection hangs, no response).
+ * The endpoint responds normally when called FROM the browser that loaded the proposal page.
+ *
+ * WHY ROUTE INTERCEPTION (not page.on('response')):
+ * page.on('response') + response.body() does not reliably capture XHR bodies from Angular apps —
+ * the body reference is consumed before Playwright's listener can read it.
+ * page.route() interception buffers the full response body reliably.
+ *
+ * WHY THE TIMEOUT IS 40s:
+ * SunPitch's API takes 10–16 seconds to respond after the page loads. The original scraper
+ * only waited 2 seconds after domcontentloaded, which is why it captured nothing.
+ *
+ * Diagnosed 2026-03-03 using real URL: https://app.sunpitch.com/facing/proposals/db9b7ee9-...
  */
 export async function scrapeSunPitch(browser: Browser, url: string): Promise<ScrapeResult> {
-  const context = await browser.newContext();
+  console.log('[scraper] scrapeSunPitch: url =', url);
+
+  const uuidMatch = url.match(/\/facing\/proposals\/([0-9a-f-]{36})/i);
+  if (!uuidMatch) {
+    return {
+      status: 'error',
+      data: null,
+      missingFields: [],
+      message:
+        'URL does not match expected SunPitch format: https://app.sunpitch.com/facing/proposals/{uuid}',
+    };
+  }
+  const uuid = uuidMatch[1];
+
+  const context = await browser.newContext({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  });
   const page = await context.newPage();
 
-  const capturedApiPayloads: CapturedPayload[] = [];
+  let capturedData: SunPitchProposalApiResponse | null = null;
+  let captureError: string | null = null;
 
-  // Set up response listener BEFORE goto — capture any JSON API responses
-  page.on('response', async (response) => {
-    const ct = response.headers()['content-type'] ?? '';
-    if (!ct.includes('application/json')) return;
-    if (!response.ok()) return;
-
+  // Set up route interception BEFORE goto — reliably buffers the full response body
+  await page.route(`**/api/proposals/${uuid}**`, async (route) => {
     try {
-      const json: unknown = await response.json();
-      if (looksLikeProposalData(json)) {
-        capturedApiPayloads.push({ url: response.url(), data: json });
-        console.log('[scraper] captured API response from:', response.url());
+      // SunPitch API can take up to 60 seconds to respond — increase route.fetch timeout
+      const response = await route.fetch({ timeout: 60000 });
+      const body = await response.body();
+      const text = body.toString('utf8');
+      console.log('[scraper] route intercepted /api/proposals — status:', response.status(), '| bytes:', text.length);
+
+      if (response.status() === 401 || response.status() === 403) {
+        captureError = `SunPitch API returned ${response.status()} — proposal may require authentication`;
+        console.log('[scraper] auth error:', response.status());
+        await route.fulfill({ response });
+        return;
       }
-    } catch {
-      // Body already consumed by another handler, or response was not valid JSON
+
+      if (response.status() === 200 && text.length > 0) {
+        try {
+          capturedData = JSON.parse(text) as SunPitchProposalApiResponse;
+          console.log('[scraper] API response parsed — top-level keys:', Object.keys(capturedData).join(', '));
+        } catch (e) {
+          captureError = `JSON parse error: ${e instanceof Error ? e.message : String(e)}`;
+          console.log('[scraper] JSON parse error:', captureError);
+        }
+      }
+      await route.fulfill({ response });
+    } catch (e) {
+      console.log('[scraper] route handler error:', e instanceof Error ? e.message : String(e));
+      await route.continue();
     }
   });
 
@@ -411,38 +480,53 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
     console.log('[scraper] navigating to:', url);
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
 
-    // Check for auth redirect — if the URL no longer contains /facing/proposals/, we were redirected
+    // Check for auth redirect — if not on the proposal page, we were sent to login
     const currentUrl = page.url();
     if (!currentUrl.includes('/facing/proposals/')) {
-      console.log('[scraper] redirected away from proposal URL, current URL:', currentUrl);
       return {
         status: 'error',
         data: null,
         missingFields: [],
         message:
-          'SunPitch redirected to login or an unexpected page. The proposal URL may require authentication.',
+          'SunPitch redirected away from the proposal page. The URL may require authentication.',
       };
     }
 
-    // Soft wait for proposal content — continue even if nothing found
-    await page
-      .waitForSelector('[data-testid], [data-proposal], main, .proposal, article', {
-        timeout: 15000,
-      })
-      .catch(() => {
-        console.log('[scraper] waitForSelector timed out — continuing with what was captured');
-      });
+    // Poll for the route interceptor to fire.
+    // SunPitch API takes 10–60 seconds to respond after page load (depending on server load).
+    // route.fetch timeout is set to 60s; poll for up to 55s to give it time.
+    const TIMEOUT_MS = 55000;
+    const POLL_INTERVAL_MS = 500;
+    let waited = 0;
 
-    // Give any async data loads a moment to complete after DOM is ready
-    await page.waitForTimeout(2000);
-
-    console.log('[scraper] captured', capturedApiPayloads.length, 'API payload(s)');
-
-    if (capturedApiPayloads.length > 0) {
-      return extractFromApiResponse(capturedApiPayloads);
+    while (capturedData === null && captureError === null && waited < TIMEOUT_MS) {
+      await page.waitForTimeout(POLL_INTERVAL_MS);
+      waited += POLL_INTERVAL_MS;
     }
 
-    return await extractFromDOM(page);
+    console.log('[scraper] waited', waited, 'ms for API — capturedData:', capturedData !== null, '| error:', captureError);
+
+    if (captureError) {
+      return {
+        status: 'error',
+        data: null,
+        missingFields: [],
+        message: captureError,
+      };
+    }
+
+    if (capturedData !== null) {
+      return parseApiResponse(capturedData);
+    }
+
+    // API never responded within timeout
+    return {
+      status: 'error',
+      data: null,
+      missingFields: [],
+      message:
+        'SunPitch API did not respond within 40 seconds. Check server logs for [scraper] entries.',
+    };
   } finally {
     await context.close();
   }
