@@ -138,9 +138,10 @@ None yet.
 | 2 | add annualGridPurchaseCost and annualSellRevenue props | 2026-03-03 | — | [2-add-annualgridpurchasecost-and-annualsell](./quick/2-add-annualgridpurchasecost-and-annualsell/) |
 | 3 | mark phase 4 as complete. all pages reviewed. write summary | 2026-03-03 | 8736cd1 | [3-mark-phase-4-as-complete-all-pages-revie](./quick/3-mark-phase-4-as-complete-all-pages-revie/) |
 | 4 | fix SunPitch scraper production total — kWh/panel/month × zone panel counts | 2026-03-04 | 11069db | [4-fix-sunpitch-scraper-production-total-an](./quick/4-fix-sunpitch-scraper-production-total-an/) |
+| 5 | add SunPitch import tab polished UI on the enter page | 2026-03-04 | 48fc6a7 | [5-add-sunpitch-import-tab-and-ui-on-the-en](./quick/5-add-sunpitch-import-tab-and-ui-on-the-en/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed quick task 4 — Fixed SunPitch scraper 5.87x annual production overcount. Now uses kWh/panel/month × AllZones[i].TotalSolarPanel formula. TypeScript clean. Annual production for 13-panel Zone B proposal = 7,782 kWh (confirmed correct).
+Stopped at: Completed quick task 5 — Redesigned SunPitchTab.tsx with polished import panel (header eyebrow, URL input card, 7-step animated progress panel, error reset link). TypeScript clean. All existing fetch/validation logic preserved.
 Resume file: None
