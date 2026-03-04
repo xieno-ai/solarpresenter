@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 Phase: 6 of 9 (SunPitch Scraping) — COMPLETE (all 3 plans done)
 Plan: 3 of 3 in Phase 6 — COMPLETE
 Status: Phase 6 complete — SunPitch scraper calibrated against real API; correct field mapping confirmed for customer name/address, utility rate, annual consumption, monthly production (per zone), system size, and system cost
-Last activity: 2026-03-04 - Completed quick task 7 — Replaced playwright with playwright-core + @sparticuz/chromium to fix /api/scrape and /api/pdf 500 errors on Vercel.
+Last activity: 2026-03-04 - Completed quick task 9: scrape cash and finance values from SunPitch proposal
 
 Progress: [██████████████████░░] 90% (18/~20 plans)
 
