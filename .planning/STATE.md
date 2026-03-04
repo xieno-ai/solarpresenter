@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-03T20:15:00Z"
+last_updated: "2026-03-04T22:07:11.817Z"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 15
-  completed_plans: 15
+  total_phases: 7
+  completed_phases: 6
+  total_plans: 20
+  completed_plans: 20
 ---
 
 # Project State
@@ -59,6 +59,8 @@ Progress: [██████████████████░░] 90% (18
 | Phase 04-proposal-rendering P03 | 5 | 2 tasks | 8 files |
 | Phase 05-pdf-generation P01 | 3 | 2 tasks | 6 files |
 | Phase 06-sunpitch-scraping P02 | 2 | 2 tasks | 2 files |
+| Phase 07-bill-extraction P02 | 2 | 2 tasks | 2 files |
+| Phase 07-bill-extraction P01 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -119,6 +121,7 @@ Recent decisions affecting current work:
 - [06-03]: Direct Node fetch of /api/proposals hangs (server requires browser session context) — browser-only strategy
 - [06-03]: API field mapping: customer.firstName/lastName, utility.rate ($/kWh), config.projections (kWh/day/zone), editor.TotalSolarPanel × equipment.panel.valueWh for system size, selected adders for cash price
 - [06-03]: netMeteringSellRate and annualEscalationRate always missing from SunPitch API — user enters manually
+- [Phase 07-02]: Used next.config.ts redirects array for /proposal → /enter to avoid overwriting the proposal renderer; missing guard preserves /proposal?d= renderer access
 
 ### Pending Todos
 
