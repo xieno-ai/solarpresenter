@@ -23,7 +23,7 @@ export function GenerateFooter({ errorCount, isFormValid, onGenerate }: Generate
           type="button"
           onClick={onGenerate}
           disabled={isDisabled}
-          className="px-6 py-2.5 rounded-lg bg-amber-400 text-neutral-950 font-semibold text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-6 py-2.5 rounded-lg bg-amber-400 text-neutral-950 font-semibold text-sm transition-all cursor-pointer hover:bg-amber-300 active:scale-95 active:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-amber-400 disabled:active:scale-100"
         >
           Generate Proposal
         </button>
