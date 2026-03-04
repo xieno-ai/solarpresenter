@@ -511,6 +511,7 @@ function parseApiResponse(
   } as typeof data.rates;
   console.log('[scraper] rates.annualEscalationRate: 0.05 (Alberta default)');
 
+  console.log('[scraper] data.consumption before return:', JSON.stringify(data.consumption));
   return buildResult(data, missingFields);
 }
 
