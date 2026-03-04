@@ -111,6 +111,16 @@ export default function ManualEntryPage() {
     const consumption = { ...empty.consumption, ...(d.consumption ?? {}) };
     const rates = { ...empty.rates, ...(d.rates ?? {}) };
 
+    // Fallback: if annual is missing but monthly values are present, derive annual from monthly sum
+    const monthlyArr = consumption.monthlyConsumptionKwh ?? [];
+    const monthlySum = (Array.isArray(monthlyArr) ? monthlyArr : []).reduce(
+      (acc: number, v: string) => acc + (Number(v) || 0), 0
+    );
+    if ((!consumption.annualConsumptionKwh || consumption.annualConsumptionKwh === '0') && monthlySum > 0) {
+      consumption.annualConsumptionKwh = String(monthlySum);
+      console.log('[handleImportSuccess] derived annualConsumptionKwh from monthly sum:', monthlySum);
+    }
+
     // Compute annualElectricityCost — watch() won't fire after reset()
     const kwh = Number(consumption.annualConsumptionKwh);
     const rate = Number(rates.allInRate);
@@ -127,7 +137,27 @@ export default function ManualEntryPage() {
       rates,
       financing: { ...empty.financing, ...(d.financing ?? {}) },
     };
+
+    // Switch to manual tab BEFORE reset so fields are mounted when reset() runs
+    setActiveTab('manual');
     reset(merged);
+
+    // Force-write scraped values to RHF after reset — fields may have been unmounted
+    // (on 'sunpitch' tab) when reset() was called, causing values to be dropped.
+    setValue('consumption.annualConsumptionKwh', consumption.annualConsumptionKwh, { shouldDirty: true, shouldValidate: false });
+    setValue('consumption.annualElectricityCost', consumption.annualElectricityCost, { shouldDirty: false, shouldValidate: false });
+    if (Array.isArray(consumption.monthlyConsumptionKwh)) {
+      consumption.monthlyConsumptionKwh.forEach((val, i) => {
+        setValue(`consumption.monthlyConsumptionKwh.${i}` as Parameters<typeof setValue>[0], val as never, { shouldDirty: true, shouldValidate: false });
+      });
+    }
+    // Also force-write monthly production in case it was dropped
+    if (Array.isArray(merged.system?.monthlyProductionKwh)) {
+      merged.system.monthlyProductionKwh.forEach((val: string, i: number) => {
+        setValue(`system.monthlyProductionKwh.${i}` as Parameters<typeof setValue>[0], val as never, { shouldDirty: true, shouldValidate: false });
+      });
+    }
+
     // Validate immediately so isValid reflects the new values (mode:'onBlur' won't auto-run)
     void trigger();
 
@@ -156,7 +186,6 @@ export default function ManualEntryPage() {
     });
 
     setHighlights(newHighlights);
-    setActiveTab('manual');
   }
 
   // Clear a field's highlight when user edits it (user takes ownership)
