@@ -101,12 +101,11 @@ interface SunPitchProposalApiResponse {
  *   system.systemSizeKw              ← editor.TotalSolarPanel × equipment.panel.valueWh / 1000
  *   financing.cashPurchasePrice      ← sum of selected adders (PerWatt × system_watts + Fixed × qty)
  *   financing.financeMonthlyPayment  ← DOM scrape or finance sub-API (not in main proposals API)
- *   financing.financeTermMonths      ← DOM scrape or finance sub-API (not in main proposals API)
+ *   financing.financeTermMonths      ← always hardcoded to 240 months
  */
 function parseApiResponse(
   raw: SunPitchProposalApiResponse,
   domMonthlyPayment?: string | null,
-  domTermMonths?: string | null,
 ): ScrapeResult {
   console.log('[scraper] parseApiResponse: mapping SunPitch API fields');
   if (raw.config) {
@@ -369,8 +368,7 @@ function parseApiResponse(
     console.log('[scraper] system.systemSizeKw: could not compute from editor/equipment');
   }
 
-  // --- System cost from config.adders ---
-  // Sum selected adders: PerWatt × system_watts + Fixed × qty
+  // --- System cost: calculated from adder sum (cash price is manual input, not from DOM) ---
   try {
     if (raw.config?.adders && data.system?.systemSizeKw) {
       const adders = JSON.parse(raw.config.adders) as Array<{
@@ -387,7 +385,6 @@ function parseApiResponse(
 
       for (const adder of adders) {
         if (!adder.selected || (adder.qty ?? 0) === 0) continue;
-        // Prefer Alberta price (price_ab), fall back to price_default
         const priceRaw = adder.price_ab ?? adder.price_default;
         const price = Number(priceRaw);
         if (isNaN(price) || price <= 0) continue;
@@ -406,7 +403,7 @@ function parseApiResponse(
           ...(data.financing ?? {}),
           cashPurchasePrice: String(Math.round(totalCost)),
         } as typeof data.financing;
-        console.log('[scraper] financing.cashPurchasePrice:', Math.round(totalCost));
+        console.log('[scraper] financing.cashPurchasePrice (calculated from adders):', Math.round(totalCost));
       } else {
         missingFields.push('financing.cashPurchasePrice');
         console.log('[scraper] financing.cashPurchasePrice: no cost from adders');
@@ -431,7 +428,6 @@ function parseApiResponse(
   //   period_1/period_2: payment period label (e.g. "1-60")
   //   useAmountAfterIncentives: whether payment is computed after incentives
   let configMonthlyPayment: string | null = null;
-  let configTermMonths: string | null = null;
   if (raw.config?.finance) {
     try {
       const financeObj = JSON.parse(raw.config.finance) as Record<string, unknown>;
@@ -445,10 +441,6 @@ function parseApiResponse(
       } else {
         // Finance product — log all fields so we can map correctly
         console.log('[scraper] config.finance raw:', JSON.stringify(financeObj));
-
-        const termMonths = termsInYears * 12;
-        configTermMonths = String(termMonths);
-        console.log('[scraper] config.finance termMonths (termsInYears×12):', configTermMonths);
 
         // rate_1 / rate_2 may be the monthly dollar payment for the respective period.
         // If non-zero, use directly. Otherwise fall back to calculating from cash price + dealer fee.
@@ -476,10 +468,10 @@ function parseApiResponse(
           const dealerFeePercent = Number(financeObj[provinceKey] ?? financeObj.price_default ?? 0);
           console.log('[scraper] config.finance province key:', provinceKey, '| dealerFeePercent:', dealerFeePercent);
 
-          if (data.financing?.cashPurchasePrice && termMonths > 0) {
+          if (data.financing?.cashPurchasePrice) {
             const cashPrice = Number(data.financing.cashPurchasePrice);
             const totalFinanced = cashPrice * (1 + dealerFeePercent / 100);
-            const monthly = totalFinanced / termMonths;
+            const monthly = totalFinanced / 240;
             configMonthlyPayment = String(Math.round(monthly));
             console.log('[scraper] config.finance monthlyPayment (calculated):', configMonthlyPayment, '| cashPrice:', cashPrice, '| dealerFee:', dealerFeePercent, '%');
           }
@@ -492,7 +484,7 @@ function parseApiResponse(
 
   // Priority: config.finance API > DOM scrape > missingFields
   const resolvedMonthlyPayment = configMonthlyPayment ?? domMonthlyPayment;
-  const resolvedTermMonths = configTermMonths ?? domTermMonths;
+  const resolvedTermMonths = '240';
 
   if (resolvedMonthlyPayment != null) {
     data.financing = {
@@ -749,33 +741,27 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
     }
 
     if (capturedData !== null) {
-      // DOM scrape for finance values — only attempt if the main API responded (page is loaded)
+      // DOM scrape for finance payment — only attempt if the main API responded (page is loaded)
       let scrapedMonthlyPayment: string | null = null;
-      let scrapedTermMonths: string | null = null;
 
       try {
         // Wait briefly for Angular to finish rendering finance sections
         await page.waitForSelector('[class*="finance"], [class*="payment"], [class*="monthly"]', { timeout: 10000 }).catch(() => null);
 
-        const financeText = await page.evaluate(() => document.body.innerText).catch(() => '');
-
-        // Match patterns like "$220/mo", "$220/month", "$220 /month", "$1,200/mo"
-        const paymentMatch = financeText.match(/\$\s*([\d,]+(?:\.\d+)?)\s*\/\s*mo(?:nth)?/i);
+        // Targeted query for the monthly payment amount shown in span.mb-1.text span.float-right
+        const rawPaymentText = await page.evaluate(() => {
+          const el = document.querySelector('span.mb-1.text span.float-right');
+          return el ? el.textContent ?? '' : '';
+        }).catch(() => '');
+        const paymentMatch = rawPaymentText.match(/\$([\d,]+(?:\.\d+)?)/);
         if (paymentMatch) {
-          scrapedMonthlyPayment = paymentMatch[1].replace(/,/g, '');
-          console.log('[scraper] DOM finance scan — raw payment match:', paymentMatch[0], '→', scrapedMonthlyPayment);
+          scrapedMonthlyPayment = String(Math.round(Number(paymentMatch[1].replace(/,/g, ''))));
+          console.log('[scraper] DOM payment (span.mb-1.text span.float-right):', rawPaymentText.trim(), '→', scrapedMonthlyPayment);
+        } else {
+          console.log('[scraper] DOM payment: span.mb-1.text span.float-right not found or empty');
         }
 
-        // Match patterns like "MONTHS 1-60", "60 months", "60-month"
-        const termMatch =
-          financeText.match(/MONTHS\s+1[-\u2013](\d+)/i) ||
-          financeText.match(/(\d+)[- ]months?/i);
-        if (termMatch) {
-          scrapedTermMonths = termMatch[1];
-          console.log('[scraper] DOM finance scan — raw term match:', termMatch[0], '→', scrapedTermMonths);
-        }
-
-        console.log('[scraper] DOM finance scan — payment:', scrapedMonthlyPayment, '| term:', scrapedTermMonths);
+        console.log('[scraper] DOM finance scan — payment:', scrapedMonthlyPayment);
       } catch (e) {
         console.log('[scraper] DOM finance scan error:', e instanceof Error ? e.message : String(e));
       }
@@ -784,13 +770,11 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
       const finalMonthlyPayment = capturedFinanceData?.monthlyPayment != null
         ? String(Math.round(capturedFinanceData.monthlyPayment))
         : scrapedMonthlyPayment;
-      const finalTermMonths = capturedFinanceData?.termMonths != null
-        ? String(capturedFinanceData.termMonths)
-        : scrapedTermMonths;
+      const finalTermMonths = '240';
 
       console.log('[scraper] final finance values — monthlyPayment:', finalMonthlyPayment, '| termMonths:', finalTermMonths);
 
-      return parseApiResponse(capturedData, finalMonthlyPayment, finalTermMonths);
+      return parseApiResponse(capturedData, finalMonthlyPayment);
     }
 
     // API never responded within timeout
