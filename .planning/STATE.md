@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 Phase: 6 of 9 (SunPitch Scraping) — COMPLETE (all 3 plans done)
 Plan: 3 of 3 in Phase 6 — COMPLETE
 Status: Phase 6 complete — SunPitch scraper calibrated against real API; correct field mapping confirmed for customer name/address, utility rate, annual consumption, monthly production (per zone), system size, and system cost
-Last activity: 2026-03-04 - Completed quick task 6 — Bumped vitest to ^4.0.18 to resolve ERESOLVE peer conflict with @vitest/coverage-v8, unblocking Vercel deploy.
+Last activity: 2026-03-04 - Completed quick task 7 — Replaced playwright with playwright-core + @sparticuz/chromium to fix /api/scrape and /api/pdf 500 errors on Vercel.
 
 Progress: [██████████████████░░] 90% (18/~20 plans)
 
@@ -140,6 +140,7 @@ None yet.
 | 4 | fix SunPitch scraper production total — kWh/panel/month × zone panel counts | 2026-03-04 | 11069db | [4-fix-sunpitch-scraper-production-total-an](./quick/4-fix-sunpitch-scraper-production-total-an/) |
 | 5 | add SunPitch import tab and UI on the enter page | 2026-03-04 | 0d8884c | [5-add-sunpitch-import-tab-and-ui-on-the-en](./quick/5-add-sunpitch-import-tab-and-ui-on-the-en/) |
 | 6 | fix vitest and coverage-v8 peer dependency mismatch blocking Vercel deploy | 2026-03-04 | 4615bbd | [6-fix-vitest-and-coverage-v8-peer-dependen](./quick/6-fix-vitest-and-coverage-v8-peer-dependen/) |
+| 7 | fix scraper on Vercel: replace playwright with playwright-core and sparticuz chromium | 2026-03-04 | da1cd21 | [7-fix-scraper-on-vercel-replace-playwright](./quick/7-fix-scraper-on-vercel-replace-playwright/) |
 | 5 | add SunPitch import tab polished UI on the enter page | 2026-03-04 | 48fc6a7 | [5-add-sunpitch-import-tab-and-ui-on-the-en](./quick/5-add-sunpitch-import-tab-and-ui-on-the-en/) |
 
 ## Session Continuity
