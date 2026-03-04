@@ -106,6 +106,9 @@ function parseApiResponse(
   domTermMonths?: string | null,
 ): ScrapeResult {
   console.log('[scraper] parseApiResponse: mapping SunPitch API fields');
+  if (raw.config) {
+    console.log('[scraper] config keys:', Object.keys(raw.config).join(', '));
+  }
 
   const data: Partial<ProposalFormValues> = {};
   const missingFields: string[] = [];
@@ -651,6 +654,81 @@ export async function scrapeSunPitch(browser: Browser, url: string): Promise<Scr
         }
 
         console.log('[scraper] DOM finance scan — payment:', scrapedMonthlyPayment, '| term:', scrapedTermMonths);
+
+        // If DOM scan found nothing, try UI automation: open "Select Finance Option" modal,
+        // switch to Financial mode, click UPDATE, then re-scan the DOM.
+        if (scrapedMonthlyPayment === null) {
+          try {
+            console.log('[scraper] DOM payment not found — attempting UI finance selection');
+
+            // Find the "Select Finance Option" clickable element
+            const financeOptionEl = page.getByText('Select Finance Option').first();
+            const isVisible = await financeOptionEl.isVisible().catch(() => false);
+            console.log('[scraper] "Select Finance Option" visible:', isVisible);
+
+            if (isVisible) {
+              await financeOptionEl.click();
+              // Wait for modal/dialog to appear
+              await page.waitForTimeout(1500);
+              console.log('[scraper] clicked "Select Finance Option"');
+
+              // The modal has two Angular mat-select dropdowns.
+              // First dropdown = type (Cash / Financial), second = product.
+              // Click first mat-select trigger to open it.
+              const selectTriggers = page.locator('mat-select, [role="combobox"], select').all();
+              const triggers = await selectTriggers;
+              console.log('[scraper] select triggers found:', triggers.length);
+
+              if (triggers.length > 0) {
+                // Click first trigger to open type dropdown
+                await triggers[0].click();
+                await page.waitForTimeout(800);
+
+                // Pick "Financial" option from the dropdown overlay
+                const financialOption = page.getByRole('option', { name: /financial/i }).first();
+                const financialVisible = await financialOption.isVisible().catch(() => false);
+                console.log('[scraper] "Financial" option visible:', financialVisible);
+
+                if (financialVisible) {
+                  await financialOption.click();
+                  await page.waitForTimeout(800);
+                  console.log('[scraper] selected "Financial" type');
+
+                  // Click UPDATE button
+                  const updateBtn = page.getByRole('button', { name: /update/i }).first();
+                  const updateVisible = await updateBtn.isVisible().catch(() => false);
+                  console.log('[scraper] UPDATE button visible:', updateVisible);
+
+                  if (updateVisible) {
+                    await updateBtn.click();
+                    // Wait for Angular to re-render with finance values
+                    await page.waitForTimeout(3000);
+                    console.log('[scraper] clicked UPDATE — waiting for re-render');
+
+                    // Re-scan DOM for monthly payment
+                    const refreshedText = await page.evaluate(() => document.body.innerText).catch(() => '');
+                    const refreshedPaymentMatch = refreshedText.match(/\$\s*([\d,]+(?:\.\d+)?)\s*\/\s*mo(?:nth)?/i);
+                    const refreshedTermMatch =
+                      refreshedText.match(/MONTHS\s+1[-\u2013](\d+)/i) ||
+                      refreshedText.match(/(\d+)[- ]months?/i);
+
+                    if (refreshedPaymentMatch) {
+                      scrapedMonthlyPayment = refreshedPaymentMatch[1].replace(/,/g, '');
+                      console.log('[scraper] UI automation payment match:', refreshedPaymentMatch[0], '→', scrapedMonthlyPayment);
+                    }
+                    if (refreshedTermMatch) {
+                      scrapedTermMonths = refreshedTermMatch[1];
+                      console.log('[scraper] UI automation term match:', refreshedTermMatch[0], '→', scrapedTermMonths);
+                    }
+                    console.log('[scraper] UI automation result — payment:', scrapedMonthlyPayment, '| term:', scrapedTermMonths);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.log('[scraper] UI finance automation error:', e instanceof Error ? e.message : String(e));
+          }
+        }
       } catch (e) {
         console.log('[scraper] DOM finance scan error:', e instanceof Error ? e.message : String(e));
       }
