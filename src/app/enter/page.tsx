@@ -24,6 +24,7 @@ export default function ManualEntryPage() {
     watch,
     setValue,
     reset,
+    trigger,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<ProposalFormValues>({
@@ -127,6 +128,8 @@ export default function ManualEntryPage() {
       financing: { ...empty.financing, ...(d.financing ?? {}) },
     };
     reset(merged);
+    // Validate immediately so isValid reflects the new values (mode:'onBlur' won't auto-run)
+    void trigger();
 
     // Persist to draft so page refresh doesn't wipe scraped data
     saveFormDraft(merged as ProposalFormValues);
