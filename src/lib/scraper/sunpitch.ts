@@ -325,7 +325,13 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
   // Financing details are not in the public proposal API
   missingFields.push('financing.financeMonthlyPayment');
   missingFields.push('financing.financeTermMonths');
-  missingFields.push('financing.financeInterestRate');
+
+  // Interest rate default — always 0%
+  data.financing = {
+    ...(data.financing ?? {}),
+    financeInterestRate: '0',
+  } as typeof data.financing;
+  console.log('[scraper] financing.financeInterestRate: 0 (default)');
 
   // Alberta regulatory defaults — always pre-fill with known constants
   data.rates = {
