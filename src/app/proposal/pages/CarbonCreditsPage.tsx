@@ -6,8 +6,9 @@ interface CarbonCreditsPageProps {
 }
 
 export function CarbonCreditsPage({ carbonCredits, annualProductionKwh }: CarbonCreditsPageProps) {
-  const { annualCo2Avoided, tenYearPayoutLow, tenYearPayoutHigh, benchmarkSchedule } =
+  const { annualCo2Avoided, tenYearPayoutLow, tenYearPayoutHigh, benchmarkSchedule: fullSchedule } =
     carbonCredits;
+  const benchmarkSchedule = fullSchedule.slice(0, 5);
 
   const co2Float = parseFloat(annualCo2Avoided);
   const co2Display = co2Float.toFixed(2);
