@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(gh:*)",
-      "Bash(winget install:*)"
+      "Bash(winget install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)",
+      "WebSearch",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(ls:*)",
+      "Skill(gsd:pause-work)",
+      "Bash(git:*)"
     ]
   }
 }

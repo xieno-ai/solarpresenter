@@ -7,7 +7,7 @@
 
 ### Data Input
 
-- [ ] **INPUT-01**: User can paste a SunPitch proposal URL and the system extracts all data via headless browser (system size, monthly production/consumption, rates, costs, financing terms, customer name/address, satellite image)
+- [x] **INPUT-01**: User can paste a SunPitch proposal URL and the system extracts all data via headless browser (system size, monthly production/consumption, rates, costs, financing terms, customer name/address, satellite image)
 - [x] **INPUT-02**: User can manually enter all proposal fields in a form (system size, 12-month production, 12-month consumption, current rate, system cost, financing terms, customer name/address)
 - [x] **INPUT-03**: Manual entry form pre-populates with scraped SunPitch data when available, all fields remain editable
 - [ ] **INPUT-04**: User can upload a utility bill (PDF, photo, or scan) and AI extracts electricity usage, utility company, energy rate, all-in rate, account holder, and service address
@@ -83,7 +83,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INPUT-01 | Phase 6: SunPitch Scraping | Pending |
+| INPUT-01 | Phase 6: SunPitch Scraping | Complete |
 | INPUT-02 | Phase 2: Manual Entry | Complete |
 | INPUT-03 | Phase 6: SunPitch Scraping | Complete |
 | INPUT-04 | Phase 7: Bill Extraction | Pending |
