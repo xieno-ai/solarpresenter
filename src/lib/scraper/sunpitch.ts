@@ -119,7 +119,7 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
     missingFields.push('customer.address');
   }
 
-  // --- Utility rate → allInRate and netMeteringBuyRate ---
+  // --- Utility rate → allInRate ---
   // utility.rate is in $/kWh; form allInRate range is 0.01–2.0 ($/kWh)
   const utilityRate = raw.utility?.rate;
   if (utilityRate != null && utilityRate > 0) {
@@ -127,26 +127,19 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
     data.rates = {
       ...(data.rates ?? {}),
       allInRate: rateStr,
-      netMeteringBuyRate: rateStr,
     } as typeof data.rates;
-    console.log('[scraper] rates.allInRate / netMeteringBuyRate:', rateStr);
+    console.log('[scraper] rates.allInRate:', rateStr);
   } else {
     missingFields.push('rates.allInRate');
-    missingFields.push('rates.netMeteringBuyRate');
   }
 
-  // --- Net metering sell rate (creditPerKwh) ---
-  const creditRate = raw.utility?.creditPerKwh;
-  if (creditRate != null && creditRate > 0) {
-    data.rates = {
-      ...(data.rates ?? {}),
-      netMeteringSellRate: String(Math.round(creditRate * 10000) / 10000),
-    } as typeof data.rates;
-    console.log('[scraper] rates.netMeteringSellRate:', creditRate);
-  } else {
-    // Alberta net metering sell rate is regulated — not stored in creditPerKwh for this proposal
-    missingFields.push('rates.netMeteringSellRate');
-  }
+  // Alberta regulatory constants — always pre-fill with known values
+  data.rates = {
+    ...(data.rates ?? {}),
+    netMeteringBuyRate: '0.084',    // 8.40¢/kWh grid buy rate
+    netMeteringSellRate: '0.335',   // 33.50¢/kWh net metering sell rate
+  } as typeof data.rates;
+  console.log('[scraper] rates.netMeteringBuyRate: 0.084, netMeteringSellRate: 0.335 (Alberta defaults)');
 
   // --- Annual/monthly consumption from utility.infoData ---
   if (raw.utility?.infoData) {
@@ -329,11 +322,17 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
     missingFields.push('financing.cashPurchasePrice');
   }
 
-  // Financing details and escalation rate are not in the public proposal API
+  // Financing details are not in the public proposal API
   missingFields.push('financing.financeMonthlyPayment');
   missingFields.push('financing.financeTermMonths');
   missingFields.push('financing.financeInterestRate');
-  missingFields.push('rates.annualEscalationRate');
+
+  // Alberta regulatory defaults — always pre-fill with known constants
+  data.rates = {
+    ...(data.rates ?? {}),
+    annualEscalationRate: '0.05',   // 5% annual utility escalation
+  } as typeof data.rates;
+  console.log('[scraper] rates.annualEscalationRate: 0.05 (Alberta default)');
 
   return buildResult(data, missingFields);
 }
