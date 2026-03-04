@@ -123,19 +123,21 @@ Plans:
 - [ ] 06-03-PLAN.md -- Human verification: live scrape test with real URL, selector calibration, end-to-end flow
 
 ### Phase 7: Bill Extraction
-**Goal**: Users can upload a utility bill and have consumption and rate data extracted by AI, pre-filling relevant fields in the manual entry form with human confirmation
+**Goal**: Users can upload a utility bill and have consumption and rate data extracted by AI, with results displayed in a standalone tool for review and copy-paste
 **Depends on**: Phase 2
 **Requirements**: INPUT-04, INPUT-05
 **Success Criteria** (what must be TRUE):
-  1. User can upload a utility bill as a PDF, photo (JPG/PNG), or scan, and see extracted data within 10 seconds
-  2. Extracted fields include electricity usage (monthly kWh preferred, annual kWh fallback, avg monthly bill last resort), utility company, energy rate, all-in rate, account holder, and service address
-  3. Extracted data is presented for human review and confirmation before being committed to any form field -- never auto-submitted to calculations
-  4. Confirmed extraction data pre-fills the corresponding manual entry form fields, and any field the user previously entered manually is preserved unless the user explicitly accepts the extracted value
-**Plans**: TBD
+  1. User can upload a utility bill as a PDF, photo (JPG/PNG), or scan, and see extracted data within 15 seconds
+  2. Extracted fields include electricity usage (monthly kWh, annual kWh), utility company, energy rate, all-in rate, account holder, and service address
+  3. Extracted data is displayed in a structured card with per-field copy buttons and a "Copy all as text" option for pasting into other tools
+  4. Missing fields are shown with amber "Not found" labels — never blank or crashing
+  5. A landing hub at / replaces the smoke test page, linking to Proposal Creator (/enter) and Bill Extractor (/bill)
+**Plans**: 3
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md -- Bill schema (Zod), extraction prompt, POST /api/extract-bill route (Gemini Flash)
+- [ ] 07-02-PLAN.md -- Landing hub at / (card grid), /proposal → /enter redirect
+- [ ] 07-03-PLAN.md -- /bill page client UI: upload zone, loading indicator, results card with copy buttons + human verification
 
 ### Phase 8: Alberta Rate Intelligence
 **Goal**: The system has built-in knowledge of Alberta utility provider rate structures, reducing the "wrong rate" error class and enabling provider-aware defaults
@@ -179,6 +181,6 @@ Note: Phases 6, 7, and 8 all depend on Phase 2 (not on each other), so they coul
 | 4. Proposal Rendering | 4/4 | Complete | 2026-03-03 |
 | 5. PDF Generation | 1/2 | In progress | - |
 | 6. SunPitch Scraping | 3/3 | Complete   | 2026-03-04 |
-| 7. Bill Extraction | 0/TBD | Not started | - |
+| 7. Bill Extraction | 0/3 | Not started | - |
 | 8. Alberta Rate Intelligence | 0/TBD | Not started | - |
 | 9. Sharing & Scenarios | 0/TBD | Not started | - |
