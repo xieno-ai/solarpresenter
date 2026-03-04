@@ -172,6 +172,7 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
           annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
         } as typeof data.consumption;
         console.log('[scraper] consumption (AvgYearlyUsage + Alberta curve):', annualNum, 'kWh →', monthly);
+        missingFields.push('consumption.monthlyConsumptionKwh'); // estimated, not from SunPitch
       } else if (infoType === 'MonthlyUsage' && Array.isArray(info.monthlyUsage)) {
         const monthly = info.monthlyUsage as (string | number)[];
         const normalized = normalizeMonthlyArray(monthly);
@@ -196,6 +197,7 @@ function parseApiResponse(raw: SunPitchProposalApiResponse): ScrapeResult {
             annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
           } as typeof data.consumption;
           console.log('[scraper] consumption (generic key + Alberta curve):', annualNum, 'kWh →', monthly);
+          missingFields.push('consumption.monthlyConsumptionKwh'); // estimated, not from SunPitch
         } else {
           missingFields.push('consumption.annualConsumptionKwh');
           missingFields.push('consumption.monthlyConsumptionKwh');

@@ -356,6 +356,11 @@ export default function ManualEntryPage() {
                           | undefined
                       }
                     />
+                    {highlights['consumption.monthlyConsumptionKwh'] === 'missing' && (
+                      <p className="mt-2 text-xs text-amber-400/80">
+                        Monthly breakdown not available from SunPitch — estimated using Alberta average consumption curve. Please verify with the customer&apos;s actual bill.
+                      </p>
+                    )}
                   </div>
                   <Controller
                     control={control}
