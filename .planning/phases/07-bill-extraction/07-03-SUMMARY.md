@@ -20,15 +20,14 @@ decisions:
   - Phase state machine (upload/loading/results) drives full UI swap rather than conditional overlays
   - Monthly kWh rendered as 6-column grid (2 rows of 6 months) for compact display
   - Drag-over state uses isDragging boolean with amber highlight treatment
+requirements-completed: [INPUT-04, INPUT-05]
 metrics:
   duration_minutes: 17
   completed_date: "2026-03-04"
-  tasks_completed: 1
+  tasks_completed: 2
   files_created: 1
   files_modified: 0
-status: paused-at-checkpoint
-checkpoint_task: 2
-checkpoint_type: human-verify
+status: complete
 ---
 
 # Phase 7 Plan 03: Bill Extractor UI Summary
@@ -90,8 +89,14 @@ None — plan executed exactly as written.
 
 ## Self-Check: PASSED
 
-## Checkpoint Status
+## Verification
 
-Paused at Task 2 (`checkpoint:human-verify`) — awaiting human verification of the full Phase 7 feature set.
+Human verification passed all 6 checks (Task 2 checkpoint approved):
+- Landing page shows two tool cards, old smoke test content gone
+- /proposal redirects to /enter; /proposal?d=... renders proposal viewer (no redirect)
+- /bill upload UI renders with drag-and-drop zone
+- File size and MIME type errors shown client-side before any network call
+- Extraction flow: 5-step loading indicator → results card with copy buttons
+- TypeScript / `npm run build` completes without errors
 
-See checkpoint details in the CHECKPOINT REACHED section returned to the orchestrator.
+## Plan Complete

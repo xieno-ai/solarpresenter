@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 6 of 9 (SunPitch Scraping) — COMPLETE (all 3 plans done)
-Plan: 3 of 3 in Phase 6 — COMPLETE
-Status: Phase 6 complete — SunPitch scraper calibrated against real API; correct field mapping confirmed for customer name/address, utility rate, annual consumption, monthly production (per zone), system size, and system cost
-Last activity: 2026-03-04 - Completed quick task 15: Update Carbon Credits via Solar Offset calculation to use SolarOffset.ca GDF-based logic with platform fee tiers
+Phase: 7 of 9 (Bill Extraction) — COMPLETE (all 3 plans done)
+Plan: 3 of 3 in Phase 7 — COMPLETE
+Status: Phase 7 complete — Bill Extractor page at /bill fully built and human-verified; Gemini Flash extracts all 7 fields from PDF/image utility bills; per-field copy buttons with clipboard fallback; landing hub updated
+Last activity: 2026-03-04 - Completed 07-03: Bill Extractor UI page — upload, loading, and results phases
 
-Progress: [██████████████████░░] 90% (18/~20 plans)
+Progress: [████████████████████] 95% (19/~20 plans)
 
 ## Performance Metrics
 
@@ -125,6 +125,9 @@ Recent decisions affecting current work:
 - [Phase 07-02]: Used next.config.ts redirects array for /proposal → /enter to avoid overwriting the proposal renderer; missing guard preserves /proposal?d= renderer access
 - [Phase 07-01]: zodToJsonSchema cast as any to bridge zod v4 types with zod-to-json-schema v3 — runtime correct, type mismatch only
 - [Phase 07-01]: GEMINI_MODEL constant with env var override for easy model updates without code changes
+- [Phase 07-03]: CopyButton uses navigator.clipboard.writeText with hidden-input + execCommand fallback for non-HTTPS environments
+- [Phase 07-03]: Phase state machine (upload/loading/results) drives full panel swap — not conditional overlays
+- [Phase 07-03]: Monthly kWh rendered as 6-column grid with month abbreviations and "X of 12 months found" summary note
 
 ### Pending Todos
 
@@ -160,5 +163,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 07-01 — bill extraction API contracts (schema, prompt, route handler).
+Stopped at: Completed 07-03 — Bill Extractor UI page at /bill; Phase 7 (Bill Extraction) complete.
 Resume file: None
