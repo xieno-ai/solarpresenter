@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 Phase: 6 of 9 (SunPitch Scraping) — COMPLETE (all 3 plans done)
 Plan: 3 of 3 in Phase 6 — COMPLETE
 Status: Phase 6 complete — SunPitch scraper calibrated against real API; correct field mapping confirmed for customer name/address, utility rate, annual consumption, monthly production (per zone), system size, and system cost
-Last activity: 2026-03-04 - Completed quick task 9: scrape cash and finance values from SunPitch proposal
+Last activity: 2026-03-04 - Completed quick task 15: Update Carbon Credits via Solar Offset calculation to use SolarOffset.ca GDF-based logic with platform fee tiers
 
 Progress: [██████████████████░░] 90% (18/~20 plans)
 
@@ -147,6 +147,7 @@ None yet.
 | 10 | monthly-first priority: preserve scraped monthly values in MonthlyGrid and scraper | 2026-03-04 | ff26423 | [10-monthly-values-priority-use-monthly-data](./quick/10-monthly-values-priority-use-monthly-data/) |
 | 11 | fix form not populating from scrape result — setValue force-writes + tab-before-reset | 2026-03-04 | ab711b8 | [11-fix-form-not-populating-from-scrape-resu](./quick/11-fix-form-not-populating-from-scrape-resu/) |
 | 13 | double netMeteringBuyRate at engine input and display props to account for transmission fees | 2026-03-04 | 78e730b | [13-double-the-grid-buy-rate-to-account-for-](./quick/13-double-the-grid-buy-rate-to-account-for-/) |
+| 15 | Update Carbon Credits via Solar Offset calculation to use SolarOffset.ca GDF-based logic with platform fee tiers | 2026-03-04 | 2941616 | [15-update-carbon-credits-via-solar-offset-c](./quick/15-update-carbon-credits-via-solar-offset-c/) |
 | 14 | fix monthly finance payment scrape returning 0 instead of 288 | 2026-03-04 | fb26cbd | [14-fix-monthly-finance-payment-scrape-retur](./quick/14-fix-monthly-finance-payment-scrape-retur/) |
 | 15 | replace carbon credits engine with SolarOffset.ca GDF schedule (2026-2035) | 2026-03-04 | 0d261db | [15-update-carbon-credits-via-solar-offset-c](./quick/15-update-carbon-credits-via-solar-offset-c/) |
 
