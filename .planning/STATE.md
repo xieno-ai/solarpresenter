@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Given a SunPitch URL or manually entered numbers, produce a pixel-accurate 11-page solar proposal PDF with all financial calculations computed correctly from documented formulas.
-**Current focus:** Phase 5 - PDF Generation
+**Current focus:** Phase 6 - SunPitch Scraping
 
 ## Current Position
 
-Phase: 5 of 9 (PDF Generation) — IN PROGRESS (verification complete, awaiting phase sign-off)
-Plan: 2 of 2 in Phase 5 — COMPLETE
-Status: Phase 5 both plans complete — PDF export human-verified and approved
-Last activity: 2026-03-03 - Completed quick task 3: mark phase 4 as complete. all pages reviewed. write summary
+Phase: 6 of 9 (SunPitch Scraping) — IN PROGRESS
+Plan: 1 of 2 in Phase 6 — COMPLETE
+Status: Phase 6 Plan 1 complete — scraper backend (types, url-validator, dual-strategy Playwright scraper, POST /api/scrape) built and TypeScript clean
+Last activity: 2026-03-04 - Completed 06-01-PLAN.md — SunPitch scraper backend complete
 
-Progress: [███████████████░░░░░] 75% (15/~20 plans)
+Progress: [████████████████░░░░] 80% (16/~20 plans)
 
 ## Performance Metrics
 
@@ -105,6 +105,10 @@ Recent decisions affecting current work:
 - [05-01]: PDF render target returns error div (not redirect) on missing d param — Playwright redirect would fail silently
 - [05-01]: Buffer from page.pdf() must be converted to Uint8Array for Next.js Response BodyInit compatibility (TypeScript 5.x)
 - [05-01]: Viewport set to 816x1056 (Letter at 96 DPI) before goto so vw/vh resolve to correct paper dimensions
+- [06-01]: /api/scrape returns HTTP 200 even on scrape failures — client reads status field not HTTP code; only structural errors (bad JSON, missing url) return 4xx
+- [06-01]: normalizeMonthlyArray() always pads/trims to exactly 12 string entries using '0' as fill
+- [06-01]: annualElectricityCost excluded from missingFields — computed by watch() in form, not scraped
+- [06-01]: Redirect detection checks page.url() for /facing/proposals/ after goto — catches silent auth redirects
 
 ### Pending Todos
 
@@ -126,6 +130,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-03
-Stopped at: Completed 05-01-PLAN.md — Playwright PDF pipeline implemented. /proposal/pdf render target, /api/pdf GET route, ProposalFAB Download PDF action with loading/error state. TypeScript clean. Ready for Plan 05-02 verification checkpoint.
+Last session: 2026-03-04
+Stopped at: Completed 06-01-PLAN.md — SunPitch scraper backend. types.ts, url-validator.ts, sunpitch.ts (dual-strategy Playwright scraper), POST /api/scrape route. TypeScript clean. Ready for Plan 06-02 (URL tab UI).
 Resume file: None
