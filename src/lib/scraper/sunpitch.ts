@@ -209,6 +209,25 @@ function parseApiResponse(
           annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
         } as typeof data.consumption;
         console.log('[scraper] consumption from MonthlyUsage:', normalized);
+      } else if (['MonthlyKwh', 'MonthlyUsage'].includes(infoType) || Object.keys(info).includes('January')) {
+        // infoType MonthlyKwh (or similar) stores values keyed by month name
+        const MONTH_KEYS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const byName = MONTH_KEYS.map((m) => info[m] as string | number | undefined);
+        if (byName.some((v) => v != null && Number(v) > 0)) {
+          const normalized = normalizeMonthlyArray(byName.map((v) => v ?? 0));
+          const annual = normalized.reduce((sum, v) => sum + Number(v), 0);
+          data.consumption = {
+            ...(data.consumption ?? {}),
+            annualConsumptionKwh: String(annual),
+            monthlyConsumptionKwh: normalized,
+            annualElectricityCost: data.consumption?.annualElectricityCost ?? '0',
+          } as typeof data.consumption;
+          console.log('[scraper] consumption from MonthlyKwh (month-name keys):', normalized);
+        } else {
+          missingFields.push('consumption.annualConsumptionKwh');
+          missingFields.push('consumption.monthlyConsumptionKwh');
+          console.log('[scraper] MonthlyKwh infoType but all values zero/null');
+        }
       } else {
         // Try monthlyUsage array first — may exist under an unexpected infoType
         if (Array.isArray(info.monthlyUsage) && info.monthlyUsage.length > 0) {
