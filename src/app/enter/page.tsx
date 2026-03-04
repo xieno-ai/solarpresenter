@@ -350,28 +350,28 @@ export default function ManualEntryPage() {
               {/* 3. Consumption */}
               <SectionCard label="Consumption">
                 <div className="space-y-6">
-                  <div className={highlightClass('consumption.monthlyConsumptionKwh')}>
-                    <MonthlyGrid
-                      control={control}
-                      setValue={setValue}
-                      watch={watch}
-                      section="consumption"
-                      annualFieldName="annualConsumptionKwh"
-                      monthlyFieldName="monthlyConsumptionKwh"
-                      label="Consumption (kWh)"
-                      useAlbertaCurve={false}
-                      errors={
-                        errors.consumption?.monthlyConsumptionKwh as
-                          | Record<string, { message?: string }[]>
-                          | undefined
-                      }
-                    />
-                    {highlights['consumption.monthlyConsumptionKwh'] === 'missing' && (
-                      <p className="mt-2 text-xs text-amber-400/80">
-                        Monthly breakdown not available from SunPitch — estimated using Alberta average consumption curve. Please verify with the customer&apos;s actual bill.
-                      </p>
-                    )}
-                  </div>
+                  <MonthlyGrid
+                    control={control}
+                    setValue={setValue}
+                    watch={watch}
+                    section="consumption"
+                    annualFieldName="annualConsumptionKwh"
+                    monthlyFieldName="monthlyConsumptionKwh"
+                    label="Consumption (kWh)"
+                    useAlbertaCurve={false}
+                    annualWrapperClassName={highlightClass('consumption.annualConsumptionKwh')}
+                    monthlyWrapperClassName={highlightClass('consumption.monthlyConsumptionKwh')}
+                    errors={
+                      errors.consumption?.monthlyConsumptionKwh as
+                        | Record<string, { message?: string }[]>
+                        | undefined
+                    }
+                  />
+                  {highlights['consumption.monthlyConsumptionKwh'] === 'missing' && (
+                    <p className="mt-2 text-xs text-amber-400/80">
+                      Monthly breakdown not available from SunPitch — estimated using Alberta average consumption curve. Please verify with the customer&apos;s actual bill.
+                    </p>
+                  )}
                   <Controller
                     control={control}
                     name="consumption.annualElectricityCost"

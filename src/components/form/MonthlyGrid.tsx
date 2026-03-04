@@ -23,6 +23,10 @@ export interface MonthlyGridProps {
   label: string;                      // e.g. "Production (kWh)"
   useAlbertaCurve?: boolean;          // true for production, false for consumption (even split)
   errors?: Record<string, { message?: string }[]>;  // Monthly field errors from formState
+  /** Optional className applied to the annual total wrapper only */
+  annualWrapperClassName?: string;
+  /** Optional className applied to the monthly grid wrapper only */
+  monthlyWrapperClassName?: string;
 }
 
 export function MonthlyGrid({
@@ -35,6 +39,8 @@ export function MonthlyGrid({
   label,
   useAlbertaCurve = false,
   errors,
+  annualWrapperClassName,
+  monthlyWrapperClassName,
 }: MonthlyGridProps) {
   const syncSource = useRef<'annual' | 'monthly' | null>(null);
   const annualPath = `${section}.${annualFieldName}` as const;
@@ -85,25 +91,27 @@ export function MonthlyGrid({
   return (
     <div>
       {/* Annual total input */}
-      <Controller
-        control={control}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        name={annualPath as any}
-        render={({ field, fieldState }) => (
-          <FormInput
-            label={`${label} — Annual Total`}
-            unit="kWh"
-            value={field.value as string}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
-            error={fieldState.error?.message}
-            placeholder="0"
-          />
-        )}
-      />
+      <div className={annualWrapperClassName}>
+        <Controller
+          control={control}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          name={annualPath as any}
+          render={({ field, fieldState }) => (
+            <FormInput
+              label={`${label} — Annual Total`}
+              unit="kWh"
+              value={field.value as string}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={fieldState.error?.message}
+              placeholder="0"
+            />
+          )}
+        />
+      </div>
 
       {/* 12-month grid: 4 columns × 3 rows */}
-      <div className="grid grid-cols-4 gap-2 mt-3">
+      <div className={`grid grid-cols-4 gap-2 mt-3 ${monthlyWrapperClassName ?? ''}`}>
         {MONTH_NAMES.map((month, i) => (
           <Controller
             key={month}
