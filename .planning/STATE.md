@@ -137,9 +137,10 @@ None yet.
 | 1 | scaffold Alberta config types and seed data | 2026-03-02 | — | [1-scaffold-alberta-config-types-and-seed-](./quick/1-scaffold-alberta-config-types-and-seed-/) |
 | 2 | add annualGridPurchaseCost and annualSellRevenue props | 2026-03-03 | — | [2-add-annualgridpurchasecost-and-annualsell](./quick/2-add-annualgridpurchasecost-and-annualsell/) |
 | 3 | mark phase 4 as complete. all pages reviewed. write summary | 2026-03-03 | 8736cd1 | [3-mark-phase-4-as-complete-all-pages-revie](./quick/3-mark-phase-4-as-complete-all-pages-revie/) |
+| 4 | fix SunPitch scraper production total — kWh/panel/month × zone panel counts | 2026-03-04 | 11069db | [4-fix-sunpitch-scraper-production-total-an](./quick/4-fix-sunpitch-scraper-production-total-an/) |
 
 ## Session Continuity
 
-Last session: 2026-03-03
-Stopped at: Completed 06-03-PLAN.md — SunPitch scraper rewritten with correct API field mapping and route interception strategy. Diagnosed 3 root causes of scraper failure via live URL testing. Phase 6 fully complete (all 3 plans). TypeScript clean. Ready for Phase 7 (bill extraction).
+Last session: 2026-03-04
+Stopped at: Completed quick task 4 — Fixed SunPitch scraper 5.87x annual production overcount. Now uses kWh/panel/month × AllZones[i].TotalSolarPanel formula. TypeScript clean. Annual production for 13-panel Zone B proposal = 7,782 kWh (confirmed correct).
 Resume file: None
