@@ -159,9 +159,10 @@ None yet.
 | 15 | Update Carbon Credits via Solar Offset calculation to use SolarOffset.ca GDF-based logic with platform fee tiers | 2026-03-04 | 2941616 | [15-update-carbon-credits-via-solar-offset-c](./quick/15-update-carbon-credits-via-solar-offset-c/) |
 | 14 | fix monthly finance payment scrape returning 0 instead of 288 | 2026-03-04 | fb26cbd | [14-fix-monthly-finance-payment-scrape-retur](./quick/14-fix-monthly-finance-payment-scrape-retur/) |
 | 15 | replace carbon credits engine with SolarOffset.ca GDF schedule (2026-2035) | 2026-03-04 | 0d261db | [15-update-carbon-credits-via-solar-offset-c](./quick/15-update-carbon-credits-via-solar-offset-c/) |
+| 16 | remove Phase 8 Alberta Rate Intelligence from roadmap; renumber Phase 9 to Phase 8 | 2026-03-04 | ff56bee | [16-remove-phase-8-we-get-the-rates-from-eac](./quick/16-remove-phase-8-we-get-the-rates-from-eac/) |
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Completed 07-03 — Bill Extractor UI page at /bill; Phase 7 (Bill Extraction) complete.
+Stopped at: Completed quick-16 — Removed Phase 8 Alberta Rate Intelligence; Phase 9 (Sharing) renumbered to Phase 8.
 Resume file: None
