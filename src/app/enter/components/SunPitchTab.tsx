@@ -236,7 +236,7 @@ export function SunPitchTab({ onImportSuccess }: SunPitchTabProps) {
 
           {/* Time note */}
           <p className="text-xs text-neutral-600 border-t border-neutral-800 pt-3">
-            SunPitch proposals typically take 10&ndash;60 seconds to process.
+            SunPitch proposals typically take 1&ndash;3 minutes to process.
           </p>
         </div>
       )}
