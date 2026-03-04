@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-04T00:18:00Z"
+last_updated: "2026-03-03T20:15:00Z"
 progress:
   total_phases: 5
   completed_phases: 5
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 15
+  completed_plans: 15
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 
 ## Current Position
 
-Phase: 6 of 9 (SunPitch Scraping) — COMPLETE
-Plan: 2 of 2 in Phase 6 — COMPLETE
-Status: Phase 6 complete — SunPitch URL tab UI with SunPitchTab component, tab switcher, highlight wrappers, handleImportSuccess pre-fill wiring all done and TypeScript clean
-Last activity: 2026-03-04 - Completed 06-02-PLAN.md — SunPitch UI wiring complete
+Phase: 6 of 9 (SunPitch Scraping) — COMPLETE (all 3 plans done)
+Plan: 3 of 3 in Phase 6 — COMPLETE
+Status: Phase 6 complete — SunPitch scraper calibrated against real API; correct field mapping confirmed for customer name/address, utility rate, annual consumption, monthly production (per zone), system size, and system cost
+Last activity: 2026-03-03 - Completed 06-03-PLAN.md — Scraper rewrite with real SunPitch API field mapping
 
-Progress: [█████████████████░░░] 85% (17/~20 plans)
+Progress: [██████████████████░░] 90% (18/~20 plans)
 
 ## Performance Metrics
 
@@ -114,6 +114,11 @@ Recent decisions affecting current work:
 - [06-02]: Form sections and GenerateFooter wrapped in {activeTab === 'manual'} — footer never shows on sunpitch tab
 - [06-02]: annualElectricityCost Controller has no highlight wrapper — computed by watch(), never scraped
 - [06-02]: markScraped() walker is shallow (one level) — matches flat ScrapeResult.data shape from Plan 01
+- [06-03]: SunPitch API takes 10–60s to respond — route.fetch timeout 60s, polling loop 55s (original 2s wait captured nothing)
+- [06-03]: page.on('response') + response.body() cannot buffer Angular XHR bodies — replaced with page.route() + route.fetch()
+- [06-03]: Direct Node fetch of /api/proposals hangs (server requires browser session context) — browser-only strategy
+- [06-03]: API field mapping: customer.firstName/lastName, utility.rate ($/kWh), config.projections (kWh/day/zone), editor.TotalSolarPanel × equipment.panel.valueWh for system size, selected adders for cash price
+- [06-03]: netMeteringSellRate and annualEscalationRate always missing from SunPitch API — user enters manually
 
 ### Pending Todos
 
@@ -122,7 +127,7 @@ None yet.
 ### Blockers/Concerns
 
 - Calculation formula details require access to the Word document (c:\Users\David\Downloads\Solar_Proposal_Calculations.docx) during Phase 3 planning
-- SunPitch DOM structure must be investigated during Phase 6 planning -- selectors cannot be designed in advance
+- SunPitch DOM structure investigated and resolved in 06-03 — scraper calibrated against real API
 - Alberta bill format variations across 5 providers need sample bills for Phase 7 acceptance testing
 
 ### Quick Tasks Completed
@@ -135,6 +140,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-04
-Stopped at: Completed 06-02-PLAN.md — SunPitch UI wiring. SunPitchTab component, tab switcher on /enter page, highlight wrappers on all 14 Controller fields, handleImportSuccess pre-fill wiring. Phase 6 complete. TypeScript clean. Ready for Phase 7 (bill extraction).
+Last session: 2026-03-03
+Stopped at: Completed 06-03-PLAN.md — SunPitch scraper rewritten with correct API field mapping and route interception strategy. Diagnosed 3 root causes of scraper failure via live URL testing. Phase 6 fully complete (all 3 plans). TypeScript clean. Ready for Phase 7 (bill extraction).
 Resume file: None
