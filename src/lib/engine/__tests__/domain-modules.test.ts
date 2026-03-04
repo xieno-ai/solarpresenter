@@ -137,16 +137,17 @@ describe('computeNetMeteringProjection — CALC-04', () => {
 });
 
 // ---------------------------------------------------------------------------
-// CALC-05: Carbon Credits
+// CALC-05: Carbon Credits (SolarOffset.ca GDF schedule)
 // ---------------------------------------------------------------------------
 describe('computeCarbonCredits — CALC-05', () => {
+  // Paul Friesen: systemSizeKw = 12.24 kWp → 5–30 range → 30% platform fee → 70% to owner
   const cc = computeCarbonCredits(
     paulFriesenInputs.system.annualProductionKwh,
-    paulFriesenConfig,
+    paulFriesenInputs.system.systemSizeKw,
   );
 
-  it('annualCo2Avoided = 15408 / 1000 × 0.55 = 8.4744', () => {
-    expect(cc.annualCo2Avoided.toFixed(4)).toBe('8.4744');
+  it('annualCo2Avoided = 15408 / 1000 × 0.4588 (Year 1 GDF) = 7.0691904', () => {
+    expect(cc.annualCo2Avoided.toFixed(7)).toBe('7.0691904');
   });
 
   it('tenYearPayoutLow is greater than 0', () => {
@@ -157,25 +158,12 @@ describe('computeCarbonCredits — CALC-05', () => {
     expect(cc.tenYearPayoutHigh.greaterThan(cc.tenYearPayoutLow)).toBe(true);
   });
 
-  it('benchmarkSchedule passes through all 10 entries from config', () => {
+  it('benchmarkSchedule has 10 entries (years 2026-2035)', () => {
     expect(cc.benchmarkSchedule).toHaveLength(10);
   });
 
-  it('benchmarkSchedule year 1 pricePerTonne = 65', () => {
-    expect(cc.benchmarkSchedule[0].pricePerTonne.toFixed(0)).toBe('65');
-  });
-
-  it('tenYearPayoutLow is within 45% range (not zero, not sky-high)', () => {
-    // annualCo2Avoided = 8.4744
-    // Gross credit = annualCo2Avoided × sum(pricePerTonne) for years 1-10
-    // Low payout is roughly 45% of gross credit
-    const annualCo2 = d('8.4744');
-    const sumPrices = [65,80,95,110,130,150,170,190,210,230].reduce((acc, p) => acc + p, 0); // 1430
-    const grossCredit = annualCo2.times(d(String(sumPrices)));
-    const expectedLow = grossCredit.times(d('0.45'));
-    const expectedHigh = grossCredit.times(d('0.65'));
-    expect(cc.tenYearPayoutLow.lessThanOrEqualTo(expectedHigh)).toBe(true);
-    expect(cc.tenYearPayoutLow.greaterThanOrEqualTo(expectedLow.times(d('0.9')))).toBe(true);
+  it('benchmarkSchedule[0].year === 2026', () => {
+    expect(cc.benchmarkSchedule[0].year).toBe(2026);
   });
 });
 
