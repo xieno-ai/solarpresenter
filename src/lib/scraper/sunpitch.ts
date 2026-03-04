@@ -375,39 +375,70 @@ function parseApiResponse(
   }
 
   // --- Finance details from config.finance (JSON string) ---
-  // config.finance is a JSON object containing the selected financing product details.
-  // Log its keys to understand the structure, then extract monthlyPayment + termMonths.
+  // config.finance stores the *saved* finance product for the proposal.
+  // Structure (from live API, 2026-03-04):
+  //   provider:     "Cash" | "Financeit" | other lender name
+  //   termsInYears: 0 (Cash) | 5 (60-month) | etc.
+  //   yearlyInterest: APR as decimal (0 = 0%)
+  //   lenderFee:    lender markup as decimal
+  //   price_ab/price_bc/...: province/state dealer fee % (e.g. 5 = 5% for AB)
+  //   rate_1/rate_2: monthly payment for period 1/2 (dollar amount, non-Cash products)
+  //   period_1/period_2: payment period label (e.g. "1-60")
+  //   useAmountAfterIncentives: whether payment is computed after incentives
   let configMonthlyPayment: string | null = null;
   let configTermMonths: string | null = null;
   if (raw.config?.finance) {
     try {
       const financeObj = JSON.parse(raw.config.finance) as Record<string, unknown>;
-      console.log('[scraper] config.finance keys:', Object.keys(financeObj).join(', '));
-      console.log('[scraper] config.finance raw:', JSON.stringify(financeObj));
+      const provider = String(financeObj.provider ?? '');
+      const termsInYears = Number(financeObj.termsInYears ?? 0);
+      console.log('[scraper] config.finance provider:', provider, '| termsInYears:', termsInYears);
 
-      // Try common field name variations for monthly payment
-      const payment =
-        financeObj.monthlyPayment ??
-        financeObj.monthly_payment ??
-        financeObj.payment ??
-        financeObj.monthlyAmount ??
-        financeObj.installment;
-      if (payment != null && Number(payment) > 0) {
-        configMonthlyPayment = String(Math.round(Number(payment)));
-        console.log('[scraper] config.finance monthlyPayment:', configMonthlyPayment);
-      }
+      if (provider === 'Cash' || termsInYears === 0) {
+        // Cash product — no monthly payment
+        console.log('[scraper] config.finance: Cash product — no monthly payment');
+      } else {
+        // Finance product — log all fields so we can map correctly
+        console.log('[scraper] config.finance raw:', JSON.stringify(financeObj));
 
-      // Try common field name variations for term in months
-      const term =
-        financeObj.termMonths ??
-        financeObj.term_months ??
-        financeObj.term ??
-        financeObj.months ??
-        financeObj.loanTerm ??
-        financeObj.loanTermMonths;
-      if (term != null && Number(term) > 0) {
-        configTermMonths = String(Number(term));
-        console.log('[scraper] config.finance termMonths:', configTermMonths);
+        const termMonths = termsInYears * 12;
+        configTermMonths = String(termMonths);
+        console.log('[scraper] config.finance termMonths (termsInYears×12):', configTermMonths);
+
+        // rate_1 / rate_2 may be the monthly dollar payment for the respective period.
+        // If non-zero, use directly. Otherwise fall back to calculating from cash price + dealer fee.
+        const rate1 = Number(financeObj.rate_1 ?? 0);
+        const rate2 = Number(financeObj.rate_2 ?? 0);
+        console.log('[scraper] config.finance rate_1:', rate1, '| rate_2:', rate2);
+
+        if (rate1 > 0) {
+          // rate_1 appears to be the monthly payment dollar amount for period 1
+          configMonthlyPayment = String(Math.round(rate1));
+          console.log('[scraper] config.finance monthlyPayment (rate_1):', configMonthlyPayment);
+        } else {
+          // Fallback: compute from cash price + provincial dealer fee
+          // price_ab etc. are dealer fee percentages (e.g. 5 = 5%)
+          // Detect province from address
+          const addr = (raw.address?.address ?? raw.customer?.address?.address ?? '').toLowerCase();
+          const provinceKey = addr.includes(', ab') ? 'price_ab'
+            : addr.includes(', bc') ? 'price_bc'
+            : addr.includes(', mb') ? 'price_mb'
+            : addr.includes(', sk') ? 'price_sk'
+            : addr.includes(', nb') ? 'price_nb'
+            : addr.includes(', ns') ? 'price_ns'
+            : addr.includes(', on') ? 'price_on'
+            : 'price_default';
+          const dealerFeePercent = Number(financeObj[provinceKey] ?? financeObj.price_default ?? 0);
+          console.log('[scraper] config.finance province key:', provinceKey, '| dealerFeePercent:', dealerFeePercent);
+
+          if (data.financing?.cashPurchasePrice && termMonths > 0) {
+            const cashPrice = Number(data.financing.cashPurchasePrice);
+            const totalFinanced = cashPrice * (1 + dealerFeePercent / 100);
+            const monthly = totalFinanced / termMonths;
+            configMonthlyPayment = String(Math.round(monthly));
+            console.log('[scraper] config.finance monthlyPayment (calculated):', configMonthlyPayment, '| cashPrice:', cashPrice, '| dealerFee:', dealerFeePercent, '%');
+          }
+        }
       }
     } catch (e) {
       console.log('[scraper] config.finance parse error:', e instanceof Error ? e.message : String(e));
