@@ -212,6 +212,7 @@ export default async function ProposalPage({
         escalationRate={formValues.rates.annualEscalationRate}
         financeTermMonths={formValues.financing.financeTermMonths}
         carbonCredits={serialized.carbonCredits}
+        annualElectricityCost={formValues.consumption.annualElectricityCost}
       />
 
       {/* Page 6 — Price History */}

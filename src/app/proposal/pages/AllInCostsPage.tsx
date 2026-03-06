@@ -13,6 +13,7 @@ interface AllInCostsPageProps {
   escalationRate: string;     // e.g. "0.05"
   financeTermMonths: string;  // e.g. "60"
   carbonCredits: SerializedProposalOutputs['carbonCredits'];
+  annualElectricityCost: string;
 }
 
 function fmtCAD(v: number, decimals = 0): string {
@@ -41,9 +42,11 @@ export function AllInCostsPage({
   escalationRate,
   financeTermMonths,
   carbonCredits,
+  annualElectricityCost,
 }: AllInCostsPageProps) {
   const escalationPct = (parseFloat(escalationRate) * 100).toFixed(0);
   const financeYears = Math.round(parseInt(financeTermMonths, 10) / 12);
+  const currentMonthlyBill = parseFloat(annualElectricityCost) / 12;
   const { twentyYear, thirtyYear } = cashPurchase;
 
   // ── Monthly finance breakdown (mirrors CALC-08 from savings.ts) ────────────
@@ -420,6 +423,32 @@ export function AllInCostsPage({
               value={`${fmtCAD(monthlyAllIn, 2)} / MO`}
               totalRow
             />
+
+            {/* vs. current bill */}
+            <div style={{
+              marginTop: '0.75rem',
+              padding: '0.6rem 0.875rem',
+              background: 'rgba(0,0,0,0.04)',
+              borderRadius: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              <p style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.75rem',
+                color: 'var(--nrg-text-secondary)',
+                margin: 0,
+                fontStyle: 'italic',
+              }}>vs. your current utility bill</p>
+              <p style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                color: 'var(--nrg-text-heading)',
+                margin: 0,
+              }}>~{fmtCAD(currentMonthlyBill, 0)} / mo</p>
+            </div>
           </div>
         </div>
 
