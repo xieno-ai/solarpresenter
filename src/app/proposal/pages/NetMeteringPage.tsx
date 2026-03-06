@@ -48,7 +48,7 @@ export function NetMeteringPage({
   const rateCards = [
     { value: toCents(allInRate), label: 'Your Rate', color: 'var(--nrg-red-badge)' },
     { value: toCents(preSolarRate), label: 'Pre-Solar Rate', color: 'var(--nrg-green)' },
-    { value: toCents(gridBuyRate), label: 'LO Rate (Winter Purchase)', color: 'var(--nrg-green)' },
+    { value: '8.40', label: 'LO Rate (Winter Purchase)', color: 'var(--nrg-green)' },
     { value: toCents(sellRate), label: 'HI Rate (Summer Surplus)', color: 'var(--nrg-gold)' },
   ];
 
