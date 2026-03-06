@@ -424,8 +424,8 @@ export function AllInCostsPage({
               totalRow
             />
 
-            {/* vs. current bill */}
-            <div style={{
+            {/* vs. current bill — only shown when solar all-in is competitive (within $20) */}
+            {currentMonthlyBill <= monthlyAllIn + 20 && <div style={{
               marginTop: '0.75rem',
               padding: '0.6rem 0.875rem',
               background: 'rgba(0,0,0,0.04)',
@@ -448,7 +448,7 @@ export function AllInCostsPage({
                 color: 'var(--nrg-text-heading)',
                 margin: 0,
               }}>~{fmtCAD(currentMonthlyBill, 0)} / mo</p>
-            </div>
+            </div>}
           </div>
         </div>
 
