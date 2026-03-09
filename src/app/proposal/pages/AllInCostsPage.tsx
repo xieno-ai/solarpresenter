@@ -424,8 +424,8 @@ export function AllInCostsPage({
               totalRow
             />
 
-            {/* vs. current bill — only shown when solar all-in is competitive (within $20) */}
-            {monthlyAllIn <= currentMonthlyBill + 20 && <div style={{
+            {/* vs. current bill — only shown when solar all-in ≤ current bill */}
+            {monthlyAllIn <= currentMonthlyBill && <div style={{
               marginTop: '0.75rem',
               padding: '0.6rem 0.875rem',
               background: 'rgba(0,0,0,0.04)',
