@@ -45,7 +45,6 @@ export function AllInCostsPage({
   annualElectricityCost,
 }: AllInCostsPageProps) {
   const escalationPct = (parseFloat(escalationRate) * 100).toFixed(0);
-  const financeYears = Math.round(parseInt(financeTermMonths, 10) / 12);
   const currentMonthlyBill = parseFloat(annualElectricityCost) / 12;
   const { twentyYear, thirtyYear } = cashPurchase;
 
@@ -388,7 +387,7 @@ export function AllInCostsPage({
             <div style={{ flex: 1 }}>
               <RightLineItem
                 label="Finance Payment"
-                sub={`0% interest for first ${financeYears} years`}
+                sub="0% interest for first 5 years"
                 value={`+${fmtCAD(monthlyFinance, 2)}`}
               />
               <RightLineItem
